@@ -50,11 +50,16 @@ internal class WorldBoardSystem : ModSystem
         return value + copy;
     }
 
+    // UI stuff
+
     public static void ToggleToolUI()
     {
         if (Self._toolUI.CurrentState is not null)
+        {
             Self._toolUI.SetState(null);
-        else 
+            Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().Mode = BoardToolPlayer.ToolMode.None;
+        }
+        else
             Self._toolUI.SetState(new ToolUIState(Main.LocalPlayer));
     }
 
@@ -64,6 +69,9 @@ internal class WorldBoardSystem : ModSystem
 
     public override void UpdateUI(GameTime gameTime)
     {
+        if (_keyboardUI.CurrentState is not null && Main.playerInventory)
+            _keyboardUI.SetState(null);
+
         _toolUI.Update(gameTime);
         _keyboardUI.Update(gameTime);
     }
@@ -104,7 +112,14 @@ internal class WorldBoardSystem : ModSystem
 
     public static bool DrawBoard()
     {
+        foreach (var item in Self.worldBoards.Values)
+            item.Draw();
+
         ToolUsage.DrawBuilding();
         return true;
     }
+
+    // Board stuff
+
+    public static Board GetBoard(string key) => Self.worldBoards[key];
 }

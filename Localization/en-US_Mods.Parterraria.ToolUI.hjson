@@ -2,3 +2,4 @@ BoardName: Board name
 EmptyBoardName: Enter a new board name here!
 BoardDescription: Boards contain all info related to starting a Party.
 BoardSelected: Board "{0}" selected!
+BoardDeleted: Editing board "{0}" deleted.

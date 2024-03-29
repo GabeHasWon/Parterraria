@@ -12,6 +12,8 @@ internal class BoardToolPlayer : ModPlayer
 
     public ToolMode Mode { get; set; } = ToolMode.None;
 
+    internal string editingBoard = "";
+
     private bool _mouseConsumed = false;
 
     public override void ResetEffects() => _mouseConsumed = false;

@@ -2,12 +2,13 @@
 
 namespace Parterraria.Core.BoardSystem;
 
-internal class Board
+public class Board
 {
     public readonly List<BoardNode> nodes = [];
 
     public void Draw() 
-    { 
-    
+    {
+        foreach (var node in nodes)
+            node.Draw();
     }
 }

@@ -56,13 +56,17 @@ internal partial class ToolUIState : UIState
                 HAlign = 0f,
             };
 
-            namePlate.OnLeftClick += (_, _) => WorldBoardSystem.OpenKeyboard((value) =>
+            namePlate.OnLeftClick += (_, _) =>
             {
-                value = ModContent.GetInstance<WorldBoardSystem>().GetUnrepeatedKey(value);
-                AddBoardNameToList(list, value);
-                WorldBoardSystem.CloseKeyboard();
-                ModContent.GetInstance<WorldBoardSystem>().worldBoards.Add(value, new Board());
-            }, WorldBoardSystem.CloseKeyboard);
+                Main.playerInventory = false;
+                WorldBoardSystem.OpenKeyboard((value) =>
+                {
+                    value = ModContent.GetInstance<WorldBoardSystem>().GetUnrepeatedKey(value);
+                    AddBoardNameToList(list, value);
+                    WorldBoardSystem.CloseKeyboard();
+                    ModContent.GetInstance<WorldBoardSystem>().worldBoards.Add(value, new Board());
+                }, WorldBoardSystem.CloseKeyboard);
+            };
 
             _openPanel.Append(namePlate);
         }
@@ -86,7 +90,8 @@ internal partial class ToolUIState : UIState
         button.OnLeftClick += (_, _) =>
         {
             Main.NewText(Language.GetText("Mods.Parterraria.ToolUI.BoardSelected").Format(board));
-            _boardId = board;
+            _boardKey = board;
+            _player.GetModPlayer<BoardToolPlayer>().editingBoard = board;
         };
 
         var delete = new UIButton<string>("[c/FF0000:x]")
@@ -101,6 +106,14 @@ internal partial class ToolUIState : UIState
             list.Remove(button);
             list.Remove(delete);
             ModContent.GetInstance<WorldBoardSystem>().worldBoards.Remove(board);
+
+            if (_player.GetModPlayer<BoardToolPlayer>().editingBoard == board)
+            {
+                _boardKey = string.Empty;
+                _player.GetModPlayer<BoardToolPlayer>().editingBoard = string.Empty;
+                _player.GetModPlayer<BoardToolPlayer>().Mode = BoardToolPlayer.ToolMode.None;
+                Main.NewText(Language.GetText("Mods.Parterraria.ToolUI.BoardDeleted").Format(board));
+            }
         };
 
         back.Append(button);

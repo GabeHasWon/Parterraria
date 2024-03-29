@@ -1,9 +1,6 @@
-﻿using Microsoft.CodeAnalysis.FlowAnalysis;
-using ReLogic.Content;
-using System;
+﻿using ReLogic.Content;
 using Terraria.GameContent.UI.Elements;
 using Terraria.Localization;
-using Terraria.ModLoader.UI;
 using Terraria.UI;
 
 namespace Parterraria.Core.BoardSystem.BoardUI;
@@ -24,7 +21,7 @@ internal partial class ToolUIState(Player player) : UIState
     private OpenPanelState _state = OpenPanelState.None;
 
     // Info / tracking
-    private string _boardId = string.Empty;
+    private string _boardKey = string.Empty;
 
     private static Asset<Texture2D> Texture(string name) => ModContent.Request<Texture2D>("Parterraria/Assets/Textures/UI/Tool/" + name);
     private static LocalizedText Text(string name) => Language.GetText("Mods.Parterraria.ToolUI." + name);
@@ -44,15 +41,39 @@ internal partial class ToolUIState(Player player) : UIState
         int number = 0;
         AppendToolButton("Select", OpenBoardList, mainPanel, ref number);
         AppendToolButton("Paint", SetPaintMode, mainPanel, ref number);
+        AppendToolButton("Link", SetLinkMode, mainPanel, ref number);
     }
 
     private void SetPaintMode(UIMouseEvent evt, UIElement listeningElement)
     {
+        if (_boardKey == string.Empty)
+        {
+            Main.NewText("Select a board first!");
+            return;
+        }
+
         Main.isMouseLeftConsumedByUI = true;
         _player.mouseInterface = true;
 
         if (_player.GetModPlayer<BoardToolPlayer>().Mode != BoardToolPlayer.ToolMode.Paint)
             _player.GetModPlayer<BoardToolPlayer>().Mode = BoardToolPlayer.ToolMode.Paint;
+        else
+            _player.GetModPlayer<BoardToolPlayer>().Mode = BoardToolPlayer.ToolMode.None;
+    }
+
+    private void SetLinkMode(UIMouseEvent evt, UIElement listeningElement)
+    {
+        if (_boardKey == string.Empty)
+        {
+            Main.NewText("Select a board first!");
+            return;
+        }
+
+        Main.isMouseLeftConsumedByUI = true;
+        _player.mouseInterface = true;
+
+        if (_player.GetModPlayer<BoardToolPlayer>().Mode != BoardToolPlayer.ToolMode.Link)
+            _player.GetModPlayer<BoardToolPlayer>().Mode = BoardToolPlayer.ToolMode.Link;
         else
             _player.GetModPlayer<BoardToolPlayer>().Mode = BoardToolPlayer.ToolMode.None;
     }

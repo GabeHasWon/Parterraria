@@ -1,10 +1,16 @@
-﻿using System;
+﻿using Parterraria.Core.BoardSystem.BoardUI;
+using Parterraria.Core.BoardSystem.Nodes;
+using System;
+using System.Linq;
+using Terraria.Achievements;
 
 namespace Parterraria.Core.BoardSystem;
 
 internal class ToolUsage
 {
-    public static BuildNode buildingNode = null;
+    public static BoardNode buildingNode = null;
+
+    private static bool _confirmClick = false;
 
     internal static void UseTool(BoardToolPlayer.ToolMode mode)
     {
@@ -13,31 +19,80 @@ internal class ToolUsage
             case BoardToolPlayer.ToolMode.Paint:
                 PaintNodes();
                 break;
-            default:
+            case BoardToolPlayer.ToolMode.Link:
+                LinkNodes();
                 break;
+            default:
+                buildingNode = null;
+                break;
+        }
+    }
+
+    private static void LinkNodes()
+    {
+        bool leftClick = Main.mouseLeft && Main.mouseLeftRelease;
+
+        if (leftClick)
+        {
+            var node = WorldBoardSystem.GetBoard(Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().editingBoard).
+                nodes.First(x => x.position.DistanceSQ(Main.MouseWorld) < x.radius * x.radius);
+
+            if (node is null)
+                return;
+
+            if (!_confirmClick)
+            {
+                buildingNode = node;
+                _confirmClick = true;
+            }
+            else
+            {
+                buildingNode.links.AddLink(node, true);
+                node.links.AddLink(buildingNode, false);
+                buildingNode = null;
+
+                _confirmClick = false;
+            }
         }
     }
 
     private static void PaintNodes()
     {
         bool leftClick = Main.mouseLeft && Main.mouseLeftRelease;
+        buildingNode ??= new EmptyNode();
 
         if (leftClick)
         {
-            buildingNode ??= new BuildNode(Main.MouseWorld, 100, "EmptyNode");
-
-            if (buildingNode.settingWidth)
+            if (_confirmClick)
             {
-
+                var board = WorldBoardSystem.GetBoard(Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().editingBoard);
+                board.nodes.Add(GenerateNode());
+                buildingNode = null;
+                _confirmClick = false;
             }
-
-            buildingNode.settingWidth = true;
+            else
+            {
+                buildingNode.radius = 120;
+                _confirmClick = true;
+            }
         }
 
-        if (!buildingNode.settingWidth)
-            buildingNode.position = Main.MouseWorld;
-        else
-            buildingNode.width = Main.MouseWorld.Distance(buildingNode.position);
+        if (buildingNode is not null)
+        {
+            if (!_confirmClick)
+                buildingNode.position = Main.MouseWorld;
+            else
+                buildingNode.radius = Main.MouseWorld.Distance(buildingNode.position) * 2f;
+        }
+    }
+
+    private static BoardNode GenerateNode()
+    {
+        var type = buildingNode.GetType();
+        var node = Activator.CreateInstance(type) as BoardNode;
+        node.position = buildingNode.position;
+        node.radius = buildingNode.radius;
+        return node;
     }
 
     internal static void DrawBuilding()
@@ -45,7 +100,6 @@ internal class ToolUsage
         if (buildingNode is null)
             return;
 
-        Texture2D tex = BoardNode.Tex(buildingNode.nodeType).Value;
-        Main.spriteBatch.Draw(tex, buildingNode.position - Main.screenPosition, null, Color.White, 0f, tex.Size() / 2f, buildingNode.width / tex.Width, SpriteEffects.None, 0);
+        buildingNode.Draw();
     }
 }
