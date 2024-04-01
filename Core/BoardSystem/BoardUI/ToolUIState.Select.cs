@@ -103,16 +103,19 @@ internal partial class ToolUIState : UIState
 
         delete.OnLeftClick += (_, _) =>
         {
-            list.Remove(button);
-            list.Remove(delete);
+            list.Remove(back);
+            list.RecalculateChildren();
+
             ModContent.GetInstance<WorldBoardSystem>().worldBoards.Remove(board);
 
             if (_player.GetModPlayer<BoardToolPlayer>().editingBoard == board)
             {
                 _boardKey = string.Empty;
                 _player.GetModPlayer<BoardToolPlayer>().editingBoard = string.Empty;
-                _player.GetModPlayer<BoardToolPlayer>().Mode = BoardToolPlayer.ToolMode.None;
+                _player.GetModPlayer<BoardToolPlayer>().Mode = ToolMode.None;
                 Main.NewText(Language.GetText("Mods.Parterraria.ToolUI.BoardDeleted").Format(board));
+
+                ToolUsage.ResetTool();
             }
         };
 

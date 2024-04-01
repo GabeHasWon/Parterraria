@@ -1,4 +1,6 @@
 ﻿using ReLogic.Content;
+using System;
+using System.Collections.Generic;
 using Terraria.GameContent.UI.Elements;
 using Terraria.Localization;
 using Terraria.UI;
@@ -22,8 +24,10 @@ internal partial class ToolUIState(Player player) : UIState
 
     // Info / tracking
     private string _boardKey = string.Empty;
+    private readonly Dictionary<ToolMode, bool> _toggledAlt = new() { { ToolMode.Paint, false }, { ToolMode.Link, false } };
 
-    private static Asset<Texture2D> Texture(string name) => ModContent.Request<Texture2D>("Parterraria/Assets/Textures/UI/Tool/" + name);
+    private static Asset<Texture2D> Texture(string name, bool immediate = false) => ModContent.Request<Texture2D>("Parterraria/Assets/Textures/UI/Tool/" + name,
+        immediate ? AssetRequestMode.ImmediateLoad : AssetRequestMode.AsyncLoad);
     private static LocalizedText Text(string name) => Language.GetText("Mods.Parterraria.ToolUI." + name);
 
     public override void OnInitialize()
@@ -38,47 +42,41 @@ internal partial class ToolUIState(Player player) : UIState
 
         Append(mainPanel);
 
+        UIText toolSelect = new(Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().Mode.ToString(), 1) 
+        { 
+            Top = StyleDimension.FromPixels(-20)
+        };
+        toolSelect.OnUpdate += (self) => (self as UIText).SetText(Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().Mode.ToString());
+        mainPanel.Append(toolSelect);
+
+        UIText boardSelect = new(GetPlayerEditingBoardName(), 1)
+        {
+            Top = StyleDimension.FromPixels(-20),
+            HAlign = 1f
+        };
+        boardSelect.OnUpdate += (self) => (self as UIText).SetText(GetPlayerEditingBoardName());
+        mainPanel.Append(boardSelect);
+
         int number = 0;
-        AppendToolButton("Select", OpenBoardList, mainPanel, ref number);
-        AppendToolButton("Paint", SetPaintMode, mainPanel, ref number);
-        AppendToolButton("Link", SetLinkMode, mainPanel, ref number);
+        AppendToolButton("Select", OpenBoardList, null, mainPanel, ref number);
+        AppendToolButton("Paint", SetPaintMode, (_, ui) => SwitchTool(ToolMode.Paint, ui as UIImageButton, "Paint", "Erase"), mainPanel, ref number);
+        AppendToolButton("Link", SetLinkMode, (_, ui) => SwitchTool(ToolMode.Link, ui as UIImageButton, "Link", "Unlink"), mainPanel, ref number);
+        
+        AppendToolButton("Close", ExitMenu, null, mainPanel, ref number);
     }
 
-    private void SetPaintMode(UIMouseEvent evt, UIElement listeningElement)
+    private void ExitMenu(UIMouseEvent evt, UIElement listeningElement)
     {
-        if (_boardKey == string.Empty)
-        {
-            Main.NewText("Select a board first!");
-            return;
-        }
-
+        WorldBoardSystem.CloseToolUI();
+        ToolUsage.ResetTool();
         Main.isMouseLeftConsumedByUI = true;
-        _player.mouseInterface = true;
 
-        if (_player.GetModPlayer<BoardToolPlayer>().Mode != BoardToolPlayer.ToolMode.Paint)
-            _player.GetModPlayer<BoardToolPlayer>().Mode = BoardToolPlayer.ToolMode.Paint;
-        else
-            _player.GetModPlayer<BoardToolPlayer>().Mode = BoardToolPlayer.ToolMode.None;
+        _player.GetModPlayer<BoardToolPlayer>().editingBoard = string.Empty;
+        _player.GetModPlayer<BoardToolPlayer>().Mode = ToolMode.None;
+        _player.mouseInterface = true;
     }
 
-    private void SetLinkMode(UIMouseEvent evt, UIElement listeningElement)
-    {
-        if (_boardKey == string.Empty)
-        {
-            Main.NewText("Select a board first!");
-            return;
-        }
-
-        Main.isMouseLeftConsumedByUI = true;
-        _player.mouseInterface = true;
-
-        if (_player.GetModPlayer<BoardToolPlayer>().Mode != BoardToolPlayer.ToolMode.Link)
-            _player.GetModPlayer<BoardToolPlayer>().Mode = BoardToolPlayer.ToolMode.Link;
-        else
-            _player.GetModPlayer<BoardToolPlayer>().Mode = BoardToolPlayer.ToolMode.None;
-    }
-
-    private static void AppendToolButton(string name, MouseEvent openBoardList, UIPanel panel, ref int number)
+    private static void AppendToolButton(string name, MouseEvent onClick, MouseEvent rightClick, UIPanel panel, ref int number)
     {
         var tex = Texture(name);
 
@@ -89,9 +87,59 @@ internal partial class ToolUIState(Player player) : UIState
             Left = StyleDimension.FromPixels(number * 40)
         };
 
-        button.OnLeftClick += openBoardList;
+        button.OnLeftClick += onClick;
+
+        if (rightClick is not null)
+            button.OnRightClick += rightClick;
+
         panel.Append(button);
 
         number++;
+    }
+
+    private static string GetPlayerEditingBoardName()
+    {
+        string board = Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().editingBoard;
+
+        if (board is null || board == string.Empty)
+            return "[None]";
+
+        return board;
+    }
+
+    private void SetPaintMode(UIMouseEvent evt, UIElement listeningElement) => ChangeTool(ToolMode.Paint, ToolMode.Erase);
+    private void SetLinkMode(UIMouseEvent evt, UIElement listeningElement) => ChangeTool(ToolMode.Link, ToolMode.Unlink);
+
+    private void ChangeTool(ToolMode mode, ToolMode altMode)
+    {
+        if (_boardKey == string.Empty)
+        {
+            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.NoBoard"));
+            return;
+        }
+
+        Main.isMouseLeftConsumedByUI = true;
+        _player.mouseInterface = true;
+
+        ToolMode useMode = _toggledAlt[mode] ? altMode : mode;
+
+        if (_player.GetModPlayer<BoardToolPlayer>().Mode != useMode)
+            _player.GetModPlayer<BoardToolPlayer>().Mode = useMode;
+        else
+            _player.GetModPlayer<BoardToolPlayer>().Mode = ToolMode.None;
+
+        ToolUsage.ResetTool();
+    }
+
+    private void SwitchTool(ToolMode mode, UIImageButton button, string defaultTexture, string altTexture)
+    {
+        _toggledAlt[mode] = !_toggledAlt[mode];
+
+        if (!_toggledAlt[mode])
+            button.SetImage(Texture(defaultTexture, true));
+        else
+            button.SetImage(Texture(altTexture, true));
+
+        button.Recalculate();
     }
 }

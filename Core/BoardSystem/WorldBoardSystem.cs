@@ -52,16 +52,9 @@ internal class WorldBoardSystem : ModSystem
 
     // UI stuff
 
-    public static void ToggleToolUI()
-    {
-        if (Self._toolUI.CurrentState is not null)
-        {
-            Self._toolUI.SetState(null);
-            Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().Mode = BoardToolPlayer.ToolMode.None;
-        }
-        else
-            Self._toolUI.SetState(new ToolUIState(Main.LocalPlayer));
-    }
+    public static bool ToolUIOpen() => Self._toolUI.CurrentState is ToolUIState;
+    public static void OpenToolUI() => Self._toolUI.SetState(new ToolUIState(Main.LocalPlayer));
+    internal static void CloseToolUI() => Self._toolUI.SetState(null);
 
     public static void OpenKeyboard(UIVirtualKeyboard.KeyboardSubmitEvent submitEvent, Action cancelAction) 
         => Self._keyboardUI.SetState(new UIVirtualKeyboard("Enter Board name", "Party", submitEvent, cancelAction, 0));

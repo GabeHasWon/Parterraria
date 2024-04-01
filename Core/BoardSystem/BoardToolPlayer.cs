@@ -1,15 +1,9 @@
-﻿
+﻿using Parterraria.Content.Items.Board.Create;
+
 namespace Parterraria.Core.BoardSystem;
 
-internal class BoardToolPlayer : ModPlayer
+internal partial class BoardToolPlayer : ModPlayer
 {
-    internal enum ToolMode : byte
-    {
-        None = 0,
-        Paint = 1,
-        Link = 2,
-    }
-
     public ToolMode Mode { get; set; } = ToolMode.None;
 
     internal string editingBoard = "";
@@ -18,7 +12,7 @@ internal class BoardToolPlayer : ModPlayer
 
     public override void ResetEffects() => _mouseConsumed = false;
 
-    public override void UpdateEquips()
+    public override void PreUpdateBuffs()
     {
         if (Mode != ToolMode.None)
         {
@@ -29,5 +23,7 @@ internal class BoardToolPlayer : ModPlayer
         }
     }
 
-    public override bool CanUseItem(Item item) => !_mouseConsumed;
+    public override bool CanUseItem(Item item) => !_mouseConsumed || item.mountType >= 0;
+
+    internal bool IsEditing() => editingBoard is not null && editingBoard != string.Empty && Player.HeldItem.type == ModContent.ItemType<BoardTool>();
 }

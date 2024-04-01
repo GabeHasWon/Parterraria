@@ -1,0 +1,8 @@
+NoBoard: Select a board first!
+
+CantConnectNode: {
+	AlreadyConnected: Node is already connected to another node.
+	SameNode: Node cannot connect to itself.
+}
+
+ConnectedNodes.Connected: Successfully connected nodes.

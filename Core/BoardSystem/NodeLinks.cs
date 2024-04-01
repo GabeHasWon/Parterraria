@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using rail;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -25,6 +27,18 @@ public class NodeLinks(BoardNode parent) : IEnumerable<NodeLinks.Link>
 
     public void RemoveLink(BoardNode node) => links.Remove(links.First(x => x.Node == node));
 
+    public void RemoveLink(Link link)
+    {
+        links.Remove(link);
+        link.Node.links.links.Remove(link);
+    }
+
     public IEnumerator<Link> GetEnumerator() => links.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => links.GetEnumerator();
+
+    internal Link GetNearestLink(Vector2 worldPos)
+    {
+        float angle = (worldPos - parent.position).ToRotation();
+        return links.MinBy(x => Math.Abs((x.Node.position - parent.position).ToRotation() - angle));
+    }
 }
