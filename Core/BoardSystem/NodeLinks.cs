@@ -36,8 +36,16 @@ public class NodeLinks(BoardNode parent) : IEnumerable<NodeLinks.Link>
     public IEnumerator<Link> GetEnumerator() => links.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => links.GetEnumerator();
 
-    internal Link GetNearestLink(Vector2 worldPos)
+    internal Link GetNearestLink(Vector2 worldPos, out bool noLinks)
     {
+        noLinks = false;
+
+        if (links.Count == 0)
+        {
+            noLinks = true;
+            return default;
+        }
+
         float angle = (worldPos - parent.position).ToRotation();
         return links.MinBy(x => Math.Abs((x.Node.position - parent.position).ToRotation() - angle));
     }

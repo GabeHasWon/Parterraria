@@ -1,16 +1,20 @@
 ﻿using Parterraria.Core.BoardSystem.Nodes;
 using System;
 using System.Linq;
+using Terraria.GameContent;
 using Terraria.Localization;
 
 namespace Parterraria.Core.BoardSystem;
 
 internal class ToolUsage
 {
+    private static string BuildNodeType => NodeLoader.Get(_buildNodeIndex).GetType().AssemblyQualifiedName;
+
     public static BoardNode buildingNode = null;
     public static bool blockUse = false;
 
     private static int _placementStage = 0;
+    private static int _buildNodeIndex = 0;
 
     internal static void UseTool(ToolMode mode)
     {
@@ -46,6 +50,13 @@ internal class ToolUsage
     private static void UnlinkNodes()
     {
         bool leftClick = Main.mouseLeft && Main.mouseLeftRelease;
+        bool rightClick = Main.mouseRight && Main.mouseRightRelease;
+
+        if (rightClick)
+        {
+            buildingNode = null;
+            _placementStage = 0;
+        }
 
         if (leftClick)
         {
@@ -62,8 +73,13 @@ internal class ToolUsage
             }
             else
             {
-                NodeLinks.Link link = buildingNode.links.GetNearestLink(Main.MouseWorld);
-                buildingNode.links.RemoveLink(link);
+                NodeLinks.Link link = buildingNode.links.GetNearestLink(Main.MouseWorld, out bool noLinks);
+
+                if (!noLinks)
+                    buildingNode.links.RemoveLink(link);
+
+                buildingNode = null;
+                _placementStage = 0;
             }
         }
     }
@@ -90,6 +106,13 @@ internal class ToolUsage
     private static void LinkNodes()
     {
         bool leftClick = Main.mouseLeft && Main.mouseLeftRelease;
+        bool rightClick = Main.mouseRight && Main.mouseRightRelease;
+
+        if (rightClick)
+        {
+            buildingNode = null;
+            _placementStage = 0;
+        }
 
         if (leftClick)
         {
@@ -113,7 +136,6 @@ internal class ToolUsage
                 }
 
                 buildingNode.links.AddLink(node, true);
-                node.links.AddLink(buildingNode, false);
                 buildingNode = null;
                 _placementStage = 0;
 
@@ -125,7 +147,22 @@ internal class ToolUsage
     private static void PaintNodes()
     {
         bool leftClick = Main.mouseLeft && Main.mouseLeftRelease;
-        buildingNode ??= new EmptyNode();
+        bool rightClick = Main.mouseRight && Main.mouseRightRelease;
+        buildingNode ??= Activator.CreateInstance(Type.GetType(BuildNodeType)) as BoardNode;
+
+        if (rightClick)
+        {
+            _buildNodeIndex++;
+
+            if (_buildNodeIndex >= NodeLoader.NodeCount)
+                _buildNodeIndex = 0;
+
+            Vector2 position = buildingNode.position;
+            float width = buildingNode.halfWidth;
+            buildingNode = Activator.CreateInstance(Type.GetType(BuildNodeType)) as BoardNode;
+            buildingNode.position = position;
+            buildingNode.halfWidth = width;
+        }
 
         if (leftClick)
         {
@@ -138,7 +175,7 @@ internal class ToolUsage
             }
             else
             {
-                buildingNode.halfWidth = 120;
+                buildingNode.halfWidth = 30;
                 _placementStage = 1;
             }
         }
@@ -148,7 +185,12 @@ internal class ToolUsage
             if (_placementStage == 0)
                 buildingNode.position = Main.MouseWorld;
             else
+            {
                 buildingNode.halfWidth = Math.Max(Math.Abs(buildingNode.position.X - Main.MouseWorld.X), Math.Abs(buildingNode.position.Y - Main.MouseWorld.Y));
+
+                if (buildingNode.halfWidth < 30)
+                    buildingNode.halfWidth = 30;
+            }
         }
     }
 
@@ -167,6 +209,22 @@ internal class ToolUsage
             return;
 
         buildingNode.Draw();
+
+        var mode = Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().Mode;
+
+        if (mode == ToolMode.Link && _placementStage == 1)
+        {
+            var src = new Rectangle(0, 0, (int)buildingNode.halfWidth * 2, (int)buildingNode.halfWidth * 2);
+            var drawPos = buildingNode.position - new Vector2(buildingNode.halfWidth) - Main.screenPosition;
+            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, drawPos, src, Color.White * 0.6f);
+        }
+        else if (mode == ToolMode.Unlink)
+        {
+            NodeLinks.Link link = buildingNode.links.GetNearestLink(Main.MouseWorld, out bool noLinks);
+
+            if (!noLinks)
+                BoardNode.DrawLink(link, buildingNode.position, Color.Red);
+        }
     }
 
     internal static void ResetTool()

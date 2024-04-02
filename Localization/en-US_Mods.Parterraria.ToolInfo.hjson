@@ -1,7 +1,7 @@
 NoBoard: Select a board first!
 
 CantConnectNode: {
-	AlreadyConnected: Node is already connected to another node.
+	AlreadyConnected: These nodes are already connected.
 	SameNode: Node cannot connect to itself.
 }
 
