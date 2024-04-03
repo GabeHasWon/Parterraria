@@ -96,10 +96,7 @@ internal class ToolUsage
             if (node is null)
                 return;
 
-            foreach (var item in board.nodes.Where(x => x.links.Any(x => x.Node == node)))
-                item.links.RemoveLink(node);
-
-            board.nodes.Remove(node);
+            board.RemoveNode(node);
         }
     }
 
@@ -135,7 +132,7 @@ internal class ToolUsage
                     return;
                 }
 
-                buildingNode.links.AddLink(node, true);
+                buildingNode.links.AddLink(node);
                 buildingNode = null;
                 _placementStage = 0;
 
@@ -169,7 +166,7 @@ internal class ToolUsage
             if (_placementStage == 1)
             {
                 var board = WorldBoardSystem.GetBoard(Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().editingBoard);
-                board.nodes.Add(GenerateNode());
+                board.AddNode(GenerateNode(board));
                 buildingNode = null;
                 _placementStage = 0;
             }
@@ -194,12 +191,24 @@ internal class ToolUsage
         }
     }
 
-    private static BoardNode GenerateNode()
+    private static BoardNode GenerateNode(Board board)
     {
         var type = buildingNode.GetType();
         var node = Activator.CreateInstance(type) as BoardNode;
         node.position = buildingNode.position;
         node.halfWidth = buildingNode.halfWidth;
+
+        int id = 0;
+
+        while (true)
+        {
+            if (board.nodes.Any(x => x.nodeId == id))
+                id++;
+            else
+                break;
+        }
+
+        node.nodeId = id;
         return node;
     }
 

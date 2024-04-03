@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using Terraria.GameContent;
+using Terraria.ModLoader.IO;
 using Terraria.UI.Chat;
 
 namespace Parterraria.Core.BoardSystem;
@@ -11,6 +12,13 @@ public abstract class BoardNode
     public Vector2 position;
     public float halfWidth;
     public NodeLinks links;
+    
+    /// <summary>
+    /// Used for IO and for multiplayer syncing.
+    /// </summary>
+    public int nodeId;
+
+    public Rectangle Bounds => new Rectangle((int)(position.X - halfWidth), (int)(position.Y - halfWidth), (int)halfWidth * 2, (int)halfWidth * 2);
 
     public BoardNode()
     {
@@ -40,6 +48,41 @@ public abstract class BoardNode
         return true;
     }
 
+    internal virtual void Save(TagCompound tag)
+    {
+        tag.Add(nameof(position), position);
+        tag.Add(nameof(halfWidth), halfWidth);
+        tag.Add(nameof(nodeId), nodeId);
+
+        if (links.LinkCount == 0)
+            return;
+
+        TagCompound linksTag = [];
+        links.Save(linksTag);
+        tag.Add(nameof(links), linksTag);
+    }
+
+    /// <summary>
+    /// Loads the given node. <paramref name="loadLinks"/> is used to not set links before all nodes are loaded.
+    /// </summary>
+    /// <param name="tag">Tag to load this node from.</param>
+    /// <param name="boardKey">The key of the board that this node is associated with.</param>
+    /// <param name="loadLinks">The load action for setting <see cref="links"/>.</param>
+    internal virtual void Load(TagCompound tag, string boardKey, out Action loadLinks)
+    {
+        position = tag.Get<Vector2>(nameof(position));
+        halfWidth = tag.GetFloat(nameof(halfWidth));
+        nodeId = tag.GetInt(nameof(nodeId));
+
+        if (tag.TryGet(nameof(links), out TagCompound linkTag))
+        {
+            TagCompound localTag = linkTag;
+            loadLinks = () => links = NodeLinks.Load(localTag, boardKey);
+        }
+        else
+            loadLinks = () => { };
+    }
+
     public virtual void Draw()
     {
         if (Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().IsEditing())
@@ -62,12 +105,7 @@ public abstract class BoardNode
     public virtual void DrawLinks()
     {
         foreach (var link in links)
-        {
-            if (!link.Forward)
-                continue;
-
             DrawLink(link, position);
-        }
     }
 
     public static void DrawLink(NodeLinks.Link link, Vector2 position, Color? color = null)

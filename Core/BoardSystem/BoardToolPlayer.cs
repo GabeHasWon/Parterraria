@@ -1,6 +1,4 @@
-﻿using Parterraria.Content.Items.Board.Create;
-
-namespace Parterraria.Core.BoardSystem;
+﻿namespace Parterraria.Core.BoardSystem;
 
 internal partial class BoardToolPlayer : ModPlayer
 {
@@ -24,6 +22,5 @@ internal partial class BoardToolPlayer : ModPlayer
     }
 
     public override bool CanUseItem(Item item) => !_mouseConsumed || item.mountType >= 0;
-
-    internal bool IsEditing() => editingBoard is not null && editingBoard != string.Empty && Player.HeldItem.type == ModContent.ItemType<BoardTool>();
+    internal bool IsEditing() => editingBoard is not null && editingBoard != string.Empty;
 }

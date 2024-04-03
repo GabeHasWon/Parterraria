@@ -61,8 +61,28 @@ internal partial class ToolUIState(Player player) : UIState
         AppendToolButton("Select", OpenBoardList, null, mainPanel, ref number);
         AppendToolButton("Paint", SetPaintMode, (_, ui) => SwitchTool(ToolMode.Paint, ui as UIImageButton, "Paint", "Erase"), mainPanel, ref number);
         AppendToolButton("Link", SetLinkMode, (_, ui) => SwitchTool(ToolMode.Link, ui as UIImageButton, "Link", "Unlink"), mainPanel, ref number);
+        AppendToolButton("Play", StartParty, (_, ui) => WorldBoardSystem.StopParty(_boardKey), mainPanel, ref number);
         
         AppendToolButton("Close", ExitMenu, null, mainPanel, ref number);
+    }
+
+    private void StartParty(UIMouseEvent evt, UIElement listeningElement)
+    {
+        if (_boardKey == string.Empty)
+        {
+            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.NoBoard"));
+            return;
+        }
+
+        if (WorldBoardSystem.CanPlayParty(_boardKey, out string denialKey))
+        {
+            WorldBoardSystem.PlayParty(_boardKey);
+            WorldBoardSystem.CloseToolUI();
+            _player.mouseInterface = true;
+            Main.isMouseLeftConsumedByUI = true;
+        }
+        else
+            Main.NewText(Language.GetTextValue(denialKey));
     }
 
     private void ExitMenu(UIMouseEvent evt, UIElement listeningElement)

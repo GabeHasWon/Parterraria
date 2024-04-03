@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Terraria.GameContent.UI.States;
 using Terraria.ID;
+using Terraria.ModLoader.IO;
 using Terraria.UI;
 
 namespace Parterraria.Core.BoardSystem;
@@ -10,8 +11,11 @@ namespace Parterraria.Core.BoardSystem;
 internal class WorldBoardSystem : ModSystem
 {
     public static WorldBoardSystem Self => ModContent.GetInstance<WorldBoardSystem>();
+    public static bool PlayingParty => Self.playingBoard is not null;
 
     public Dictionary<string, Board> worldBoards = [];
+
+    public Board playingBoard = null;
 
     private UserInterface _toolUI = null;
     private UserInterface _keyboardUI = null;
@@ -28,10 +32,41 @@ internal class WorldBoardSystem : ModSystem
         }
     }
 
+    public override void SaveWorldData(TagCompound tag)
+    {
+        tag.Add("boardCount", worldBoards.Count);
+        int boardId = 0;
+
+        foreach (var item in worldBoards)
+        {
+            TagCompound boardTag = [];
+            boardTag.Add("boardKey", item.Key);
+            item.Value.Save(boardTag);
+            tag.Add("board" + boardId++, boardTag);
+        }
+    }
+
+    public override void LoadWorldData(TagCompound tag)
+    {
+        int boardCount = tag.GetInt("boardCount");
+
+        for (int i = 0; i < boardCount; i++)
+        {
+            TagCompound boardTag = tag.GetCompound("board" + i);
+            string key = boardTag.GetString("boardKey");
+            Board board = Board.Load(boardTag, key, out var links);
+            worldBoards.Add(key, board);
+
+            foreach (var item in links)
+                item();
+        }
+    }
+
     public override void ClearWorld()
     {
         worldBoards.Clear();
         worldBoards = [];
+        playingBoard = null;
 
         _toolUI.SetState(null);
         _keyboardUI.SetState(null);
@@ -115,4 +150,27 @@ internal class WorldBoardSystem : ModSystem
     // Board stuff
 
     public static Board GetBoard(string key) => Self.worldBoards[key];
+
+    internal static void PlayParty(string boardKey)
+    {
+        Self.playingBoard = GetBoard(boardKey);
+        Self.playingBoard.Start();
+    }
+
+    internal static void StopParty(string boardKey)
+    {
+        Self.playingBoard = null;
+    }
+
+    internal static bool CanPlayParty(string boardKey, out string denialKey)
+    {
+        if (!Self.worldBoards.ContainsKey(boardKey))
+        {
+            denialKey = "Mods.Parterraria.ToolInfo.InvalidBoard";
+            return false;
+        }
+
+        Board board = GetBoard(boardKey);
+        return board.CanStart(out denialKey);
+    }
 }
