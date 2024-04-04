@@ -3,4 +3,11 @@ Items: {
 		DisplayName: Board Tool
 		Tooltip: ""
 	}
+
+	NormalDice: {
+		DisplayName: Normal Dice
+		Tooltip: ""
+	}
 }
+
+Projectiles.NormalDice_Dice.DisplayName: Normal Dice_ Dice
