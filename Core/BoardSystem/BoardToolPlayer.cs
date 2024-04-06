@@ -22,5 +22,4 @@ internal partial class BoardToolPlayer : ModPlayer
     }
 
     public override bool CanUseItem(Item item) => !_mouseConsumed || item.mountType >= 0;
-    internal bool IsEditing() => editingBoard is not null && editingBoard != string.Empty;
 }

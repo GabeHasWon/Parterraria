@@ -1,4 +1,5 @@
-﻿using ReLogic.Content;
+﻿using Parterraria.Core.BoardSystem.Nodes;
+using ReLogic.Content;
 using System;
 using System.Linq;
 using Terraria.GameContent;
@@ -18,14 +19,14 @@ public abstract class BoardNode
     /// </summary>
     public int nodeId;
 
-    public Rectangle Bounds => new Rectangle((int)(position.X - halfWidth), (int)(position.Y - halfWidth), (int)halfWidth * 2, (int)halfWidth * 2);
+    public Rectangle Bounds => new((int)(position.X - halfWidth + 4), (int)(position.Y - halfWidth + 4), (int)halfWidth * 2 - 8, (int)halfWidth * 2 - 8);
 
     public BoardNode()
     {
         links = new NodeLinks(this);
     }
 
-    public static Asset<Texture2D> Tex(BoardNode node) => Tex(node.GetType().Name.Replace("Node", ""));
+    public static Asset<Texture2D> Tex(BoardNode node, bool icon = false) => Tex(node.GetType().Name.Replace("Node", "") + (icon ? "_Icon" : ""));
     public static Asset<Texture2D> Tex(string node) => ModContent.Request<Texture2D>("Parterraria/Assets/Textures/Nodes/" + node.Replace("Node", ""));
 
     public abstract void LandOn(Board board, Player player);
@@ -40,7 +41,7 @@ public abstract class BoardNode
             return false;
         }
 
-        if (links.Any(x => x.Node == node))
+        if (links.Any(x => x.ToNode == node))
         {
             denialReasonKey = "Mods.Parterraria.ToolInfo.CantConnectNode.AlreadyConnected";
             return false;
@@ -83,53 +84,37 @@ public abstract class BoardNode
             loadLinks = () => { };
     }
 
-    public virtual void Draw()
+    public void Draw()
     {
-        if (Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().IsEditing())
+        if (WorldBoardSystem.BuildingBoard) // Debug, plain visuals for building
+        {
             DrawLinks();
 
-        var font = FontAssets.DeathText.Value;
-        var namePos = position + new Vector2(-halfWidth + 6) - Main.screenPosition;
-        string text = GetType().Name;
-        float size = font.MeasureString(text).X * 0.8f;
-        Vector2 nameScale = Vector2.Min(new(halfWidth / size), Vector2.One);
+            var font = FontAssets.DeathText.Value;
+            var namePos = position + new Vector2(-halfWidth + 6) - Main.screenPosition;
+            string text = GetType().Name;
+            float size = font.MeasureString(text).X * 0.8f;
+            Vector2 nameScale = Vector2.Min(new(halfWidth / size), Vector2.One);
 
-        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, namePos, Color.White, 0, Vector2.Zero, nameScale);
+            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, namePos, Color.White, 0, Vector2.Zero, nameScale);
 
-        DrawLine(position - new Vector2(halfWidth), 0, halfWidth * 2);
-        DrawLine(position - new Vector2(halfWidth), MathHelper.PiOver2, halfWidth * 2);
-        DrawLine(position + new Vector2(halfWidth), -MathHelper.Pi, halfWidth * 2);
-        DrawLine(position + new Vector2(halfWidth), -MathHelper.PiOver2, halfWidth * 2);
+            NodeDrawing.DrawLine(position - new Vector2(halfWidth), 0, halfWidth * 2);
+            NodeDrawing.DrawLine(position - new Vector2(halfWidth), MathHelper.PiOver2, halfWidth * 2);
+            NodeDrawing.DrawLine(position + new Vector2(halfWidth), -MathHelper.Pi, halfWidth * 2);
+            NodeDrawing.DrawLine(position + new Vector2(halfWidth), -MathHelper.PiOver2, halfWidth * 2);
+        }
+        else // Nicer visuals for playing
+            FancyDraw();
+    }
+
+    public virtual void FancyDraw()
+    {
+        NodeDrawing.DrawNodeSquare(position - Main.screenPosition, halfWidth, GetType().Name, Color.LightGray);
     }
 
     public virtual void DrawLinks()
     {
         foreach (var link in links)
-            DrawLink(link, position);
-    }
-
-    public static void DrawLink(NodeLinks.Link link, Vector2 position, Color? color = null)
-    {
-        float rot = position.AngleTo(link.Node.position);
-        float dist = position.Distance(link.Node.position);
-        DrawLine(position, rot, dist, color);
-        DrawArrow(position, rot - MathHelper.Pi);
-        DrawArrow(link.Node.position, rot - MathHelper.Pi);
-        DrawArrow(Vector2.Lerp(position, link.Node.position, 0.5f), rot - MathHelper.Pi);
-    }
-
-    private static void DrawLine(Vector2 position, float rot, float dist, Color? color = null)
-    {
-        var pixel = TextureAssets.MagicPixel.Value;
-        var col = color ?? Color.White;
-        Main.spriteBatch.Draw(pixel, position - Main.screenPosition, new Rectangle(0, 0, (int)dist, 3), col, rot, Vector2.Zero, 1f, SpriteEffects.None, 0);
-    }
-
-    private static void DrawArrow(Vector2 position, float rot)
-    {
-        var pixel = TextureAssets.MagicPixel.Value;
-
-        Main.spriteBatch.Draw(pixel, position - Main.screenPosition, new Rectangle(0, 0, 30, 3), Color.Green, rot + 0.7f, Vector2.Zero, 1f, SpriteEffects.None, 0);
-        Main.spriteBatch.Draw(pixel, position - Main.screenPosition, new Rectangle(0, 0, 30, 3), Color.Green, rot - 0.7f, Vector2.Zero, 1f, SpriteEffects.None, 0);
+            NodeDrawing.DrawLink(link, position);
     }
 }

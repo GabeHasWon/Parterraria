@@ -44,6 +44,8 @@ public class Board
                 BoardNode node = nodes.First(x => x is StartNode);
                 plr.Center = node.position;
                 plr.GetModPlayer<PlayingBoardPlayer>().connectedNode = node;
+                plr.GetModPlayer<PlayingBoardPlayer>().connectedNode.LandOn(WorldBoardSystem.Self.playingBoard, plr);
+                plr.GetModPlayer<PlayingBoardPlayer>().storedRoll = 0;
                 plr.GetModPlayer<BoardToolPlayer>().Mode = ToolMode.None;
 
                 if (i == Main.myPlayer)
@@ -63,7 +65,7 @@ public class Board
 
     internal void RemoveNode(BoardNode node)
     {
-        foreach (var item in nodes.Where(x => x.links.Any(x => x.Node == node)))
+        foreach (var item in nodes.Where(x => x.links.Any(x => x.ToNode == node)))
             item.links.RemoveLink(node);
 
         nodes.Remove(node);
@@ -94,7 +96,11 @@ public class Board
         for (int i = 0; i < nodeCount; ++i)
         {
             TagCompound nodeTag = boardCompound.GetCompound("node" + i);
-            BoardNode node = Activator.CreateInstance(Type.GetType(nodeTag.GetString("nodeType"))) as BoardNode;
+            var nodeType = Type.GetType(nodeTag.GetString("nodeType"));
+
+            if (nodeType is null || Activator.CreateInstance(nodeType) is not BoardNode node)
+                continue;
+
             node.Load(nodeTag, boardKey, out var linkAction);
             linkActions.Add(linkAction);
             board.AddNode(node);

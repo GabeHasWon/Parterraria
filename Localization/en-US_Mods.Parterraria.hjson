@@ -8,6 +8,16 @@ Items: {
 		DisplayName: Normal Dice
 		Tooltip: ""
 	}
+
+	AmethystCoin: {
+		DisplayName: Amethyst Coin
+		Tooltip: ""
+	}
+
+	DoubleDice: {
+		DisplayName: Double Dice
+		Tooltip: ""
+	}
 }
 
 Projectiles.NormalDice_Dice.DisplayName: Normal Dice_ Dice

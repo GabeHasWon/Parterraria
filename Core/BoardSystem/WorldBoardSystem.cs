@@ -12,13 +12,16 @@ internal class WorldBoardSystem : ModSystem
 {
     public static WorldBoardSystem Self => ModContent.GetInstance<WorldBoardSystem>();
     public static bool PlayingParty => Self.playingBoard is not null;
+    public static bool BuildingBoard => !PlayingParty && Self._toolUI.CurrentState is not null;
 
     public Dictionary<string, Board> worldBoards = [];
 
     public Board playingBoard = null;
+    public BoardNode hoverNode = null;
 
     private UserInterface _toolUI = null;
     private UserInterface _keyboardUI = null;
+    private UserInterface _miscUI = null;
 
     public override void Load()
     {
@@ -29,6 +32,9 @@ internal class WorldBoardSystem : ModSystem
 
             _keyboardUI = new UserInterface();
             _keyboardUI.SetState(null);
+
+            _miscUI = new UserInterface();
+            _miscUI.SetState(null);
         }
     }
 
@@ -68,8 +74,12 @@ internal class WorldBoardSystem : ModSystem
         worldBoards = [];
         playingBoard = null;
 
-        _toolUI.SetState(null);
-        _keyboardUI.SetState(null);
+        if (Main.netMode != NetmodeID.Server)
+        {
+            _toolUI.SetState(null);
+            _keyboardUI.SetState(null);
+            _miscUI.SetState(null);
+        }
     }
 
     internal string GetUnrepeatedKey(string value)
@@ -95,13 +105,19 @@ internal class WorldBoardSystem : ModSystem
         => Self._keyboardUI.SetState(new UIVirtualKeyboard("Enter Board name", "Party", submitEvent, cancelAction, 0));
     public static void CloseKeyboard() => Self._keyboardUI.SetState(null);
 
+    internal static void SetMiscUI(UIState state) => Self._miscUI.SetState(state);
+    internal static void CloseMiscUI() => Self._miscUI.SetState(null);
+
     public override void UpdateUI(GameTime gameTime)
     {
         if (_keyboardUI.CurrentState is not null && Main.playerInventory)
             _keyboardUI.SetState(null);
 
+        hoverNode = null;
+
         _toolUI.Update(gameTime);
         _keyboardUI.Update(gameTime);
+        _miscUI.Update(gameTime);
     }
 
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -116,6 +132,16 @@ internal class WorldBoardSystem : ModSystem
                 InterfaceScaleType.UI)
             );
 
+            layers.Insert(resourceBarIndex - 1, new LegacyGameInterfaceLayer(
+                "Parterraria: Misc UI",
+                delegate
+                {
+                    _miscUI.Draw(Main.spriteBatch, Main.gameTimeCache);
+                    return true;
+                },
+                InterfaceScaleType.UI)
+            );
+
             layers.Insert(resourceBarIndex, new LegacyGameInterfaceLayer(
                 "Parterraria: Tool UI",
                 delegate
@@ -126,7 +152,7 @@ internal class WorldBoardSystem : ModSystem
                 InterfaceScaleType.UI)
             );
 
-            layers.Insert(resourceBarIndex + 2, new LegacyGameInterfaceLayer(
+            layers.Insert(resourceBarIndex + 1, new LegacyGameInterfaceLayer(
                 "Parterraria: Keyboard UI",
                 delegate
                 {
@@ -143,7 +169,13 @@ internal class WorldBoardSystem : ModSystem
         foreach (var item in Self.worldBoards.Values)
             item.Draw();
 
+        if (Self.hoverNode is not null)
+            ToolUsage.DrawBoxOnNode(Self.hoverNode);
+
         ToolUsage.DrawBuilding();
+
+        if (PlayingParty)
+            Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>().DrawBoardInfo();
         return true;
     }
 
@@ -157,9 +189,11 @@ internal class WorldBoardSystem : ModSystem
         Self.playingBoard.Start();
     }
 
-    internal static void StopParty(string boardKey)
+    internal static void StopParty()
     {
         Self.playingBoard = null;
+
+        Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>().ExitParty();
     }
 
     internal static bool CanPlayParty(string boardKey, out string denialKey)

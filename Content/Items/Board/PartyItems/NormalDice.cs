@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-
-namespace Parterraria.Content.Items.Board.PartyItems;
+﻿namespace Parterraria.Content.Items.Board.PartyItems;
 
 internal class NormalDice : DiceItem
 {
     protected override int DiceType => ModContent.ProjectileType<NormalDice_Dice>();
+    protected override bool IsConsumable => false;
 
     public class NormalDice_Dice : DiceProjectile
     {
         protected override int[] PipChoices => [1, 2, 3, 4, 5, 6];
-        protected override Dictionary<int, int> PipCountToFrame => new() { { 1, 0 }, { 2, 1 }, { 3, 2 }, { 4, 3 }, { 5, 4 }, { 6, 5 } };
+        protected override int PipCountToFrame(int pipCount) => pipCount - 1;
     }
 }

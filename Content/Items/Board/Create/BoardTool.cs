@@ -1,5 +1,4 @@
-﻿
-using Parterraria.Core.BoardSystem;
+﻿using Parterraria.Core.BoardSystem;
 using Terraria.ID;
 
 namespace Parterraria.Content.Items.Board.Create;

@@ -172,7 +172,7 @@ internal class ToolUsage
             }
             else
             {
-                buildingNode.halfWidth = 30;
+                buildingNode.halfWidth = 40;
                 _placementStage = 1;
             }
         }
@@ -185,8 +185,8 @@ internal class ToolUsage
             {
                 buildingNode.halfWidth = Math.Max(Math.Abs(buildingNode.position.X - Main.MouseWorld.X), Math.Abs(buildingNode.position.Y - Main.MouseWorld.Y));
 
-                if (buildingNode.halfWidth < 30)
-                    buildingNode.halfWidth = 30;
+                if (buildingNode.halfWidth < 40)
+                    buildingNode.halfWidth = 40;
             }
         }
     }
@@ -222,18 +222,21 @@ internal class ToolUsage
         var mode = Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().Mode;
 
         if (mode == ToolMode.Link && _placementStage == 1)
-        {
-            var src = new Rectangle(0, 0, (int)buildingNode.halfWidth * 2, (int)buildingNode.halfWidth * 2);
-            var drawPos = buildingNode.position - new Vector2(buildingNode.halfWidth) - Main.screenPosition;
-            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, drawPos, src, Color.White * 0.6f);
-        }
+            DrawBoxOnNode(buildingNode);
         else if (mode == ToolMode.Unlink)
         {
             NodeLinks.Link link = buildingNode.links.GetNearestLink(Main.MouseWorld, out bool noLinks);
 
             if (!noLinks)
-                BoardNode.DrawLink(link, buildingNode.position, Color.Red);
+                NodeDrawing.DrawLink(link, buildingNode.position, Color.Red);
         }
+    }
+
+    public static void DrawBoxOnNode(BoardNode node)
+    {
+        var src = new Rectangle(0, 0, (int)node.halfWidth * 2, (int)node.halfWidth * 2);
+        var drawPos = node.position - new Vector2(node.halfWidth) - Main.screenPosition;
+        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, drawPos, src, Color.White * 0.6f);
     }
 
     internal static void ResetTool()

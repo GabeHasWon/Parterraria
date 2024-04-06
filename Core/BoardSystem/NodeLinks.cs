@@ -11,7 +11,7 @@ public class NodeLinks(BoardNode parent) : IEnumerable<NodeLinks.Link>
 {
     public readonly struct Link(BoardNode node, BoardNode parent)
     {
-        public readonly BoardNode Node = node;
+        public readonly BoardNode ToNode = node;
         public readonly BoardNode Parent = parent;
     }
 
@@ -26,12 +26,12 @@ public class NodeLinks(BoardNode parent) : IEnumerable<NodeLinks.Link>
         links.Add(link);
     }
 
-    public void RemoveLink(BoardNode node) => links.Remove(links.First(x => x.Node == node));
+    public void RemoveLink(BoardNode node) => links.Remove(links.First(x => x.ToNode == node));
 
     public void RemoveLink(Link link)
     {
         links.Remove(link);
-        link.Node.links.links.Remove(link);
+        link.ToNode.links.links.Remove(link);
     }
 
     public IEnumerator<Link> GetEnumerator() => links.GetEnumerator();
@@ -48,7 +48,7 @@ public class NodeLinks(BoardNode parent) : IEnumerable<NodeLinks.Link>
         }
 
         float angle = (worldPos - parent.position).ToRotation();
-        return links.MinBy(x => Math.Abs((x.Node.position - parent.position).ToRotation() - angle));
+        return links.MinBy(x => Math.Abs((x.ToNode.position - parent.position).ToRotation() - angle));
     }
 
     internal void Save(TagCompound tag)
@@ -60,7 +60,7 @@ public class NodeLinks(BoardNode parent) : IEnumerable<NodeLinks.Link>
         int linkId = 0;
 
         foreach (var link in links)
-            tag.Add("linkTo" + linkId++, link.Node.nodeId);
+            tag.Add("linkTo" + linkId++, link.ToNode.nodeId);
     }
 
     public static NodeLinks Load(TagCompound tag, string boardKey)
