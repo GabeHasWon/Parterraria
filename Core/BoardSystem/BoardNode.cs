@@ -88,7 +88,7 @@ public abstract class BoardNode
     {
         if (WorldBoardSystem.BuildingBoard) // Debug, plain visuals for building
         {
-            DrawLinks();
+            DrawLinks(false);
 
             var font = FontAssets.DeathText.Value;
             var namePos = position + new Vector2(-halfWidth + 6) - Main.screenPosition;
@@ -104,7 +104,10 @@ public abstract class BoardNode
             NodeDrawing.DrawLine(position + new Vector2(halfWidth), -MathHelper.PiOver2, halfWidth * 2);
         }
         else // Nicer visuals for playing
+        {
+            DrawLinks(true);
             FancyDraw();
+        }
     }
 
     public virtual void FancyDraw()
@@ -112,9 +115,9 @@ public abstract class BoardNode
         NodeDrawing.DrawNodeSquare(position - Main.screenPosition, halfWidth, GetType().Name, Color.LightGray);
     }
 
-    public virtual void DrawLinks()
+    public virtual void DrawLinks(bool fancy)
     {
         foreach (var link in links)
-            NodeDrawing.DrawLink(link, position);
+            NodeDrawing.DrawLink(link, position, null, fancy);
     }
 }
