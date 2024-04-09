@@ -36,9 +36,9 @@ internal class NodeDrawing
         }
         else
         {
-            var pixel = TextureAssets.MagicPixel.Value;
+            var pixel = ModContent.Request<Texture2D>("Parterraria/Assets/Textures/Nodes/Line").Value;
             var col = color ?? Color.White;
-            Main.spriteBatch.Draw(pixel, position - Main.screenPosition, null, col, rot - MathHelper.PiOver2, Vector2.Zero, new Vector2(2, dist / pixel.Height), SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(pixel, position - Main.screenPosition, null, col * 0.2f, rot - MathHelper.PiOver2, Vector2.Zero, new Vector2(2, dist / pixel.Height), SpriteEffects.None, 0);
         }
     }
 

@@ -1,5 +1,4 @@
 ﻿using Parterraria.Content.Items.Board.PartyItems;
-using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.Localization;
@@ -8,7 +7,7 @@ namespace Parterraria.Core.BoardSystem.Nodes;
 
 public class ShopNode() : EmptyNode
 {
-    public override void LandOn(Board board, Player player)
+    public override void PassBy(Board board, Player player)
     {
         NPC npc;
 
@@ -21,8 +20,12 @@ public class ShopNode() : EmptyNode
         else
         {
             npc = Main.npc[NPC.FindFirstNPC(ModContent.NPCType<ShopNPC>())];
+            player.SetTalkNPC(npc.whoAmI);
             npc.Center = player.Center;
         }
+
+        for (int i = 0; i < 15; ++i)
+            Dust.NewDust(npc.position, npc.width, npc.height, DustID.Confetti, Main.rand.NextFloat(-2, 2f), Main.rand.NextFloat(-8, -6));
 
         Main.playerInventory = true;
         Main.stackSplit = 9999;

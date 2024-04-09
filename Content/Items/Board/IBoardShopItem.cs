@@ -2,5 +2,4 @@
 
 internal interface IBoardShopItem
 {
-    int AmethystCost();
 }

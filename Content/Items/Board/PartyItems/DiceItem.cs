@@ -6,7 +6,7 @@ using Terraria.ID;
 
 namespace Parterraria.Content.Items.Board.PartyItems;
 
-internal abstract class DiceItem : ModItem
+internal abstract class DiceItem : ModItem, IBoardShopItem
 {
     protected abstract int DiceType { get; }
     protected virtual bool IsConsumable => true;
@@ -100,8 +100,14 @@ internal abstract class DiceItem : ModItem
                 if (node is null)
                     return;
 
-                if (node != null && Projectile.Top.Y < node.Bounds.Y)
+                if (Projectile.Top.Y < node.Bounds.Y)
                     Projectile.velocity.Y += 0.2f;
+
+                if (Projectile.Left.X > node.Bounds.Right)
+                    Projectile.velocity.X -= 0.2f;
+
+                if (Projectile.Right.X < node.Bounds.Left)
+                    Projectile.velocity.X += 0.2f;
             }
             else
             {
@@ -135,6 +141,7 @@ internal abstract class DiceItem : ModItem
 
                 Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, source, col, 0, source.Size() / 2f, 1f, SpriteEffects.None, 0);
             }
+
             return false;
         }
     }

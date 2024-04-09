@@ -30,6 +30,7 @@ public abstract class BoardNode
     public static Asset<Texture2D> Tex(string node) => ModContent.Request<Texture2D>("Parterraria/Assets/Textures/Nodes/" + node.Replace("Node", ""));
 
     public abstract void LandOn(Board board, Player player);
+    public virtual void PassBy(Board board, Player player) { }
 
     internal virtual bool CanLink(BoardNode node, out string denialReasonKey)
     {
@@ -46,6 +47,7 @@ public abstract class BoardNode
             denialReasonKey = "Mods.Parterraria.ToolInfo.CantConnectNode.AlreadyConnected";
             return false;
         }
+
         return true;
     }
 

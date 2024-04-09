@@ -15,10 +15,10 @@ internal class PromptSplitPathUIState(List<NodeLinks.Link> linksToCheck) : UISta
 
         UIPanel panel = new()
         {
-            Width = StyleDimension.FromPixels((links.Count + 1) * 36),
-            Height = StyleDimension.FromPixels(60),
+            Width = StyleDimension.FromPixels(links.Count * 72 + 14),
+            Height = StyleDimension.FromPixels(86),
             Top = StyleDimension.FromPercent(0.2f),
-            HAlign = 0.5f
+            HAlign = 0.5f,
         };
 
         Append(panel);
@@ -29,9 +29,9 @@ internal class PromptSplitPathUIState(List<NodeLinks.Link> linksToCheck) : UISta
         {
             UIImageButton button = new(BoardNode.Tex(item.ToNode, true))
             {
-                Width = StyleDimension.FromPixels(30),
-                Height = StyleDimension.FromPixels(30),
-                Left = StyleDimension.FromPixels(fromLeft++ * 36),
+                Width = StyleDimension.FromPixels(60),
+                Height = StyleDimension.FromPixels(60),
+                Left = StyleDimension.FromPixels(fromLeft++ * 72),
             };
 
             NodeLinks.Link link = item;
@@ -39,6 +39,8 @@ internal class PromptSplitPathUIState(List<NodeLinks.Link> linksToCheck) : UISta
             button.OnUpdate += (ui) => HoverOverButton(ui, link.ToNode);
             panel.Append(button);
         }
+
+        panel.Append(new UIText("Choose a path, any path") { HAlign = 0.5f, VAlign = -1 });
     }
 
     private static void HoverOverButton(UIElement ui, BoardNode node)

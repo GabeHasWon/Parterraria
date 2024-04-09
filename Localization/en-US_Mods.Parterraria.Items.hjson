@@ -1,0 +1,33 @@
+BoardTool: {
+	DisplayName: Board Tool
+	Tooltip:
+		'''
+		Right click to open the Tool Menu
+		The Tool Menu has a ton of options for creating, deleting, editing and playing boards
+		'''
+}
+
+NormalDice: {
+	DisplayName: Normal Dice
+	Tooltip: Rolls 1-6
+}
+
+AmethystCoin: {
+	DisplayName: Amethyst Coin
+	Tooltip: Used to barter with the Partykeep
+}
+
+DoubleDice: {
+	DisplayName: Double Dice
+	Tooltip: Throws out two Normal Dice, allowing you to roll higher
+}
+
+TripleDice: {
+	DisplayName: Triple Dice
+	Tooltip: Throws out three Normal Dice, allowing you to roll higher
+}
+
+CelestialCore: {
+	DisplayName: Celestial Core
+	Tooltip: ""
+}

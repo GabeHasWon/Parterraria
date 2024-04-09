@@ -3,7 +3,6 @@ using Parterraria.Core.BoardSystem.BoardUI;
 using System;
 using System.Linq;
 using Terraria.GameContent;
-using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
 namespace Parterraria.Core.BoardSystem;
@@ -56,6 +55,7 @@ internal class PlayingBoardPlayer : ModPlayer
             if (!boardPlayer.isMoving && boardPlayer.CollideWithNode())
                 vel = Vector2.Zero;
         }
+
         return vel;
     }
 
@@ -76,7 +76,7 @@ internal class PlayingBoardPlayer : ModPlayer
         if (!WorldBoardSystem.PlayingParty)
             connectedNode = null;
 
-        if (!prompingSplitPath && ++moveTimer >= MaxMoveTimer && nextNode is not null)
+        if (!prompingSplitPath && Player.talkNPC == -1 && ++moveTimer >= MaxMoveTimer && nextNode is not null)
             Player.Teleport(nextNode.position);
 
         if (nextNode is not null)
@@ -84,6 +84,7 @@ internal class PlayingBoardPlayer : ModPlayer
             if (Player.Hitbox.Intersects(nextNode.Bounds))
             {
                 connectedNode = nextNode;
+                connectedNode.PassBy(WorldBoardSystem.Self.playingBoard, Player);
                 CheckNextRoll();
             }
         }
@@ -192,10 +193,14 @@ internal class PlayingBoardPlayer : ModPlayer
         string coin = $"[i:{ModContent.ItemType<AmethystCoin>()}]: " + Player.CountItem(ModContent.ItemType<AmethystCoin>());
         CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
 
+        pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 60);
+        coin = $"[i:{ModContent.ItemType<CelestialCore>()}]: " + Player.CountItem(ModContent.ItemType<CelestialCore>());
+        CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
+
         if (isMoving && !prompingSplitPath)
         {
-            pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 60);
-            float moveTime = Math.Max((MaxMoveTimer / 60f) - (moveTimer / 60f), 0);
+            pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 40);
+            float moveTime = Math.Max(MaxMoveTimer / 60f - moveTimer / 60f, 0);
             string timeLeft = $"Move timer: " + moveTime.ToString("#0.#") + "s";
             CenteredString(FontAssets.ItemStack.Value, pos, timeLeft, Color.White);
         }
