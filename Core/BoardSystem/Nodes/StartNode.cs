@@ -1,5 +1,4 @@
 ﻿using Parterraria.Content.Items.Board;
-using Terraria.ID;
 
 namespace Parterraria.Core.BoardSystem.Nodes;
 

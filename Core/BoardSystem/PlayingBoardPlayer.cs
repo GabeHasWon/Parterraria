@@ -1,5 +1,6 @@
 ﻿using Parterraria.Content.Items.Board;
 using Parterraria.Core.BoardSystem.BoardUI;
+using Parterraria.Core.BoardSystem.Nodes;
 using System;
 using System.Linq;
 using Terraria.GameContent;
@@ -90,8 +91,14 @@ internal class PlayingBoardPlayer : ModPlayer
         }
     }
 
-    public override void PreUpdateMovement()
+    public override void OnRespawn()
     {
+        if (connectedNode != null)
+        {
+            Board board = WorldBoardSystem.Self.playingBoard;
+            BoardNode node = board.nodes.First(x => x is StartNode);
+            connectedNode = node;
+        }
     }
 
     private bool CollideWithNode()
@@ -177,29 +184,24 @@ internal class PlayingBoardPlayer : ModPlayer
         connectedNode = null;
         moveTimer = 0;
         isMoving = false;
-
-        int count = Player.CountItem(ModContent.ItemType<AmethystCoin>());
-
-        for (int i = 0; i < count; ++i)
-            Player.ConsumeItem(ModContent.ItemType<AmethystCoin>());
     }
 
     internal void DrawBoardInfo()
     {
-        var pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 100);
+        var pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 120);
         CenteredString(FontAssets.ItemStack.Value, pos, "Roll: " + storedRoll, Color.White);
 
-        pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 80);
+        pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 96);
         string coin = $"[i:{ModContent.ItemType<AmethystCoin>()}]: " + Player.CountItem(ModContent.ItemType<AmethystCoin>());
         CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
 
-        pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 60);
+        pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 72);
         coin = $"[i:{ModContent.ItemType<CelestialCore>()}]: " + Player.CountItem(ModContent.ItemType<CelestialCore>());
         CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
 
         if (isMoving && !prompingSplitPath)
         {
-            pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 40);
+            pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 48);
             float moveTime = Math.Max(MaxMoveTimer / 60f - moveTimer / 60f, 0);
             string timeLeft = $"Move timer: " + moveTime.ToString("#0.#") + "s";
             CenteredString(FontAssets.ItemStack.Value, pos, timeLeft, Color.White);

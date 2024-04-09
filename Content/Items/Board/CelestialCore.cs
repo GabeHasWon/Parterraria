@@ -2,7 +2,7 @@
 
 namespace Parterraria.Content.Items.Board;
 
-class CelestialCore : ModItem
+class CelestialCore : ModItem, IBoardClearItem
 {
     public override void SetDefaults()
     {

@@ -1,5 +1,5 @@
 ﻿namespace Parterraria.Content.Items.Board;
 
-internal interface IBoardShopItem
+internal interface IBoardShopItem : IBoardClearItem
 {
 }

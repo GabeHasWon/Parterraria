@@ -2,7 +2,7 @@
 
 namespace Parterraria.Content.Items.Board;
 
-class AmethystCoin : ModItem
+class AmethystCoin : ModItem, IBoardClearItem
 {
     public override void SetDefaults()
     {

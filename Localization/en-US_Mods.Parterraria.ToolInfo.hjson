@@ -2,6 +2,7 @@ NoBoard: Select a board first!
 BoardEmpty: Board is empty!
 NoStart: Board has no start node!
 InvalidBoard: Invalid board.
+BossActive: A boss or event is active!
 
 CantConnectNode: {
 	AlreadyConnected: These nodes are already connected.

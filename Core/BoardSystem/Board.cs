@@ -15,6 +15,12 @@ public class Board
     {
         denialKey = null;
 
+        if (!Main.CurrentFrameFlags.AnyActiveBossNPC)
+        {
+            denialKey = "Mods.Parterraria.ToolInfo.BossActive";
+            return false;
+        }
+
         if (!nodes.Any())
         {
             denialKey = "Mods.Parterraria.ToolInfo.BoardEmpty";
