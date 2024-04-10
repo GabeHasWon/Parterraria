@@ -1,7 +1,10 @@
-﻿using ReLogic.Content;
+﻿using Parterraria.Common;
+using Parterraria.Core.Synchronization;
+using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ID;
 using Terraria.Localization;
 using Terraria.UI;
 
@@ -61,28 +64,41 @@ internal partial class ToolUIState(Player player) : UIState
         AppendToolButton("Select", OpenBoardList, null, mainPanel, ref number);
         AppendToolButton("Paint", SetPaintMode, (_, ui) => SwitchTool(ToolMode.Paint, ui as UIImageButton, "Paint", "Erase"), mainPanel, ref number);
         AppendToolButton("Link", SetLinkMode, (_, ui) => SwitchTool(ToolMode.Link, ui as UIImageButton, "Link", "Unlink"), mainPanel, ref number);
-        AppendToolButton("Play", StartParty, (_, ui) => WorldBoardSystem.StopParty(), mainPanel, ref number);
+        AppendToolButton("Play", StartParty, (_, ui) => EndParty(), mainPanel, ref number);
         
         AppendToolButton("Close", ExitMenu, null, mainPanel, ref number);
+    }
+
+    private static void EndParty()
+    {
+        if (Main.netMode == NetmodeID.SinglePlayer)
+            WorldBoardSystem.StopParty();
+        else
+            new SyncEndPartyModule().Send();
     }
 
     private void StartParty(UIMouseEvent evt, UIElement listeningElement)
     {
         if (_boardKey == string.Empty)
         {
-            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.NoBoard"));
+            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.NoBoard"), CommonColors.Error);
             return;
         }
 
         if (WorldBoardSystem.CanPlayParty(_boardKey, out string denialKey))
         {
-            WorldBoardSystem.PlayParty(_boardKey);
-            WorldBoardSystem.CloseToolUI();
-            _player.mouseInterface = true;
-            Main.isMouseLeftConsumedByUI = true;
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+                new SyncStartPartyModule(Main.myPlayer, _boardKey).Send();
+            else
+            {
+                WorldBoardSystem.PlayParty(_boardKey);
+                WorldBoardSystem.CloseToolUI();
+                _player.mouseInterface = true;
+                Main.isMouseLeftConsumedByUI = true;
+            }
         }
         else
-            Main.NewText(Language.GetTextValue(denialKey));
+            Main.NewText(Language.GetTextValue(denialKey), CommonColors.Error);
     }
 
     private void ExitMenu(UIMouseEvent evt, UIElement listeningElement)
@@ -120,11 +136,7 @@ internal partial class ToolUIState(Player player) : UIState
     private static string GetPlayerEditingBoardName()
     {
         string board = Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().editingBoard;
-
-        if (board is null || board == string.Empty)
-            return "[None]";
-
-        return board;
+        return board is null || board == string.Empty ? "[None]" : board;
     }
 
     private void SetPaintMode(UIMouseEvent evt, UIElement listeningElement) => ChangeTool(ToolMode.Paint, ToolMode.Erase);
@@ -134,7 +146,7 @@ internal partial class ToolUIState(Player player) : UIState
     {
         if (_boardKey == string.Empty)
         {
-            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.NoBoard"));
+            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.NoBoard"), CommonColors.Error);
             return;
         }
 

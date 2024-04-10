@@ -16,3 +16,12 @@ NPCs: {
 		}
 	}
 }
+
+Party: {
+	Minigames: {
+		CraftLargeDiamondGame: {
+			Name: Gem Dash
+			Description: Various diamonds will spawn around the arena. Mine them, craft a Large Diamond, and win!
+		}
+	}
+}

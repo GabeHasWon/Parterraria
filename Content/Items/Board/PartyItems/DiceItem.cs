@@ -1,4 +1,5 @@
 ﻿using Parterraria.Core.BoardSystem;
+using Parterraria.Core.Synchronization.BoardItemSyncing;
 using System;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -6,7 +7,7 @@ using Terraria.ID;
 
 namespace Parterraria.Content.Items.Board.PartyItems;
 
-internal abstract class DiceItem : ModItem, IBoardShopItem
+internal abstract class DiceItem : ModItem
 {
     protected abstract int DiceType { get; }
     protected virtual bool IsConsumable => true;
@@ -22,6 +23,7 @@ internal abstract class DiceItem : ModItem, IBoardShopItem
         Item.noUseGraphic = true;
         Item.shoot = DiceType;
         Item.consumable = IsConsumable;
+        Item.rare = ItemRarityID.LightPurple;
     }
 
     public override bool CanUseItem(Player player)
@@ -34,8 +36,7 @@ internal abstract class DiceItem : ModItem, IBoardShopItem
 
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
-        var boardPlayer = player.GetModPlayer<PlayingBoardPlayer>();
-        boardPlayer.diceCount = 1;
+        player.GetModPlayer<PlayingBoardPlayer>().SetDiceCount(1);
         return true;
     }
 
@@ -58,8 +59,8 @@ internal abstract class DiceItem : ModItem, IBoardShopItem
             Projectile.timeLeft = 600;
             Projectile.penetrate = 6;
             Projectile.aiStyle = -1;
-            Projectile.hostile = true;
-            Projectile.friendly = false;
+            Projectile.hostile = false;
+            Projectile.friendly = true;
         }
 
         public override void AI()
@@ -77,6 +78,7 @@ internal abstract class DiceItem : ModItem, IBoardShopItem
                 Roll = Main.rand.Next(PipChoices);
                 HitY = Projectile.Center.Y;
                 Projectile.velocity.Y = plr.velocity.Y * 6f;
+                Projectile.netUpdate = true;
                 Spinning = false;
 
                 AdvancedPopupRequest popup = default;
@@ -86,7 +88,10 @@ internal abstract class DiceItem : ModItem, IBoardShopItem
                 popup.DurationInFrames = 240;
                 PopupText.NewText(popup, Projectile.Center);
 
-                plr.GetModPlayer<PlayingBoardPlayer>().RolledDice((int)Roll);
+                if (Main.netMode == NetmodeID.SinglePlayer)
+                    plr.GetModPlayer<PlayingBoardPlayer>().RolledDice((int)Roll);
+                else
+                    new SyncRolledDice(Projectile.owner, (int)Roll).Send();
             }
 
             Projectile.velocity.Y *= 0.8f;

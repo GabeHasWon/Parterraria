@@ -1,9 +1,12 @@
-﻿using Parterraria.Content.Items.Board;
+﻿using Parterraria.Common;
+using Parterraria.Content.Items.Board;
 using Parterraria.Core.BoardSystem.BoardUI;
 using Parterraria.Core.BoardSystem.Nodes;
+using Parterraria.Core.Synchronization.BoardItemSyncing;
 using System;
 using System.Linq;
 using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.UI.Chat;
 
 namespace Parterraria.Core.BoardSystem;
@@ -17,6 +20,7 @@ internal class PlayingBoardPlayer : ModPlayer
     public BoardNode connectedNode = null;
     public BoardNode nextNode = null;
     public int storedRoll = 0;
+    public bool hasGoneOnCurrentTurn = false;
 
     /// <summary>
     /// How long the player has until they are teleported to the next node.
@@ -87,6 +91,9 @@ internal class PlayingBoardPlayer : ModPlayer
                 connectedNode = nextNode;
                 connectedNode.PassBy(WorldBoardSystem.Self.playingBoard, Player);
                 CheckNextRoll();
+
+                if (nextNode is null)
+                    hasGoneOnCurrentTurn = true;
             }
         }
     }
@@ -133,6 +140,14 @@ internal class PlayingBoardPlayer : ModPlayer
         }
 
         return false;
+    }
+
+    internal void SetDiceCount(int count)
+    {
+        if (Main.netMode == NetmodeID.SinglePlayer)
+            diceCount = count;
+        else
+            new SyncDieCount(Main.myPlayer, count).Send();
     }
 
     public void RolledDice(int roll)
@@ -184,43 +199,28 @@ internal class PlayingBoardPlayer : ModPlayer
         connectedNode = null;
         moveTimer = 0;
         isMoving = false;
+        hasGoneOnCurrentTurn = false;
     }
 
     internal void DrawBoardInfo()
     {
         var pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 120);
-        CenteredString(FontAssets.ItemStack.Value, pos, "Roll: " + storedRoll, Color.White);
+        DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, "Roll: " + storedRoll, Color.White);
 
         pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 96);
         string coin = $"[i:{ModContent.ItemType<AmethystCoin>()}]: " + Player.CountItem(ModContent.ItemType<AmethystCoin>());
-        CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
+        DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
 
         pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 72);
         coin = $"[i:{ModContent.ItemType<CelestialCore>()}]: " + Player.CountItem(ModContent.ItemType<CelestialCore>());
-        CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
+        DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
 
         if (isMoving && !prompingSplitPath)
         {
             pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 48);
             float moveTime = Math.Max(MaxMoveTimer / 60f - moveTimer / 60f, 0);
             string timeLeft = $"Move timer: " + moveTime.ToString("#0.#") + "s";
-            CenteredString(FontAssets.ItemStack.Value, pos, timeLeft, Color.White);
+            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, timeLeft, Color.White);
         }
-    }
-
-    public static void CenteredString(DynamicSpriteFont font, Vector2 position, string text, Color color)
-    {
-        Vector2 size = font.MeasureString(text);
-        
-        for (int i = 0; i < text.Length; ++i)
-        {
-            if (i > text.Length - 5)
-                break;
-
-            if (text.Substring(i, 4) == "[i:")
-                size.X += 32;
-        }
-
-        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, position - size / 2f, color, 0, Vector2.Zero, Vector2.One);
     }
 }

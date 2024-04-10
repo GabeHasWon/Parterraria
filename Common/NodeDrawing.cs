@@ -1,6 +1,7 @@
-﻿using Terraria.GameContent;
+﻿using Parterraria.Core.BoardSystem;
+using Terraria.GameContent;
 
-namespace Parterraria.Core.BoardSystem.Nodes;
+namespace Parterraria.Common;
 
 internal class NodeDrawing
 {

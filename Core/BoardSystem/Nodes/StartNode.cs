@@ -1,8 +1,9 @@
-﻿using Parterraria.Content.Items.Board;
+﻿using Parterraria.Common;
+using Parterraria.Content.Items.Board;
 
 namespace Parterraria.Core.BoardSystem.Nodes;
 
 public class StartNode() : EmptyNode
 {
-    public override void LandOn(Board board, Player player) => player.QuickSpawnItem(new EntitySource_Board(board), ModContent.ItemType<AmethystCoin>(), 5);
+    public override void LandOn(Board board, Player player) => CommonUtils.AddItemToInvOrSpawnIfOverfull(player, ModContent.ItemType<AmethystCoin>(), 5);
 }

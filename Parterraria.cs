@@ -8,6 +8,7 @@ global using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent.UI;
 using Terraria.Localization;
 using Parterraria.Content.Items.Board;
+using System.IO;
 
 namespace Parterraria;
 
@@ -15,10 +16,9 @@ public class Parterraria : Mod
 {
     public static int AmethystCurrencyID { get; private set; }
 
-    public override void Load()
-    {
-        AmethystCurrencyID = CustomCurrencyManager.RegisterCurrency(new AmethystCurrency(ModContent.ItemType<AmethystCoin>(), 999L));
-    }
+    public override void Load() => AmethystCurrencyID = CustomCurrencyManager.RegisterCurrency(new AmethystCurrency(ModContent.ItemType<AmethystCoin>(), 999L));
+    public override void PostSetupContent() => NetEasy.NetEasy.Register(this);
+    public override void HandlePacket(BinaryReader reader, int whoAmI) => NetEasy.NetEasy.HandleModule(reader, whoAmI);
 
     public class AmethystCurrency(int coinItemID, long currencyCap) : CustomCurrencySingleCoin(coinItemID, currencyCap)
     {

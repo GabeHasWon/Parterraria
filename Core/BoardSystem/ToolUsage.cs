@@ -1,4 +1,4 @@
-﻿using Parterraria.Core.BoardSystem.Nodes;
+﻿using Parterraria.Common;
 using System;
 using System.Linq;
 using Terraria.GameContent;
@@ -128,7 +128,7 @@ internal class ToolUsage
             {
                 if (!buildingNode.CanLink(node, out string key))
                 {
-                    Main.NewText(Language.GetTextValue(key), 255, 180, 180);
+                    Main.NewText(Language.GetTextValue(key), CommonColors.Error);
                     return;
                 }
 
@@ -136,7 +136,7 @@ internal class ToolUsage
                 buildingNode = null;
                 _placementStage = 0;
 
-                Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.ConnectedNodes.Connected"), 180, 255, 180);
+                Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.ConnectedNodes.Connected"), CommonColors.Success);
             }
         }
     }
@@ -166,7 +166,7 @@ internal class ToolUsage
             if (_placementStage == 1)
             {
                 var board = WorldBoardSystem.GetBoard(Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().editingBoard);
-                board.AddNode(GenerateNode(board));
+                board.AddNode(BoardNode.GenerateNode(board, buildingNode.GetType(), buildingNode.position, buildingNode.halfWidth));
                 buildingNode = null;
                 _placementStage = 0;
             }
@@ -189,27 +189,6 @@ internal class ToolUsage
                     buildingNode.halfWidth = 40;
             }
         }
-    }
-
-    private static BoardNode GenerateNode(Board board)
-    {
-        var type = buildingNode.GetType();
-        var node = Activator.CreateInstance(type) as BoardNode;
-        node.position = buildingNode.position;
-        node.halfWidth = buildingNode.halfWidth;
-
-        int id = 0;
-
-        while (true)
-        {
-            if (board.nodes.Any(x => x.nodeId == id))
-                id++;
-            else
-                break;
-        }
-
-        node.nodeId = id;
-        return node;
     }
 
     internal static void DrawBuilding()

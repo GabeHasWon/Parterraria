@@ -1,10 +1,15 @@
-﻿using Parterraria.Core.BoardSystem.BoardUI;
+﻿using Parterraria.Common;
+using Parterraria.Content.Items.Board.Create;
+using Parterraria.Core.BoardSystem.BoardUI;
+using Parterraria.Core.MinigameSystem;
 using System;
 using System.Collections.Generic;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.States;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
 using Terraria.UI;
+using Terraria.UI.Chat;
 
 namespace Parterraria.Core.BoardSystem;
 
@@ -12,11 +17,13 @@ internal class WorldBoardSystem : ModSystem
 {
     public static WorldBoardSystem Self => ModContent.GetInstance<WorldBoardSystem>();
     public static bool PlayingParty => Self.playingBoard is not null;
+    public static bool InMinigame => Self.playingMinigame is not null;
     public static bool BuildingBoard => !PlayingParty && Self._toolUI.CurrentState is not null;
 
     public Dictionary<string, Board> worldBoards = [];
 
     public Board playingBoard = null;
+    public Minigame playingMinigame = null;
     public BoardNode hoverNode = null;
 
     private UserInterface _toolUI = null;
@@ -60,7 +67,7 @@ internal class WorldBoardSystem : ModSystem
         {
             TagCompound boardTag = tag.GetCompound("board" + i);
             string key = boardTag.GetString("boardKey");
-            Board board = Board.Load(boardTag, key, out var links);
+            var board = Board.Load(boardTag, key, out var links);
             worldBoards.Add(key, board);
 
             foreach (var item in links)
@@ -129,7 +136,7 @@ internal class WorldBoardSystem : ModSystem
             layers.Insert(resourceBarIndex - 1, new LegacyGameInterfaceLayer(
                 "Parterraria: Board",
                 DrawBoard,
-                InterfaceScaleType.UI)
+                InterfaceScaleType.Game)
             );
 
             layers.Insert(resourceBarIndex - 1, new LegacyGameInterfaceLayer(
@@ -161,6 +168,8 @@ internal class WorldBoardSystem : ModSystem
                 },
                 InterfaceScaleType.UI)
             );
+
+            layers.Add(new LegacyGameInterfaceLayer("Parterraria: Minigame UI", DrawMinigame, InterfaceScaleType.UI));
         }
     }
 
@@ -174,8 +183,24 @@ internal class WorldBoardSystem : ModSystem
 
         ToolUsage.DrawBuilding();
 
+        if (Main.LocalPlayer.HeldItem.ModItem is MinigameTool tool)
+            tool.DrawTool();
+
         if (PlayingParty)
             Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>().DrawBoardInfo();
+        return true;
+    }
+
+    public static bool DrawMinigame()
+    {
+        if (!InMinigame)
+            return true;
+
+        Self.playingMinigame.Draw();
+
+        if (Self.playingMinigame.PlayTime < 240)
+            DrawCommon.CenteredString(FontAssets.DeathText.Value, Main.ScreenSize.ToVector2() / 2f, Self.playingMinigame.DisplayName.Value, Color.White);
+
         return true;
     }
 
@@ -200,11 +225,27 @@ internal class WorldBoardSystem : ModSystem
     {
         if (!Self.worldBoards.ContainsKey(boardKey))
         {
-            denialKey = "Mods.Parterraria.ToolInfo.InvalidBoard";
+            denialKey = "Mods.Parterraria.ToolInfo.Board.InvalidBoard";
             return false;
         }
 
         Board board = GetBoard(boardKey);
         return board.CanStart(out denialKey);
+    }
+
+    public override void PreUpdatePlayers()
+    {
+        if (InMinigame || WorldMinigameSystem.worldMinigames.Count == 0)
+            return;
+
+        for (int i = 0; i < Main.maxPlayers; ++i)
+        {
+            Player plr = Main.player[i];
+
+            if (plr.active && !plr.GetModPlayer<PlayingBoardPlayer>().hasGoneOnCurrentTurn)
+                return;
+        }
+
+        playingMinigame = Main.rand.Next(WorldMinigameSystem.worldMinigames);
     }
 }

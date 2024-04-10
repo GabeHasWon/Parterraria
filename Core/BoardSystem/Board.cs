@@ -1,4 +1,5 @@
 ﻿using Parterraria.Core.BoardSystem.Nodes;
+using Parterraria.Core.Synchronization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,21 +16,21 @@ public class Board
     {
         denialKey = null;
 
-        if (!Main.CurrentFrameFlags.AnyActiveBossNPC)
+        if (Main.CurrentFrameFlags.AnyActiveBossNPC)
         {
-            denialKey = "Mods.Parterraria.ToolInfo.BossActive";
+            denialKey = "Mods.Parterraria.ToolInfo.Board.BossActive";
             return false;
         }
 
         if (!nodes.Any())
         {
-            denialKey = "Mods.Parterraria.ToolInfo.BoardEmpty";
+            denialKey = "Mods.Parterraria.ToolInfo.Board.BoardEmpty";
             return false;
         }
 
         if (!nodes.Any(x => x is StartNode))
         {
-            denialKey = "Mods.Parterraria.ToolInfo.NoStart";
+            denialKey = "Mods.Parterraria.ToolInfo.Board.NoStart";
             return false;
         }
 
@@ -113,6 +114,25 @@ public class Board
         }
 
         return board;
+    }
+
+    internal BoardData GetData(string key)
+    {
+        var nodeData = new BoardData.NodeData[nodes.Count];
+
+        for (int i = 0; i < nodes.Count; ++i)
+        {
+            BoardNode node = nodes[i];
+            int[] links = new int[node.links.LinkCount];
+
+            for (int j = 0; j < links.Length; ++j)
+                links[j] = node.links.links[j].ToNode.nodeId;
+
+            nodeData[i] = new BoardData.NodeData(node.nodeId, node.GetType().AssemblyQualifiedName, node.position, node.halfWidth, links);
+        }
+
+        var data = new BoardData(key, nodeData);
+        return data;
     }
 
     public void Draw() 

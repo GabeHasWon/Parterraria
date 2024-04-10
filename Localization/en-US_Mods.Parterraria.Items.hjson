@@ -1,3 +1,5 @@
+DisappearsWhenNotPartying: This item disappears when not playing a party
+
 BoardTool: {
 	DisplayName: Board Tool
 	Tooltip:
@@ -14,20 +16,37 @@ NormalDice: {
 
 AmethystCoin: {
 	DisplayName: Amethyst Coin
-	Tooltip: Used to barter with the Partykeep
+	Tooltip:
+		'''
+		Used to barter with the Partykeep
+		{$DisappearsWhenNotPartying}
+		'''
 }
 
 DoubleDice: {
 	DisplayName: Double Dice
-	Tooltip: Throws out two Normal Dice, allowing you to roll higher
+	Tooltip:
+		'''
+		Throws out two Normal Dice, allowing you to roll higher
+		{$DisappearsWhenNotPartying}
+		'''
 }
 
 TripleDice: {
 	DisplayName: Triple Dice
-	Tooltip: Throws out three Normal Dice, allowing you to roll higher
+	Tooltip:
+		'''
+		Throws out three Normal Dice, allowing you to roll higher
+		{$DisappearsWhenNotPartying}
+		'''
 }
 
 CelestialCore: {
 	DisplayName: Celestial Core
+	Tooltip: ""
+}
+
+MinigameTool: {
+	DisplayName: Minigame Tool
 	Tooltip: ""
 }

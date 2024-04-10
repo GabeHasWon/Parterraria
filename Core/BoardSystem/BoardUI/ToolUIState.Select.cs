@@ -1,4 +1,5 @@
-﻿using Terraria.GameContent.UI.Elements;
+﻿using Parterraria.Common;
+using Terraria.GameContent.UI.Elements;
 using Terraria.Localization;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
@@ -89,7 +90,7 @@ internal partial class ToolUIState : UIState
 
         button.OnLeftClick += (_, _) =>
         {
-            Main.NewText(Language.GetText("Mods.Parterraria.ToolUI.BoardSelected").Format(board));
+            Main.NewText(Language.GetText("Mods.Parterraria.ToolUI.BoardSelected").Format(board), CommonColors.Info);
             _boardKey = board;
             _player.GetModPlayer<BoardToolPlayer>().editingBoard = board;
         };
@@ -113,7 +114,7 @@ internal partial class ToolUIState : UIState
                 _boardKey = string.Empty;
                 _player.GetModPlayer<BoardToolPlayer>().editingBoard = string.Empty;
                 _player.GetModPlayer<BoardToolPlayer>().Mode = ToolMode.None;
-                Main.NewText(Language.GetText("Mods.Parterraria.ToolUI.BoardDeleted").Format(board));
+                Main.NewText(Language.GetText("Mods.Parterraria.ToolUI.BoardDeleted").Format(board), CommonColors.Info);
 
                 ToolUsage.ResetTool();
             }

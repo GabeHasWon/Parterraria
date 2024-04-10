@@ -1,4 +1,4 @@
-﻿using Parterraria.Core.BoardSystem.Nodes;
+﻿using Parterraria.Common;
 using ReLogic.Content;
 using System;
 using System.Linq;
@@ -28,6 +28,26 @@ public abstract class BoardNode
 
     public static Asset<Texture2D> Tex(BoardNode node, bool icon = false) => Tex(node.GetType().Name.Replace("Node", "") + (icon ? "_Icon" : ""));
     public static Asset<Texture2D> Tex(string node) => ModContent.Request<Texture2D>("Parterraria/Assets/Textures/Nodes/" + node.Replace("Node", ""));
+
+    public static BoardNode GenerateNode(Board board, Type type, Vector2 position, float halfWidth)
+    {
+        var node = Activator.CreateInstance(type) as BoardNode;
+        node.position = position;
+        node.halfWidth = halfWidth;
+
+        int id = 0;
+
+        while (true)
+        {
+            if (board.nodes.Any(x => x.nodeId == id))
+                id++;
+            else
+                break;
+        }
+
+        node.nodeId = id;
+        return node;
+    }
 
     public abstract void LandOn(Board board, Player player);
     public virtual void PassBy(Board board, Player player) { }
