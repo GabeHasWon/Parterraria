@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Parterraria.Core.BoardSystem;
+using System;
 
 namespace Parterraria.Core.Synchronization;
 
 [Serializable]
-public readonly struct BoardData(string key, BoardData.NodeData[] nodes)
+public readonly struct BoardData(string key, BoardConfig config, BoardData.NodeData[] nodes)
 {
     [Serializable]
     public readonly struct NodeData(int id, string type, Vector2 position, float halfWidth, int[] links)
@@ -15,6 +16,7 @@ public readonly struct BoardData(string key, BoardData.NodeData[] nodes)
         public readonly int[] Links = links;
     }
 
+    public readonly BoardConfig Config = config; 
     public readonly NodeData[] Nodes = nodes;
     public readonly string Key = key;
 }

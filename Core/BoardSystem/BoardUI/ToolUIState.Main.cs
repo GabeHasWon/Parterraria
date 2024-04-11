@@ -65,8 +65,20 @@ internal partial class ToolUIState(Player player) : UIState
         AppendToolButton("Paint", SetPaintMode, (_, ui) => SwitchTool(ToolMode.Paint, ui as UIImageButton, "Paint", "Erase"), mainPanel, ref number);
         AppendToolButton("Link", SetLinkMode, (_, ui) => SwitchTool(ToolMode.Link, ui as UIImageButton, "Link", "Unlink"), mainPanel, ref number);
         AppendToolButton("Play", StartParty, (_, ui) => EndParty(), mainPanel, ref number);
+        AppendToolButton("Edit", EditBoard, null, mainPanel, ref number);
         
         AppendToolButton("Close", ExitMenu, null, mainPanel, ref number);
+    }
+
+    private void EditBoard(UIMouseEvent evt, UIElement listeningElement)
+    {
+        if (_boardKey == string.Empty)
+        {
+            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.NoBoard"), CommonColors.Error);
+            return;
+        }
+
+        WorldBoardSystem.SetMiscUI();
     }
 
     private static void EndParty()

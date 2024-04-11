@@ -1,4 +1,5 @@
-﻿using Terraria.DataStructures;
+﻿using System;
+using Terraria.DataStructures;
 using Terraria.Localization;
 using Terraria.Map;
 using Terraria.UI;
@@ -17,8 +18,9 @@ internal class BoardMapLayer : ModMapLayer
             foreach (var node in board.nodes)
             {
                 var tex = BoardNode.Tex(node, true).Value;
+                float zoom = Main.mapFullscreenScale / MathF.Max(tex.Width, tex.Height) * node.halfWidth / 16f;
 
-                if (context.Draw(tex, (node.position / 16f).Floor(), Color.White, new SpriteFrame(1, 1, 0, 0), 1f, 1f, Alignment.Center).IsMouseOver)
+                if (context.Draw(tex, (node.position / 16f).Floor(), Color.White, new SpriteFrame(1, 1, 0, 0), zoom, zoom, Alignment.Center).IsMouseOver)
                     text = Language.GetTextValue(item.Key);
 
                 //position += node.position;

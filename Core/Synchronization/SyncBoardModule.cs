@@ -35,6 +35,7 @@ public class SyncBoardModule(BoardData boardData) : Module
             foreach (var item in setLinkActions)
                 item();
 
+            board.config = data.Config;
             WorldBoardSystem.Self.worldBoards.Add(data.Key, board);
         }
     }

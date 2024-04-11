@@ -16,7 +16,7 @@ internal class PlayingBoardPlayer : ModPlayer
 {
     private static Player CheckNodes = null;
 
-    private static int MaxMoveTimer => 60 * 10;
+    private static int MaxMoveTimer => WorldBoardSystem.Self.playingBoard.config.MaxMoveTimer;
 
     public BoardNode connectedNode = null;
     public BoardNode nextNode = null;

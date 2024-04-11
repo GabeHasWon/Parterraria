@@ -12,6 +12,8 @@ public class Board
     public readonly List<BoardNode> nodes = [];
     public readonly Dictionary<int, BoardNode> nodesById = [];
 
+    public BoardConfig config;
+
     public bool CanStart(out string denialKey)
     {
         denialKey = null;
@@ -131,7 +133,7 @@ public class Board
             nodeData[i] = new BoardData.NodeData(node.nodeId, node.GetType().AssemblyQualifiedName, node.position, node.halfWidth, links);
         }
 
-        var data = new BoardData(key, nodeData);
+        var data = new BoardData(key, config, nodeData);
         return data;
     }
 
