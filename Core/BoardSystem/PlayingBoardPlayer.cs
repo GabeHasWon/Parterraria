@@ -6,6 +6,7 @@ using Parterraria.Core.Synchronization.BoardItemSyncing;
 using System;
 using System.Linq;
 using Terraria.GameContent;
+using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.UI.Chat;
 
@@ -184,7 +185,9 @@ internal class PlayingBoardPlayer : ModPlayer
             node = connectedNode.links.First().ToNode;
         else
         {
-            WorldBoardSystem.SetMiscUI(new PromptSplitPathUIState(connectedNode.links.links));
+            if (Main.myPlayer == Player.whoAmI)
+                WorldBoardSystem.SetMiscUI(new PromptSplitPathUIState(connectedNode.links.links));
+
             prompingSplitPath = true;
             node = null;
         }
@@ -204,20 +207,20 @@ internal class PlayingBoardPlayer : ModPlayer
 
     internal void DrawBoardInfo()
     {
-        var pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 120);
+        var pos = Player.Center - new Vector2(0, 120) - Main.screenPosition;
         DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, "Roll: " + storedRoll, Color.White);
 
-        pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 96);
+        pos = Player.Center - new Vector2(0, 96) - Main.screenPosition;
         string coin = $"[i:{ModContent.ItemType<AmethystCoin>()}]: " + Player.CountItem(ModContent.ItemType<AmethystCoin>());
         DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
 
-        pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 72);
+        pos = Player.Center - new Vector2(0, 72) - Main.screenPosition;
         coin = $"[i:{ModContent.ItemType<CelestialCore>()}]: " + Player.CountItem(ModContent.ItemType<CelestialCore>());
         DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
 
         if (isMoving && !prompingSplitPath)
         {
-            pos = new Vector2(Main.screenWidth / 2f, Main.screenHeight / 2f - 48);
+            pos = Player.Center - new Vector2(0, 48) - Main.screenPosition;
             float moveTime = Math.Max(MaxMoveTimer / 60f - moveTimer / 60f, 0);
             string timeLeft = $"Move timer: " + moveTime.ToString("#0.#") + "s";
             DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, timeLeft, Color.White);

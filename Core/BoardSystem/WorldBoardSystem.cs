@@ -187,7 +187,16 @@ internal class WorldBoardSystem : ModSystem
             tool.DrawTool();
 
         if (PlayingParty)
-            Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>().DrawBoardInfo();
+        {
+            for (int i = 0; i < Main.maxPlayers; ++i)
+            {
+                Player plr = Main.player[i];
+
+                if (plr.active && !plr.dead)
+                    plr.GetModPlayer<PlayingBoardPlayer>().DrawBoardInfo();
+            }
+        }
+
         return true;
     }
 

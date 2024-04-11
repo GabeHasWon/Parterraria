@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Parterraria.Core.Synchronization;
+using System.Collections.Generic;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ID;
 using Terraria.UI;
 
 namespace Parterraria.Core.BoardSystem.BoardUI;
@@ -54,6 +56,9 @@ internal class PromptSplitPathUIState(List<NodeLinks.Link> linksToCheck) : UISta
         var boardPlayer = Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>();
         boardPlayer.prompingSplitPath = false;
         boardPlayer.nextNode = link.ToNode;
+
+        if (Main.netMode == NetmodeID.MultiplayerClient)
+            new SyncConfirmSplitPathModule(Main.myPlayer, boardPlayer.nextNode.nodeId).Send();
 
         WorldBoardSystem.Self.hoverNode = null;
         WorldBoardSystem.CloseMiscUI();
