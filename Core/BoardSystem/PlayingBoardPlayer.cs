@@ -6,9 +6,7 @@ using Parterraria.Core.Synchronization.BoardItemSyncing;
 using System;
 using System.Linq;
 using Terraria.GameContent;
-using Terraria.Graphics.Renderers;
 using Terraria.ID;
-using Terraria.UI.Chat;
 
 namespace Parterraria.Core.BoardSystem;
 
@@ -81,8 +79,7 @@ internal class PlayingBoardPlayer : ModPlayer
     {
         if (!WorldBoardSystem.PlayingParty)
             connectedNode = null;
-
-        if (!prompingSplitPath && Player.talkNPC == -1 && ++moveTimer >= MaxMoveTimer && nextNode is not null)
+        else if (!prompingSplitPath && Player.talkNPC == -1 && ++moveTimer >= MaxMoveTimer && nextNode is not null)
             Player.Teleport(nextNode.position);
 
         if (nextNode is not null)

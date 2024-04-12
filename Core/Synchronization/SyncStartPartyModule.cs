@@ -1,5 +1,6 @@
 ﻿using NetEasy;
 using Parterraria.Core.BoardSystem;
+using Parterraria.Core.BoardSystem.BoardUI;
 using System;
 using Terraria.ID;
 
@@ -19,6 +20,9 @@ public class SyncStartPartyModule(int fromWho, string boardKey) : Module
         if (Main.netMode == NetmodeID.Server)
             Send(-1, -1, false);
         else
+        {
             WorldBoardSystem.CloseToolUI();
+            WorldBoardSystem.CheckCloseMiscUI<EditObjectUIState>();
+        }
     }
 }

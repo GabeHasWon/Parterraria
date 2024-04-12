@@ -12,7 +12,7 @@ public class Board
     public readonly List<BoardNode> nodes = [];
     public readonly Dictionary<int, BoardNode> nodesById = [];
 
-    public BoardConfig config;
+    public BoardConfig config = new();
 
     public bool CanStart(out string denialKey)
     {

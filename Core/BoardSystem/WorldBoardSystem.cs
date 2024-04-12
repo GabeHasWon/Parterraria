@@ -115,6 +115,12 @@ internal class WorldBoardSystem : ModSystem
     internal static void SetMiscUI(UIState state) => Self._miscUI.SetState(state);
     internal static void CloseMiscUI() => Self._miscUI.SetState(null);
 
+    internal static void CheckCloseMiscUI<T>() where T : UIState
+    {
+        if (Self._miscUI.CurrentState is T)
+            Self._miscUI.SetState(null);
+    }
+
     public override void UpdateUI(GameTime gameTime)
     {
         if (_keyboardUI.CurrentState is not null && Main.playerInventory)
