@@ -94,6 +94,10 @@ public class Board
             node.Save(nodeTag);
             boardCompound.Add("node" + nodeId++, nodeTag);
         }
+
+        TagCompound configTag = [];
+        config.Save(configTag);
+        boardCompound.Add(nameof(config), configTag);
     }
 
     public static Board Load(TagCompound boardCompound, string boardKey, out List<Action> linkActions)
@@ -115,6 +119,7 @@ public class Board
             board.AddNode(node);
         }
 
+        board.config = BoardConfig.Load(boardCompound.GetCompound(nameof(config)));
         return board;
     }
 

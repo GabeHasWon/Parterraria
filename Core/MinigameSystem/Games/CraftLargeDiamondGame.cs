@@ -1,9 +1,15 @@
-﻿using Terraria.ID;
+﻿using System.Collections.Generic;
+using Terraria.DataStructures;
+using Terraria.ID;
 
 namespace Parterraria.Core.MinigameSystem.Games;
 
 internal class CraftLargeDiamondGame : Minigame
 {
+    public override MinigameWinType WinType => MinigameWinType.First;
+
+    private HashSet<Point16> _diamondLocations = [];
+
     public override bool ValidateRectangle(ref Rectangle rectangle)
     {
         bool modified = false;
@@ -21,6 +27,33 @@ internal class CraftLargeDiamondGame : Minigame
         }
 
         return modified;
+    }
+
+    public override void OnStart()
+    {
+        for (int i = 0; i < 20; ++i)
+        {
+            Point16 position = new(Main.rand.Next(area.X, area.Right) / 16, Main.rand.Next(area.Y, area.Bottom) / 16);
+
+            if (Main.tile[position].HasTile)
+            {
+                i--;
+                continue;
+            }
+
+            WorldGen.PlaceTile(position.X, position.Y, TileID.Diamond, true, false);
+            Dust.NewDust(position.ToWorldCoordinates(0, 0), 8, 8, DustID.GemDiamond);
+            _diamondLocations.Add(position);
+        }
+    }
+
+    public override void SetupPlayer(Player plr) => plr.GetModPlayer<AdventurePlayer>().AddPick(TileID.Diamond);
+    public override void ResetPlayer(Player plr) => plr.GetModPlayer<AdventurePlayer>().RemovePick(TileID.Diamond);
+
+    public override void OnStop()
+    {
+        foreach (var item in _diamondLocations)
+            WorldGen.KillTile(item.X, item.Y, false, false, true);
     }
 
     public override void InternalUpdate()

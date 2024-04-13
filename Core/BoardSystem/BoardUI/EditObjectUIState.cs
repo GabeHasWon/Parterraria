@@ -1,5 +1,6 @@
 ﻿using Steamworks;
 using System;
+using System.Linq;
 using System.Reflection;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
@@ -8,8 +9,9 @@ namespace Parterraria.Core.BoardSystem.BoardUI;
 
 internal class EditObjectUIState(object objectToEdit, Action<object> setObjectFunc) : UIState
 {
+    private readonly Action<object> _setObjectFunc = setObjectFunc;
+
     private object _objectToEdit = objectToEdit;
-    private Action<object> _setObjectFunc = setObjectFunc;
 
     public override void Update(GameTime gameTime)
     {
@@ -54,7 +56,7 @@ internal class EditObjectUIState(object objectToEdit, Action<object> setObjectFu
             if (item.DeclaringType == typeof(object))
                 continue;
 
-            if (!MemberEditUI.EditableTypes.Contains(item.FieldType))
+            if (!MemberEditUI.EditableTypes.Contains(item.FieldType) && !MemberEditUI.EditableTypes.Any(x => x.IsAssignableFrom(item.FieldType)))
                 continue;
 
             MemberEditUI edit = new(_objectToEdit, item)

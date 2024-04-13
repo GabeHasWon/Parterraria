@@ -50,28 +50,19 @@ public class ShopNPC : ModNPC
         NPC.townNPC = true;
     }
 
-    public override bool PreAI()
-    {
-        return false;
-    }
+    public override bool PreAI() => false;
 
-    public override void SetChatButtons(ref string button, ref string button2)
-    { // What the chat buttons are when you open up the chat UI
-        button = Language.GetTextValue("LegacyInterface.28");
-    }
+    public override void SetChatButtons(ref string button, ref string button2) => button = Language.GetTextValue("LegacyInterface.28");
 
     public override void OnChatButtonClicked(bool firstButton, ref string shop)
     {
         if (firstButton)
-        {
-            shop = "Shop"; // Name of the shop tab we want to open.
-        }
+            shop = "Shop";
     }
 
     public override void AddShops()
     {
         NPCShop shop = new NPCShop(Type)
-            .Add(new NPCShop.Entry(new Item(ModContent.ItemType<DoubleDice>())))
             .Add(new NPCShop.Entry(new Item(ModContent.ItemType<DoubleDice>()) { shopSpecialCurrency = Parterraria.AmethystCurrencyID, shopCustomPrice = 4 }))
             .Add(new NPCShop.Entry(new Item(ModContent.ItemType<TripleDice>()) { shopSpecialCurrency = Parterraria.AmethystCurrencyID, shopCustomPrice = 9 }));
         shop.Register();

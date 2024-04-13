@@ -1,6 +1,7 @@
 ﻿using NetEasy;
 using Parterraria.Core.BoardSystem;
 using Parterraria.Core.BoardSystem.BoardUI;
+using Parterraria.Core.MinigameSystem.MinigameUI;
 using System;
 using Terraria.ID;
 
@@ -21,8 +22,8 @@ public class SyncStartPartyModule(int fromWho, string boardKey) : Module
             Send(-1, -1, false);
         else
         {
-            WorldBoardSystem.CloseToolUI();
-            WorldBoardSystem.CheckCloseMiscUI<EditObjectUIState>();
+            BoardUISystem.CloseToolUI();
+            BoardUISystem.CheckCloseMiscUI<EditObjectUIState>();
         }
     }
 }

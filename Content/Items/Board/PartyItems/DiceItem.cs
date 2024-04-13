@@ -1,4 +1,5 @@
 ﻿using Parterraria.Core.BoardSystem;
+using Parterraria.Core.MinigameSystem;
 using Parterraria.Core.Synchronization.BoardItemSyncing;
 using System;
 using Terraria.DataStructures;
@@ -29,7 +30,7 @@ internal abstract class DiceItem : ModItem
     public override bool CanUseItem(Player player)
     {
         var boardPlayer = player.GetModPlayer<PlayingBoardPlayer>();
-        return !boardPlayer.isMoving && boardPlayer.diceCount == 0;
+        return !boardPlayer.isMoving && boardPlayer.diceCount == 0 && !WorldMinigameSystem.InMinigame;
     }
 
     public override void ModifyShootStats(Player player, ref Vector2 p, ref Vector2 velocity, ref int t, ref int d, ref float k) => velocity.Y = -16;
@@ -61,6 +62,7 @@ internal abstract class DiceItem : ModItem
             Projectile.aiStyle = -1;
             Projectile.hostile = false;
             Projectile.friendly = true;
+            Projectile.tileCollide = false;
         }
 
         public override void AI()

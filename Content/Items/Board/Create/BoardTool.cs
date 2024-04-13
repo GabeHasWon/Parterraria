@@ -21,8 +21,8 @@ class BoardTool : ModItem
     {
         if (player.altFunctionUse == 2)
         {
-            if (!WorldBoardSystem.ToolUIOpen())
-                WorldBoardSystem.OpenToolUI();
+            if (!BoardUISystem.ToolUIOpen())
+                BoardUISystem.OpenToolUI();
             return true;
         }
 

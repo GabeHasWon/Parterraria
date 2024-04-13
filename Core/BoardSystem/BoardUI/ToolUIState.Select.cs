@@ -48,7 +48,7 @@ internal partial class ToolUIState : UIState
             list.SetScrollbar(bar);
             _openPanel.Append(bar);
 
-            foreach (var item in ModContent.GetInstance<WorldBoardSystem>().worldBoards.Keys)
+            foreach (string item in ModContent.GetInstance<WorldBoardSystem>().worldBoards.Keys)
                 AddBoardNameToList(list, item);
 
             UICharacterNameButton namePlate = new(Text("BoardName"), Text("EmptyBoardName"), Text("BoardDescription"))
@@ -60,13 +60,13 @@ internal partial class ToolUIState : UIState
             namePlate.OnLeftClick += (_, _) =>
             {
                 Main.playerInventory = false;
-                WorldBoardSystem.OpenKeyboard((value) =>
+                BoardUISystem.OpenKeyboard((value) =>
                 {
                     value = ModContent.GetInstance<WorldBoardSystem>().GetUnrepeatedKey(value);
                     AddBoardNameToList(list, value);
-                    WorldBoardSystem.CloseKeyboard();
+                    BoardUISystem.CloseKeyboard();
                     ModContent.GetInstance<WorldBoardSystem>().worldBoards.Add(value, new Board());
-                }, WorldBoardSystem.CloseKeyboard);
+                }, BoardUISystem.CloseKeyboard);
             };
 
             _openPanel.Append(namePlate);
@@ -116,6 +116,7 @@ internal partial class ToolUIState : UIState
                 _player.GetModPlayer<BoardToolPlayer>().Mode = ToolMode.None;
                 Main.NewText(Language.GetText("Mods.Parterraria.ToolUI.BoardDeleted").Format(board), CommonColors.Info);
 
+                BoardUISystem.CheckCloseMiscUI<EditObjectUIState>();
                 ToolUsage.ResetTool();
             }
         };

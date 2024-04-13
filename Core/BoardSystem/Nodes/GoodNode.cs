@@ -5,5 +5,5 @@ namespace Parterraria.Core.BoardSystem.Nodes;
 
 public class GoodNode() : EmptyNode
 {
-    public override void LandOn(Board board, Player player) => CommonUtils.AddItemToInvOrSpawnIfOverfull(player, ModContent.ItemType<AmethystCoin>(), 3);
+    public override void LandOn(Board board, Player player) => CommonUtils.SafelyAddItemToInv<AmethystCoin>(player, board.config.CoinDeltaFromNodes);
 }

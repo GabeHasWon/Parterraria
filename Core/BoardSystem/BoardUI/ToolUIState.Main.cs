@@ -65,7 +65,7 @@ internal partial class ToolUIState(Player player) : UIState
         AppendToolButton("Paint", SetPaintMode, (_, ui) => SwitchTool(ToolMode.Paint, ui as UIImageButton, "Paint", "Erase"), mainPanel, ref number);
         AppendToolButton("Link", SetLinkMode, (_, ui) => SwitchTool(ToolMode.Link, ui as UIImageButton, "Link", "Unlink"), mainPanel, ref number);
         AppendToolButton("Play", StartParty, (_, ui) => EndParty(), mainPanel, ref number);
-        AppendToolButton("Edit", EditBoard, (_, ui) => WorldBoardSystem.CloseMiscUI(), mainPanel, ref number);
+        AppendToolButton("Edit", EditBoard, (_, ui) => BoardUISystem.CloseMiscUI(), mainPanel, ref number);
         
         AppendToolButton("Close", ExitMenu, null, mainPanel, ref number);
     }
@@ -78,7 +78,7 @@ internal partial class ToolUIState(Player player) : UIState
             return;
         }
 
-        WorldBoardSystem.SetMiscUI(new EditObjectUIState(WorldBoardSystem.Self.worldBoards[_boardKey].config, (obj) => WorldBoardSystem.Self.worldBoards[_boardKey].config = (BoardConfig)obj));
+        BoardUISystem.SetMiscUI(new EditObjectUIState(WorldBoardSystem.Self.worldBoards[_boardKey].config, (obj) => WorldBoardSystem.Self.worldBoards[_boardKey].config = (BoardConfig)obj));
     }
 
     private static void EndParty()
@@ -107,8 +107,8 @@ internal partial class ToolUIState(Player player) : UIState
             else
             {
                 WorldBoardSystem.PlayParty(_boardKey);
-                WorldBoardSystem.CloseToolUI();
-                WorldBoardSystem.CheckCloseMiscUI<EditObjectUIState>();
+                BoardUISystem.CloseToolUI();
+                BoardUISystem.CheckCloseMiscUI<EditObjectUIState>();
             }
         }
         else
@@ -117,7 +117,7 @@ internal partial class ToolUIState(Player player) : UIState
 
     private void ExitMenu(UIMouseEvent evt, UIElement listeningElement)
     {
-        WorldBoardSystem.CloseToolUI();
+        BoardUISystem.CloseToolUI();
         ToolUsage.ResetTool();
         Main.isMouseLeftConsumedByUI = true;
 

@@ -9,7 +9,7 @@ namespace Parterraria.Core.BoardSystem.BoardUI;
 
 internal class MemberEditUI(object reference, FieldInfo info) : UIState
 {
-    public static List<Type> EditableTypes = [ typeof(int), typeof(bool), typeof(float), typeof(string), typeof(Vector2) ];
+    public static List<Type> EditableTypes = [ typeof(int), typeof(short), typeof(ushort), typeof(byte), typeof(bool), typeof(float), typeof(string), typeof(Vector2), typeof(Enum) ];
 
     public object GetValue => _info.GetValue(_reference);
 
@@ -37,9 +37,9 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
         switch (value)
         {
             case int:
-                BuildInteger(panel);
-                break;
             case short:
+            case byte:
+            case ushort:
                 BuildInteger(panel);
                 break;
             default:
@@ -52,8 +52,8 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
         object value = _info.GetValue(_reference);
         text.SetText(value switch
         {
-            int or short => _info.Name + ": " + _info.GetValue(_reference),
-            Enum => _info.Name + ": " + _info.GetValue(_reference),
+            int or short or byte or ushort => _info.Name + ": " + value,
+            Enum => _info.Name + ": " + value + $" ({Convert.ToInt32((Enum)value)})",
             _ => "[Unknown data type, how'd you get here?]"
         });
     }
@@ -77,11 +77,29 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
         decButton.OnLeftClick += (_, _) => ModifyValue(false);
         panel.Append(decButton);
 
-        void ModifyValue(bool increase) => _info.SetValue(_reference, _info.GetValue(_reference) switch
+        void ModifyValue(bool increase) 
         {
-            int integer => integer + (increase ? 1 : -1),
-            short shortVal => shortVal + (increase ? 1 : -1),
-            _ => throw null,
-        });
+            switch (_info.GetValue(_reference))
+            {
+                case int integer:
+                    _info.SetValue(_reference, integer + (increase ? 1 : -1));
+                    break;
+
+                case short shortVal:
+                    _info.SetValue(_reference, (short)(shortVal + (increase ? 1 : -1)));
+                    break;
+
+                case ushort ushortVal:
+                    _info.SetValue(_reference, (ushort)Math.Clamp((short)(ushortVal + (increase ? 1 : -1)), ushort.MinValue, ushort.MaxValue));
+                    break;
+
+                case byte byteVal:
+                    _info.SetValue(_reference, (byte)MathHelper.Clamp(byteVal + (increase ? 1 : -1), 0, 255));
+                    break;
+
+                default:
+                    throw null;
+            }
+        }
     }
 }

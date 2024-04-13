@@ -1,13 +1,12 @@
-﻿using Parterraria.Content.Items.Board;
-using System;
-using Terraria;
-using Terraria.DataStructures;
+﻿using Terraria.DataStructures;
 
 namespace Parterraria.Common;
 
 internal static class CommonUtils
 {
-    public static void AddItemToInvOrSpawnIfOverfull(Player player, int type, int count)
+    public static void SafelyAddItemToInv<T>(Player player, int count) where T : ModItem => SafelyAddItemToInv(player, ModContent.ItemType<T>(), count);
+
+    public static void SafelyAddItemToInv(Player player, int type, int count)
     {
         if (Main.myPlayer == player.whoAmI)
         {
@@ -42,6 +41,9 @@ internal static class CommonUtils
             player.QuickSpawnItem(new EntitySource_OverfullInventory(player), type, count);
         }
     }
+
+    public static bool ConsumeItemFromInventory<T>(Player player, int count, bool consumeAlways = false) where T : ModItem 
+        => ConsumeItemFromInventory(player, ModContent.ItemType<T>(), count, consumeAlways);
 
     public static bool ConsumeItemFromInventory(Player player, int type, int count, bool consumeAlways = false)
     {

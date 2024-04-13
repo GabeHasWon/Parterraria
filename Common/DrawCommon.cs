@@ -4,9 +4,11 @@ namespace Parterraria.Common;
 
 internal static class DrawCommon
 {
-    public static void CenteredString(DynamicSpriteFont font, Vector2 position, string text, Color color)
+    public static void CenteredString(DynamicSpriteFont font, Vector2 position, string text, Color color) => CenteredString(font, position, text, color, Vector2.One);
+
+    public static void CenteredString(DynamicSpriteFont font, Vector2 position, string text, Color color, Vector2 scale)
     {
-        Vector2 size = font.MeasureString(text);
+        Vector2 size = font.MeasureString(text) * scale;
 
         for (int i = 0; i < text.Length; ++i)
         {
@@ -17,6 +19,6 @@ internal static class DrawCommon
                 size.X += 32;
         }
 
-        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, position - size / 2f, color, 0, Vector2.Zero, Vector2.One);
+        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, position - size / 2f, color, 0, Vector2.Zero, scale);
     }
 }

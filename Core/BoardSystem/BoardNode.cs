@@ -21,10 +21,7 @@ public abstract class BoardNode
 
     public Rectangle Bounds => new((int)(position.X - halfWidth + 4), (int)(position.Y - halfWidth + 4), (int)halfWidth * 2 - 8, (int)halfWidth * 2 - 8);
 
-    public BoardNode()
-    {
-        links = new NodeLinks(this);
-    }
+    public BoardNode() => links = new NodeLinks(this);
 
     public static Asset<Texture2D> Tex(BoardNode node, bool icon = false) => Tex(node.GetType().Name.Replace("Node", "") + (icon ? "_Icon" : ""));
     public static Asset<Texture2D> Tex(string node) => ModContent.Request<Texture2D>("Parterraria/Assets/Textures/Nodes/" + node.Replace("Node", ""));
@@ -116,7 +113,7 @@ public abstract class BoardNode
             var namePos = position + new Vector2(-halfWidth + 6) - Main.screenPosition;
             string text = GetType().Name;
             float size = font.MeasureString(text).X * 0.8f;
-            Vector2 nameScale = Vector2.Min(new(halfWidth / size), Vector2.One);
+            var nameScale = Vector2.Min(new(halfWidth / size), Vector2.One);
 
             ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, namePos, Color.White, 0, Vector2.Zero, nameScale);
 
@@ -132,10 +129,7 @@ public abstract class BoardNode
         }
     }
 
-    public virtual void FancyDraw()
-    {
-        NodeDrawing.DrawNodeSquare(position - Main.screenPosition, halfWidth, GetType().Name, Color.LightGray);
-    }
+    public virtual void FancyDraw() => NodeDrawing.DrawNodeSquare(position - Main.screenPosition, halfWidth, GetType().Name, Color.LightGray);
 
     public virtual void DrawLinks(bool fancy)
     {

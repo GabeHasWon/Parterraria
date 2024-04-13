@@ -2,6 +2,7 @@
 using Parterraria.Content.Items.Board;
 using Parterraria.Core.BoardSystem.BoardUI;
 using Parterraria.Core.BoardSystem.Nodes;
+using Parterraria.Core.MinigameSystem;
 using Parterraria.Core.Synchronization.BoardItemSyncing;
 using System;
 using System.Linq;
@@ -14,12 +15,13 @@ internal class PlayingBoardPlayer : ModPlayer
 {
     private static Player CheckNodes = null;
 
-    private static int MaxMoveTimer => WorldBoardSystem.Self.playingBoard.config.MaxMoveTimer;
+    private static int MaxMoveTimer => WorldBoardSystem.Self.playingBoard.config.MaxMoveTimerInSeconds * 60;
 
     public BoardNode connectedNode = null;
     public BoardNode nextNode = null;
     public int storedRoll = 0;
     public bool hasGoneOnCurrentTurn = false;
+    public bool minigameReady = false;
 
     /// <summary>
     /// How long the player has until they are teleported to the next node.
@@ -52,7 +54,7 @@ internal class PlayingBoardPlayer : ModPlayer
     {
         Vector2 vel = orig(Position, Velocity, Width, Height, fallThrough, fall2, gravDir);
 
-        if (CheckNodes is not null && WorldBoardSystem.PlayingParty)
+        if (CheckNodes is not null && WorldBoardSystem.PlayingParty && !WorldMinigameSystem.InMinigame)
         {
             var boardPlayer = CheckNodes.GetModPlayer<PlayingBoardPlayer>();
 
@@ -94,6 +96,14 @@ internal class PlayingBoardPlayer : ModPlayer
                     hasGoneOnCurrentTurn = true;
             }
         }
+
+        if (WorldMinigameSystem.InMinigame)
+        {
+            if (Main.mouseRight)
+                minigameReady = true;
+        }
+        else
+            minigameReady = false;
     }
 
     public override void OnRespawn()
@@ -183,7 +193,7 @@ internal class PlayingBoardPlayer : ModPlayer
         else
         {
             if (Main.myPlayer == Player.whoAmI)
-                WorldBoardSystem.SetMiscUI(new PromptSplitPathUIState(connectedNode.links.links));
+                BoardUISystem.SetMiscUI(new PromptSplitPathUIState(connectedNode.links.links));
 
             prompingSplitPath = true;
             node = null;
@@ -204,23 +214,31 @@ internal class PlayingBoardPlayer : ModPlayer
 
     internal void DrawBoardInfo()
     {
-        var pos = Player.Center - new Vector2(0, 120) - Main.screenPosition;
-        DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, "Roll: " + storedRoll, Color.White);
-
-        pos = Player.Center - new Vector2(0, 96) - Main.screenPosition;
-        string coin = $"[i:{ModContent.ItemType<AmethystCoin>()}]: " + Player.CountItem(ModContent.ItemType<AmethystCoin>());
-        DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
-
-        pos = Player.Center - new Vector2(0, 72) - Main.screenPosition;
-        coin = $"[i:{ModContent.ItemType<CelestialCore>()}]: " + Player.CountItem(ModContent.ItemType<CelestialCore>());
-        DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
-
-        if (isMoving && !prompingSplitPath)
+        if (!WorldMinigameSystem.InMinigame)
         {
-            pos = Player.Center - new Vector2(0, 48) - Main.screenPosition;
-            float moveTime = Math.Max(MaxMoveTimer / 60f - moveTimer / 60f, 0);
-            string timeLeft = $"Move timer: " + moveTime.ToString("#0.#") + "s";
-            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, timeLeft, Color.White);
+            var pos = Player.Center - new Vector2(0, 120 - Player.gfxOffY) - Main.screenPosition;
+            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, "Roll: " + storedRoll, Color.White);
+
+            pos = Player.Center - new Vector2(0, 96 - Player.gfxOffY) - Main.screenPosition;
+            string coin = $"[i:{ModContent.ItemType<AmethystCoin>()}]: " + Player.CountItem(ModContent.ItemType<AmethystCoin>());
+            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
+
+            pos = Player.Center - new Vector2(0, 72 - Player.gfxOffY) - Main.screenPosition;
+            coin = $"[i:{ModContent.ItemType<CelestialCore>()}]: " + Player.CountItem(ModContent.ItemType<CelestialCore>());
+            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
+
+            if (isMoving && !prompingSplitPath)
+            {
+                pos = Player.Center - new Vector2(0, 48 - Player.gfxOffY) - Main.screenPosition;
+                float moveTime = Math.Max(MaxMoveTimer / 60f - moveTimer / 60f, 0);
+                string timeLeft = $"Move timer: " + moveTime.ToString("#0.#") + "s";
+                DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, timeLeft, Color.White);
+            }
+        }
+        else if (WorldMinigameSystem.NotReady)
+        {
+            var pos = Player.Center - new Vector2(0, 48 - Player.gfxOffY) - Main.screenPosition;
+            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos.Floor(), minigameReady ? "READY" : "NOT READY", minigameReady ? Color.Green : Color.Orange);
         }
     }
 }

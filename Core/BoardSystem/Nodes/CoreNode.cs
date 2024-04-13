@@ -7,7 +7,7 @@ public class CoreNode() : EmptyNode
 {
     public override void PassBy(Board board, Player player)
     {
-        if (CommonUtils.ConsumeItemFromInventory(player, ModContent.ItemType<AmethystCoin>(), 20, false))
-            CommonUtils.AddItemToInvOrSpawnIfOverfull(player, ModContent.ItemType<CelestialCore>(), 1);
+        if (CommonUtils.ConsumeItemFromInventory<AmethystCoin>(player, board.config.CoreCost, false))
+            CommonUtils.SafelyAddItemToInv(player, ModContent.ItemType<CelestialCore>(), 1);
     }
 }

@@ -7,7 +7,7 @@ namespace Parterraria.Content.Items.Board.Create;
 
 class MinigameTool : ModItem
 {
-    private string SelectedMinigame => Minigame.MinigamesById[_selectedMinigameId].FullName;
+    private Minigame SelectedMinigame => Minigame.MinigamesById[_selectedMinigameId];
 
     private int _selectedMinigameId = 0;
     private Rectangle? _minigameArea = null;
@@ -28,12 +28,17 @@ class MinigameTool : ModItem
     {
         if (player.altFunctionUse == 2)
         {
-            _selectedMinigameId++;
+            if (!_minigameArea.HasValue)
+            {
+                _selectedMinigameId++;
 
-            if (_selectedMinigameId >= Minigame.MinigamesById.Count)
-                _selectedMinigameId = 0;
+                if (_selectedMinigameId >= Minigame.MinigamesById.Count)
+                    _selectedMinigameId = 0;
 
-            Main.NewText($"Minigame {Minigame.MinigamesByModAndName[SelectedMinigame].DisplayName.Value} selected.");
+                Main.NewText($"Minigame {SelectedMinigame.DisplayName.Value} selected.");
+            }
+            else
+                _minigameArea = null;
             return false;
         }
 
@@ -47,7 +52,7 @@ class MinigameTool : ModItem
             Rectangle area = _minigameArea.Value;
             area.Width = (int)(Main.MouseWorld.X - area.X);
             area.Height = (int)(Main.MouseWorld.Y - area.Y);
-            Minigame.MinigamesByModAndName[SelectedMinigame].ValidateRectangle(ref area);
+            SelectedMinigame.ValidateRectangle(ref area);
             _minigameArea = area;
         }
     }
@@ -61,7 +66,7 @@ class MinigameTool : ModItem
         }
         else
         {
-            WorldMinigameSystem.TryAddMinigame(SelectedMinigame, _minigameArea.Value);
+            WorldMinigameSystem.TryAddMinigame(SelectedMinigame.FullName, _minigameArea.Value);
             _minigameArea = null;
         }
 
@@ -76,8 +81,7 @@ class MinigameTool : ModItem
             rect.Location -= Main.screenPosition.ToPoint();
 
             Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, Color.White * 0.6f);
-
-            DrawCommon.CenteredString(FontAssets.DeathText.Value, Main.ScreenSize.ToVector2() / 2f, "Megg", Color.White);
+            DrawCommon.CenteredString(FontAssets.DeathText.Value, Main.ScreenSize.ToVector2() / 2f, SelectedMinigame.DisplayName.Value, Color.White);
         }
     }
 }

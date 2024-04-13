@@ -61,6 +61,6 @@ internal class PromptSplitPathUIState(List<NodeLinks.Link> linksToCheck) : UISta
             new SyncConfirmSplitPathModule(Main.myPlayer, boardPlayer.nextNode.nodeId).Send();
 
         WorldBoardSystem.Self.hoverNode = null;
-        WorldBoardSystem.CloseMiscUI();
+        BoardUISystem.CloseMiscUI();
     }
 }

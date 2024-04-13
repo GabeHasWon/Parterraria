@@ -1,4 +1,5 @@
 ﻿using System;
+using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.BoardSystem;
 
@@ -13,7 +14,26 @@ public class BoardConfig
     }
 
     public WinType Win = WinType.TurnCount;
-    public int MaxMoveTimer = 60 * 10;
+    public ushort MaxMoveTimerInSeconds = 10;
+    public ushort CoreCost = 20;
     public string[] DisallowedMinigames = [];
-    public int CoinDeltaFromNodes = 3;
+    public byte CoinDeltaFromNodes = 3;
+
+    public void Save(TagCompound tag)
+    {
+        tag.Add(nameof(Win), (byte)Win);
+        tag.Add(nameof(MaxMoveTimerInSeconds), MaxMoveTimerInSeconds);
+        tag.Add(nameof(CoreCost), CoreCost);
+        tag.Add(nameof(CoinDeltaFromNodes), CoinDeltaFromNodes);
+    }
+
+    public static BoardConfig Load(TagCompound tag)
+    {
+        BoardConfig config = new();
+        config.Win = (WinType)tag.GetByte(nameof(Win));
+        config.MaxMoveTimerInSeconds = (ushort)tag.GetShort(nameof(MaxMoveTimerInSeconds));
+        config.CoreCost = (ushort)tag.GetShort(nameof(CoreCost));
+        config.CoinDeltaFromNodes = tag.GetByte(nameof(CoinDeltaFromNodes));
+        return config;
+    }
 }
