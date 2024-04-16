@@ -2,9 +2,12 @@
 using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem;
 using Parterraria.Core.MinigameSystem.MinigameUI;
+using Parterraria.Core.Synchronization.MinigameSyncing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader.IO;
 
@@ -18,9 +21,11 @@ internal class WorldMinigameSystem : ModSystem
 
     internal static readonly List<Minigame> worldMinigames = [];
 
+    internal static bool selectingMinigame = false;
+
     private static int _minigameOverTimer = 0;
     private static int _minigamePreviewTimer = 0;
-    private static bool _selectingMinigame = false;
+    private static MinigameRanking _rankings = null;
 
     public Minigame playingMinigame = null;
 
@@ -65,6 +70,9 @@ internal class WorldMinigameSystem : ModSystem
             var descPos = Main.ScreenSize.ToVector2() / new Vector2(2f, 4f) + new Vector2(0, 40);
             DrawCommon.CenteredString(FontAssets.DeathText.Value, descPos, Self.playingMinigame.Description.Value, alpha, new Vector2(0.5f));
         }
+
+        if (_minigameOverTimer > 0)
+            _rankings.Draw(Math.Min(_minigameOverTimer / 120f, 1));
     }
 
     private static void DebugDrawMinigames(Minigame game)
@@ -104,32 +112,19 @@ internal class WorldMinigameSystem : ModSystem
             else
                 playingMinigame.Update();
 
-            if (playingMinigame.Beaten && _minigameOverTimer++ > 240)
+            if (playingMinigame.Beaten)
             {
-                for (int i = 0; i < Main.maxPlayers; ++i)
-                {
-                    Player plr = Main.player[i];
+                _rankings ??= playingMinigame.GetRanking();
 
-                    if (plr.active)
-                    {
-                        if (plr.dead)
-                            plr.Spawn(PlayerSpawnContext.ReviveFromDeath);
-
-                        plr.Center = plr.GetModPlayer<PlayingBoardPlayer>().connectedNode.position;
-                        plr.GetModPlayer<PlayingBoardPlayer>().hasGoneOnCurrentTurn = false;
-                        playingMinigame.ResetPlayer(plr);
-                    }
-                }
-
-                playingMinigame.OnStop();
-                playingMinigame = null;
+                if (_minigameOverTimer++ > 240)
+                    CompleteMinigame();
             }
         }
 
-        if (InMinigame || worldMinigames.Count == 0)
+        if (InMinigame || worldMinigames.Count == 0 || Main.netMode == NetmodeID.MultiplayerClient)
             return;
 
-        if (_selectingMinigame)
+        if (selectingMinigame)
             return;
 
         for (int i = 0; i < Main.maxPlayers; ++i)
@@ -140,18 +135,50 @@ internal class WorldMinigameSystem : ModSystem
                 return;
         }
 
-        BoardUISystem.SetMiscUI(new MinigameSelectionUIState(StartMinigame));
-        _selectingMinigame = true;
+        if (Main.netMode == NetmodeID.SinglePlayer)
+            BoardUISystem.SetMiscUI(new MinigameSelectionUIState(StartMinigame));
+        else
+            new SyncMinigameRollUIModule(Main.rand.NextFloat(2f, 2.5f), MinigameSelectionUIState.DetermineMinigames()).Send();
+        selectingMinigame = true;
     }
 
-    private void StartMinigame(string minigameName)
+    private void CompleteMinigame()
+    {
+        for (int i = 0; i < Main.maxPlayers; ++i)
+        {
+            Player plr = Main.player[i];
+
+            if (plr.active)
+            {
+                if (plr.dead)
+                    plr.Spawn(PlayerSpawnContext.ReviveFromDeath);
+
+                plr.Center = plr.GetModPlayer<PlayingBoardPlayer>().connectedNode.position;
+                plr.GetModPlayer<PlayingBoardPlayer>().hasGoneOnCurrentTurn = false;
+                playingMinigame.ResetPlayer(plr);
+            }
+
+            playingMinigame.Reward(_rankings, plr);
+        }
+
+        playingMinigame.OnStop();
+        playingMinigame = null;
+    }
+
+    public override void ClearWorld()
+    {
+        playingMinigame = null;
+        worldMinigames.Clear();
+    }
+
+    public void StartMinigame(string minigameName)
     {
         _minigamePreviewTimer = 0;
         _minigameOverTimer = 0;
         playingMinigame = Main.rand.Next(worldMinigames.Where(x => x.FullName == minigameName).ToArray()).Clone();
         playingMinigame.OnSet();
         NotReady = true;
-        _selectingMinigame = false;
+        selectingMinigame = false;
 
         for (int i = 0; i < Main.maxPlayers; ++i)
         {
@@ -195,7 +222,7 @@ internal class WorldMinigameSystem : ModSystem
     internal void StopParty()
     {
         playingMinigame = null;
-        _selectingMinigame = false;
+        selectingMinigame = false;
         NotReady = true;
     }
 }

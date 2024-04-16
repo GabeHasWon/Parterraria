@@ -15,6 +15,8 @@ internal partial class WorldBoardSystem : ModSystem
 
     public Board playingBoard = null;
     public BoardNode hoverNode = null;
+    public int boardHost = -1;
+    public string playingBoardKey = null;
 
     public override void SaveWorldData(TagCompound tag)
     {
@@ -72,6 +74,7 @@ internal partial class WorldBoardSystem : ModSystem
 
     internal static void PlayParty(string boardKey)
     {
+        Self.playingBoardKey = boardKey;
         Self.playingBoard = GetBoard(boardKey);
         Self.playingBoard.Start();
     }
@@ -82,6 +85,7 @@ internal partial class WorldBoardSystem : ModSystem
 
         WorldMinigameSystem.Self.StopParty();
         Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>().ExitParty();
+        BoardUISystem.CloseMiscUI();
     }
 
     internal static bool CanPlayParty(string boardKey, out string denialKey)

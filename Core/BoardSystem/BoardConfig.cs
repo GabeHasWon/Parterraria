@@ -18,6 +18,7 @@ public class BoardConfig
     public ushort CoreCost = 20;
     public string[] DisallowedMinigames = [];
     public byte CoinDeltaFromNodes = 3;
+    public byte CoinDeltaFromGames = 3;
 
     public void Save(TagCompound tag)
     {
@@ -25,6 +26,7 @@ public class BoardConfig
         tag.Add(nameof(MaxMoveTimerInSeconds), MaxMoveTimerInSeconds);
         tag.Add(nameof(CoreCost), CoreCost);
         tag.Add(nameof(CoinDeltaFromNodes), CoinDeltaFromNodes);
+        tag.Add(nameof(CoinDeltaFromGames), CoinDeltaFromGames);
     }
 
     public static BoardConfig Load(TagCompound tag)
@@ -34,6 +36,7 @@ public class BoardConfig
         config.MaxMoveTimerInSeconds = (ushort)tag.GetShort(nameof(MaxMoveTimerInSeconds));
         config.CoreCost = (ushort)tag.GetShort(nameof(CoreCost));
         config.CoinDeltaFromNodes = tag.GetByte(nameof(CoinDeltaFromNodes));
+        config.CoinDeltaFromGames = tag.GetByte(nameof(CoinDeltaFromGames));
         return config;
     }
 }

@@ -5,5 +5,6 @@ internal class SyncPlayer : ModPlayer
     public override void OnEnterWorld()
     {
         new RequestBoardsFromServerModule(Main.myPlayer).Send(-1, -1, false);
+        new RequestMinigamesFromServerModule(Main.myPlayer).Send(-1, -1, false);
     }
 }

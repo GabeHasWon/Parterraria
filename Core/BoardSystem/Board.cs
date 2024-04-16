@@ -1,8 +1,12 @@
-﻿using Parterraria.Core.BoardSystem.Nodes;
+﻿using Parterraria.Content.Items.Board.Create;
+using Parterraria.Content.Items.Board.PartyItems;
+using Parterraria.Core.BoardSystem.Nodes;
+using Parterraria.Core.InventoryStorageSystem;
 using Parterraria.Core.Synchronization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Terraria.ID;
 using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.BoardSystem;
@@ -52,6 +56,23 @@ public class Board
 
                 BoardNode node = nodes.First(x => x is StartNode);
                 plr.Center = node.position;
+
+                if (i == WorldBoardSystem.Self.boardHost)
+                    plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
+                        [
+                            new Item(ModContent.ItemType<NormalDice>()),
+                            new Item(ItemID.GoldPickaxe),
+                            new Item(ItemID.BladeofGrass),
+                            new Item(ModContent.ItemType<BoardTool>())
+                        ]);
+                else
+                    plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
+                        [
+                            new Item(ModContent.ItemType<NormalDice>()),
+                            new Item(ItemID.GoldPickaxe),
+                            new Item(ItemID.BladeofGrass)
+                        ]);
+
                 plr.GetModPlayer<PlayingBoardPlayer>().connectedNode = node;
                 plr.GetModPlayer<PlayingBoardPlayer>().connectedNode.LandOn(WorldBoardSystem.Self.playingBoard, plr);
                 plr.GetModPlayer<PlayingBoardPlayer>().storedRoll = 0;

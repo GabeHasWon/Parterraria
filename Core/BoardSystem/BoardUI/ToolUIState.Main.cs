@@ -35,6 +35,9 @@ internal partial class ToolUIState(Player player) : UIState
 
     public override void OnInitialize()
     {
+        if (WorldBoardSystem.PlayingParty)
+            _boardKey = WorldBoardSystem.Self.playingBoardKey;
+
         UIPanel mainPanel = new()
         {
             Width = StyleDimension.FromPixels(300),
@@ -106,6 +109,7 @@ internal partial class ToolUIState(Player player) : UIState
                 new SyncStartPartyModule(Main.myPlayer, _boardKey).Send();
             else
             {
+                WorldBoardSystem.Self.boardHost = Main.myPlayer;
                 WorldBoardSystem.PlayParty(_boardKey);
                 BoardUISystem.CloseToolUI();
                 BoardUISystem.CheckCloseMiscUI<EditObjectUIState>();

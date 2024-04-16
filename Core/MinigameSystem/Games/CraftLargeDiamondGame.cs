@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Parterraria.Core.InventoryStorageSystem;
+using System.Collections.Generic;
 using Terraria.DataStructures;
 using Terraria.ID;
 
@@ -31,7 +32,7 @@ internal class CraftLargeDiamondGame : Minigame
 
     public override void OnStart()
     {
-        for (int i = 0; i < 20; ++i)
+        for (int i = 0; i <= 20; ++i)
         {
             Point16 position = new(Main.rand.Next(area.X, area.Right) / 16, Main.rand.Next(area.Y, area.Bottom) / 16);
 
@@ -47,13 +48,38 @@ internal class CraftLargeDiamondGame : Minigame
         }
     }
 
-    public override void SetupPlayer(Player plr) => plr.GetModPlayer<AdventurePlayer>().AddPick(TileID.Diamond);
-    public override void ResetPlayer(Player plr) => plr.GetModPlayer<AdventurePlayer>().RemovePick(TileID.Diamond);
+    public override void SetupPlayer(Player plr)
+    {
+        plr.GetModPlayer<AdventurePlayer>().AddPick(TileID.Diamond);
+        plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
+            [
+                new Item(ItemID.ChlorophytePickaxe),
+            ]);
+    }
+
+    public override void ResetPlayer(Player plr)
+    {
+        plr.GetModPlayer<AdventurePlayer>().RemovePick(TileID.Diamond);
+        plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
+    }
 
     public override void OnStop()
     {
         foreach (var item in _diamondLocations)
             WorldGen.KillTile(item.X, item.Y, false, false, true);
+    }
+
+    public override MinigameRanking GetRanking()
+    {
+        for (int i = 0; i < Main.maxPlayers; ++i)
+        {
+            Player plr = Main.player[i];
+
+            if (!plr.dead && (plr.HasItem(ItemID.LargeDiamond) || plr.HeldItem.type == ItemID.LargeDiamond))
+                return MinigameRanking.ByFirst(plr.whoAmI);
+        }
+
+        return null;
     }
 
     public override void InternalUpdate()

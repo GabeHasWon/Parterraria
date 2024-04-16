@@ -2,8 +2,10 @@
 using Parterraria.Content.Items.Board;
 using Parterraria.Core.BoardSystem.BoardUI;
 using Parterraria.Core.BoardSystem.Nodes;
+using Parterraria.Core.InventoryStorageSystem;
 using Parterraria.Core.MinigameSystem;
 using Parterraria.Core.Synchronization.BoardItemSyncing;
+using Parterraria.Core.Synchronization.MinigameSyncing;
 using System;
 using System.Linq;
 using Terraria.GameContent;
@@ -99,8 +101,13 @@ internal class PlayingBoardPlayer : ModPlayer
 
         if (WorldMinigameSystem.InMinigame)
         {
-            if (Main.mouseRight)
+            if (Main.mouseRight && Main.myPlayer == Player.whoAmI)
+            {
                 minigameReady = true;
+
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                    new SyncMinigameReadyModule(Main.myPlayer).Send();
+            }
         }
         else
             minigameReady = false;
@@ -210,6 +217,8 @@ internal class PlayingBoardPlayer : ModPlayer
         moveTimer = 0;
         isMoving = false;
         hasGoneOnCurrentTurn = false;
+
+        Player.GetModPlayer<InventoryPlayer>().ReplaceInventory();
     }
 
     internal void DrawBoardInfo()

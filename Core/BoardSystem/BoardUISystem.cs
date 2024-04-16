@@ -84,7 +84,7 @@ internal class BoardUISystem : ModSystem
                 InterfaceScaleType.Game)
             );
 
-            layers.Insert(resourceBarIndex - 2, new LegacyGameInterfaceLayer(
+            layers.Insert(resourceBarIndex + 2, new LegacyGameInterfaceLayer(
                 "Parterraria: Misc UI",
                 delegate
                 {

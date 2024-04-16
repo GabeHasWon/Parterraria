@@ -44,6 +44,7 @@ internal abstract class Minigame : ModType
     }
 
     public abstract void InternalUpdate();
+    public abstract MinigameRanking GetRanking();
     public virtual Minigame Clone() => MemberwiseClone() as Minigame;
     
     /// <summary>
@@ -72,6 +73,8 @@ internal abstract class Minigame : ModType
     /// </summary>
     /// <param name="plr">Relevant player.</param>
     public virtual void ResetPlayer(Player plr) { }
+
+    internal virtual void Reward(MinigameRanking rankings, Player plr) => rankings.Reward(plr);
 
     public abstract bool ValidateRectangle(ref Rectangle rectangle);
     public virtual void Draw() { }

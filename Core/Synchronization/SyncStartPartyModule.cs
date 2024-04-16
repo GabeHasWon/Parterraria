@@ -1,7 +1,6 @@
 ﻿using NetEasy;
 using Parterraria.Core.BoardSystem;
 using Parterraria.Core.BoardSystem.BoardUI;
-using Parterraria.Core.MinigameSystem.MinigameUI;
 using System;
 using Terraria.ID;
 
@@ -16,6 +15,8 @@ public class SyncStartPartyModule(int fromWho, string boardKey) : Module
     protected override void Receive()
     {
         Main.NewText($"Starting party \"{_boardKey}\" from {Main.player[_fromWho].name}!");
+
+        WorldBoardSystem.Self.boardHost = _fromWho;
         WorldBoardSystem.PlayParty(_boardKey);
 
         if (Main.netMode == NetmodeID.Server)

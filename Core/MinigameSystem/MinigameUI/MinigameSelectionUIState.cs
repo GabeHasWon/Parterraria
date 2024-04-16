@@ -1,67 +1,84 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 
 namespace Parterraria.Core.MinigameSystem.MinigameUI;
 
-internal class MinigameSelectionUIState(MinigameSelectionUIState.SetMinigameDelegate setMinigame) : UIState
+internal class MinigameSelectionUIState(MinigameSelectionUIState.SetMinigameDelegate setMinigame, float timerSpeed = -1, string[] minigames = null) : UIState
 {
     public delegate void SetMinigameDelegate(string value);
 
-    private string[] _minigames = [];
+    private string[] _minigames = minigames;
     private int _selectedMinigame = 0;
     private SetMinigameDelegate _setMinigame = setMinigame;
-    private int _timer = 0;
+    private float _timer = 0;
+    private float _timerSpeed = timerSpeed;
+    private float _minigameTime = 0;
 
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
 
-        _timer++;
+        if (_timer == 0 && _timerSpeed == -1)
+            _timerSpeed = Main.rand.NextFloat(2f, 2.5f);
 
-        if (Main.instance.IsActive && _timer > 240)
+        _timer++;
+        _minigameTime += _timerSpeed;
+        _timerSpeed *= 0.98f;
+
+        if (_minigameTime > 1)
+        {
+            _selectedMinigame++;
+            _minigameTime = 0;
+        }
+
+        if (_selectedMinigame >= 4)
+            _selectedMinigame = 0;
+
+        if (Main.instance.IsActive && _timerSpeed < 0.005f)
             _setMinigame(_minigames[_selectedMinigame]);
     }
 
     public override void OnInitialize()
     {
+        var minigamePanel = new UIPanel()
+        {
+            Width = StyleDimension.FromPixels(240),
+            Height = StyleDimension.FromPixels(56),
+            HAlign = 0.5f,
+            VAlign = 0.2f,
+            Top = StyleDimension.FromPixels(-90)
+        };
+        Append(minigamePanel);
+
+        var minigame = new UIText("Minigame!", 1, true)
+        {
+            HAlign = 0.5f,
+            VAlign = 0.5f,
+        };
+        minigamePanel.Append(minigame);
+
         var panel = new UIPanel()
         {
-            Width = StyleDimension.FromPixels(400),
-            Height = StyleDimension.FromPixels(50 * 4),
+            Width = StyleDimension.FromPixels(200),
+            Height = StyleDimension.FromPixels(46 * 4),
             HAlign = 0.5f,
             VAlign = 0.2f
         };
 
         Append(panel);
 
-        _minigames = new string[4];
         string[] minigamesDisplay = new string[4];
-        HashSet<Minigame> games = [];
 
-        foreach (var item in WorldMinigameSystem.worldMinigames)
+        if (_minigames is null)
+            _minigames = DetermineMinigames(minigamesDisplay);
+        else
         {
-            if (!games.Contains(item))
-                games.Add(item);
-        }
-
-        for (int i = 0; i < 4; ++i)
-        {
-            if (games.Count > 0)
-            {
-                Minigame game = Main.rand.Next(games.ToArray());
-                _minigames[i] = game.FullName;
-                minigamesDisplay[i] = game.DisplayName.Value;
-                games.Remove(game);
-            }
-            else
-            {
-                int slot = Main.rand.Next(i);
-                _minigames[i] = _minigames[slot];
-                minigamesDisplay[i] = minigamesDisplay[slot];
-            }
+            for (int i = 0; i < minigamesDisplay.Length; ++i)
+                minigamesDisplay[i] = ModContent.Find<Minigame>(_minigames[i]).DisplayName.Value;
         }
 
         for (int i = 0; i < _minigames.Length; ++i)
@@ -75,5 +92,37 @@ internal class MinigameSelectionUIState(MinigameSelectionUIState.SetMinigameDele
             text.OnUpdate += (_) => text.SetText($"[c/{(slot == _selectedMinigame ? "444444" : "FFFFFF")}:{minigamesDisplay[slot]}]");
             panel.Append(text);
         }
+    }
+
+    public static string[] DetermineMinigames(string[] minigamesDisplay = null)
+    {
+        minigamesDisplay ??= new string[4];
+        string[] minigames = new string[4];
+        HashSet<Minigame> games = [];
+
+        foreach (var item in WorldMinigameSystem.worldMinigames)
+        {
+            if (!games.Contains(item))
+                games.Add(item);
+        }
+
+        for (int i = 0; i < 4; ++i)
+        {
+            if (games.Count > 0)
+            {
+                Minigame game = Main.rand.Next(games.ToArray());
+                minigames[i] = game.FullName;
+                minigamesDisplay[i] = game.DisplayName.Value;
+                games.Remove(game);
+            }
+            else
+            {
+                int slot = Main.rand.Next(i);
+                minigames[i] = minigames[slot];
+                minigamesDisplay[i] = minigamesDisplay[slot];
+            }
+        }
+
+        return minigames;
     }
 }
