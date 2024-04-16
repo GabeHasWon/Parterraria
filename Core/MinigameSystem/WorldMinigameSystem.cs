@@ -27,6 +27,11 @@ internal class WorldMinigameSystem : ModSystem
     private static int _minigamePreviewTimer = 0;
     private static MinigameRanking _rankings = null;
 
+    private float _minigameTime = 0;
+    private float _timerSpeed = 0f;
+    private string[] _minigames = [];
+    private int _selectedMinigame = 0;
+
     public Minigame playingMinigame = null;
 
     public static bool TryAddMinigame(string name, Rectangle rectangle)
@@ -121,11 +126,13 @@ internal class WorldMinigameSystem : ModSystem
             }
         }
 
-        if (InMinigame || worldMinigames.Count == 0 || Main.netMode == NetmodeID.MultiplayerClient)
-            return;
+        if (!WorldBoardSystem.PlayingParty || InMinigame || worldMinigames.Count == 0 || Main.netMode == NetmodeID.MultiplayerClient || selectingMinigame)
+        {
+            if (selectingMinigame && Main.netMode == NetmodeID.Server)
+                RollMinigameOnServer();
 
-        if (selectingMinigame)
             return;
+        }
 
         for (int i = 0; i < Main.maxPlayers; ++i)
         {
@@ -138,8 +145,31 @@ internal class WorldMinigameSystem : ModSystem
         if (Main.netMode == NetmodeID.SinglePlayer)
             BoardUISystem.SetMiscUI(new MinigameSelectionUIState(StartMinigame));
         else
-            new SyncMinigameRollUIModule(Main.rand.NextFloat(2f, 2.5f), MinigameSelectionUIState.DetermineMinigames()).Send();
+        {
+            _minigames = MinigameSelectionUIState.DetermineMinigames();
+            _timerSpeed = Main.rand.NextFloat(2f, 2.5f);
+            new SyncMinigameRollUIModule(_timerSpeed, _minigames).Send(-1, -1, false);
+        }
+
         selectingMinigame = true;
+    }
+
+    public void RollMinigameOnServer()
+    {
+        _minigameTime += _timerSpeed;
+        _timerSpeed *= 0.98f;
+
+        if (_minigameTime > 1)
+        {
+            _selectedMinigame++;
+            _minigameTime = 0;
+        }
+
+        if (_selectedMinigame >= 4)
+            _selectedMinigame = 0;
+
+        if ((Main.netMode != NetmodeID.SinglePlayer || Main.instance.IsActive) && _timerSpeed < 0.005f)
+            StartMinigame(_minigames[_selectedMinigame]);
     }
 
     private void CompleteMinigame()
@@ -192,7 +222,8 @@ internal class WorldMinigameSystem : ModSystem
             playingMinigame.SetupPlayer(plr);
         }
 
-        BoardUISystem.CloseMiscUI();
+        if (Main.netMode != NetmodeID.Server)
+            BoardUISystem.CloseMiscUI();
     }
 
     public override void SaveWorldData(TagCompound tag)

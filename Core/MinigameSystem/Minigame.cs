@@ -59,7 +59,7 @@ internal abstract class Minigame : ModType
     public virtual void SetupPlayer(Player plr) { }
 
     /// <summary>
-    /// Called when all players are ready to start the minigame.
+    /// Called when all players are ready to start the minigame. This is called on all clients and the server.
     /// </summary>
     public virtual void OnStart() { }
 

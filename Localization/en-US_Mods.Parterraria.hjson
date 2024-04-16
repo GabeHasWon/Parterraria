@@ -1,4 +1,8 @@
-Projectiles.NormalDice_Dice.DisplayName: Dice
+Projectiles: {
+	NormalDice_Dice.DisplayName: Dice
+	HighDice_Dice.DisplayName: High Dice_ Dice
+	LowDice_Dice.DisplayName: Low Dice_ Dice
+}
 
 NPCs: {
 	ShopNPC: {
@@ -20,7 +24,7 @@ NPCs: {
 Party: {
 	Minigames: {
 		CraftLargeDiamondGame: {
-			Name: Gem Dash
+			Name: Diamond Dash
 			Description: Various diamonds will spawn around the arena. Mine them, craft a Large Diamond, and win!
 		}
 	}

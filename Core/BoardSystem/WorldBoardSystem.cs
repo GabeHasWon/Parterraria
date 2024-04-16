@@ -9,7 +9,7 @@ internal partial class WorldBoardSystem : ModSystem
 {
     public static WorldBoardSystem Self => ModContent.GetInstance<WorldBoardSystem>();
     public static bool PlayingParty => Self.playingBoard is not null;
-    public static bool BuildingBoard => !PlayingParty && BoardUISystem.Self.toolUI.CurrentState is not null;
+    public static bool BuildingBoard => !PlayingParty && (Main.netMode == NetmodeID.Server || BoardUISystem.Self.toolUI.CurrentState is not null);
 
     public Dictionary<string, Board> worldBoards = [];
 
@@ -85,7 +85,9 @@ internal partial class WorldBoardSystem : ModSystem
 
         WorldMinigameSystem.Self.StopParty();
         Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>().ExitParty();
-        BoardUISystem.CloseMiscUI();
+
+        if (Main.netMode != NetmodeID.Server)
+            BoardUISystem.CloseMiscUI();
     }
 
     internal static bool CanPlayParty(string boardKey, out string denialKey)

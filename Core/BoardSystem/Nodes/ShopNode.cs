@@ -41,7 +41,9 @@ public class ShopNode() : EmptyNode
 /// </summary>
 public class ShopNPC : ModNPC
 {
-    public override string Texture => "Terraria/Images/NPC_1";
+    public override string Texture => "Terraria/Images/NPC_" + NPCID.Guide;
+
+    public override void SetStaticDefaults() => Main.npcFrameCount[Type] = Main.npcFrameCount[NPCID.Guide];
 
     public override void SetDefaults()
     {
@@ -64,7 +66,9 @@ public class ShopNPC : ModNPC
     {
         NPCShop shop = new NPCShop(Type)
             .Add(new NPCShop.Entry(new Item(ModContent.ItemType<DoubleDice>()) { shopSpecialCurrency = Parterraria.AmethystCurrencyID, shopCustomPrice = 4 }))
-            .Add(new NPCShop.Entry(new Item(ModContent.ItemType<TripleDice>()) { shopSpecialCurrency = Parterraria.AmethystCurrencyID, shopCustomPrice = 9 }));
+            .Add(new NPCShop.Entry(new Item(ModContent.ItemType<TripleDice>()) { shopSpecialCurrency = Parterraria.AmethystCurrencyID, shopCustomPrice = 9 }))
+            .Add(new NPCShop.Entry(new Item(ModContent.ItemType<HighDice>()) { shopSpecialCurrency = Parterraria.AmethystCurrencyID, shopCustomPrice = 3 }))
+            .Add(new NPCShop.Entry(new Item(ModContent.ItemType<LowDice>()) { shopSpecialCurrency = Parterraria.AmethystCurrencyID, shopCustomPrice = 1 }));
         shop.Register();
     }
 }

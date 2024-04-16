@@ -27,11 +27,18 @@ internal class MinigameRanking
     internal void Draw(float alphaFade)
     {
         int step = 0;
+        float scale = 1f;
+        var color = Color.White * alphaFade;
 
         foreach (var (who, rank) in Ranking)
         {
             var pos = Main.ScreenSize.ToVector2() / new Vector2(2f, 4f) + new Vector2(0, step++ * 40);
-            DrawCommon.CenteredString(FontAssets.DeathText.Value, pos, $"{Main.player[who].name}: {rank.RewardText}", Color.White * alphaFade);
+            DrawCommon.CenteredString(FontAssets.DeathText.Value, pos, $"{Main.player[who].name}: {rank.RewardText}", color, new(scale));
+
+            scale *= 0.75f;
+
+            if (step > 6)
+                color *= 0.9f;
         }
     }
 

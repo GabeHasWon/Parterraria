@@ -16,7 +16,7 @@ public class SyncMinigameRollUIModule(float timerSpeed, string[] minigames) : Mo
     protected override void Receive()
     {
         if (Main.netMode == NetmodeID.Server)
-            Send(-1, -1);
+            Send(-1, -1, false);
         else
             BoardUISystem.SetMiscUI(new MinigameSelectionUIState(ModContent.GetInstance<WorldMinigameSystem>().StartMinigame, _timerSpeed, _minigames));
     }

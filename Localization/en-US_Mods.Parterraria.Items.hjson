@@ -50,3 +50,13 @@ MinigameTool: {
 	DisplayName: Minigame Tool
 	Tooltip: ""
 }
+
+HighDice: {
+	DisplayName: High Dice
+	Tooltip: ""
+}
+
+LowDice: {
+	DisplayName: Low Dice
+	Tooltip: ""
+}

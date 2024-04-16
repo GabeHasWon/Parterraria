@@ -12,9 +12,9 @@ public class SyncMinigameReadyModule(int readyPlayer) : Module
 
     protected override void Receive()
     {
+        Main.player[_who].GetModPlayer<PlayingBoardPlayer>().minigameReady = true;
+
         if (Main.netMode == NetmodeID.Server)
-            Send(-1, _who);
-        else
-            Main.player[_who].GetModPlayer<PlayingBoardPlayer>().minigameReady = true;
+            Send(-1, _who, false);
     }
 }

@@ -32,6 +32,9 @@ internal class CraftLargeDiamondGame : Minigame
 
     public override void OnStart()
     {
+        if (Main.netMode == NetmodeID.MultiplayerClient)
+            return;
+
         for (int i = 0; i <= 20; ++i)
         {
             Point16 position = new(Main.rand.Next(area.X, area.Right) / 16, Main.rand.Next(area.Y, area.Bottom) / 16);
@@ -45,6 +48,9 @@ internal class CraftLargeDiamondGame : Minigame
             WorldGen.PlaceTile(position.X, position.Y, TileID.Diamond, true, false);
             Dust.NewDust(position.ToWorldCoordinates(0, 0), 8, 8, DustID.GemDiamond);
             _diamondLocations.Add(position);
+
+            if (Main.netMode == NetmodeID.Server)
+                NetMessage.SendTileSquare(-1, position.X, position.Y);
         }
     }
 
@@ -66,7 +72,12 @@ internal class CraftLargeDiamondGame : Minigame
     public override void OnStop()
     {
         foreach (var item in _diamondLocations)
+        {
             WorldGen.KillTile(item.X, item.Y, false, false, true);
+
+            if (Main.netMode == NetmodeID.Server)
+                NetMessage.SendTileSquare(-1, item.X, item.Y);
+        }
     }
 
     public override MinigameRanking GetRanking()

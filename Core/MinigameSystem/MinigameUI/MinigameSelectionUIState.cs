@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ID;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 
@@ -14,7 +15,6 @@ internal class MinigameSelectionUIState(MinigameSelectionUIState.SetMinigameDele
     private string[] _minigames = minigames;
     private int _selectedMinigame = 0;
     private SetMinigameDelegate _setMinigame = setMinigame;
-    private float _timer = 0;
     private float _timerSpeed = timerSpeed;
     private float _minigameTime = 0;
 
@@ -22,10 +22,14 @@ internal class MinigameSelectionUIState(MinigameSelectionUIState.SetMinigameDele
     {
         base.Update(gameTime);
 
-        if (_timer == 0 && _timerSpeed == -1)
+        if (_timerSpeed == -1)
             _timerSpeed = Main.rand.NextFloat(2f, 2.5f);
 
-        _timer++;
+        UpdateTimers();
+    }
+
+    private void UpdateTimers()
+    {
         _minigameTime += _timerSpeed;
         _timerSpeed *= 0.98f;
 
@@ -38,7 +42,7 @@ internal class MinigameSelectionUIState(MinigameSelectionUIState.SetMinigameDele
         if (_selectedMinigame >= 4)
             _selectedMinigame = 0;
 
-        if (Main.instance.IsActive && _timerSpeed < 0.005f)
+        if ((Main.netMode != NetmodeID.SinglePlayer || Main.instance.IsActive) && _timerSpeed < 0.005f)
             _setMinigame(_minigames[_selectedMinigame]);
     }
 
