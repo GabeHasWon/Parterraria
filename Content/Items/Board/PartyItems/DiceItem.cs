@@ -16,7 +16,7 @@ internal abstract class DiceItem : ModItem
     public override void SetDefaults()
     {
         Item.Size = new(30);
-        Item.noMelee = false;
+        Item.noMelee = true;
         Item.useTurn = true;
         Item.useTime = 8;
         Item.useAnimation = 8;
@@ -29,8 +29,8 @@ internal abstract class DiceItem : ModItem
 
     public override bool CanUseItem(Player player)
     {
-        var boardPlayer = player.GetModPlayer<PlayingBoardPlayer>();
-        return !boardPlayer.isMoving && boardPlayer.diceCount == 0 && !WorldMinigameSystem.InMinigame && !WorldMinigameSystem.selectingMinigame;
+        var play = player.GetModPlayer<PlayingBoardPlayer>();
+        return !play.isMoving && !play.hasGoneOnCurrentTurn && play.diceCount == 0 && !WorldMinigameSystem.InMinigame && !WorldMinigameSystem.selectingMinigame;
     }
 
     public override void ModifyShootStats(Player player, ref Vector2 p, ref Vector2 velocity, ref int t, ref int d, ref float k) => velocity.Y = -16;
@@ -77,6 +77,9 @@ internal abstract class DiceItem : ModItem
 
             if (Spinning && plr.active && !plr.dead && plr.velocity.Y < -0.5f && plr.Hitbox.Intersects(Projectile.Hitbox))
             {
+                Main.NewText(plr.GetModPlayer<PlayingBoardPlayer>().storedRoll);
+                Main.NewText(plr.GetModPlayer<PlayingBoardPlayer>().diceCount);
+
                 Roll = Main.rand.Next(PipChoices);
                 HitY = Projectile.Center.Y;
                 Projectile.velocity.Y = plr.velocity.Y * 6f;
@@ -90,10 +93,13 @@ internal abstract class DiceItem : ModItem
                 popup.DurationInFrames = 240;
                 PopupText.NewText(popup, Projectile.Center);
 
-                if (Main.netMode == NetmodeID.SinglePlayer)
-                    plr.GetModPlayer<PlayingBoardPlayer>().RolledDice((int)Roll);
-                else
-                    new SyncRolledDice(Projectile.owner, (int)Roll).Send();
+                if (WorldBoardSystem.PlayingParty)
+                {
+                    if (Main.netMode == NetmodeID.SinglePlayer)
+                        plr.GetModPlayer<PlayingBoardPlayer>().RolledDice((int)Roll);
+                    else
+                        new SyncRolledDice(Projectile.owner, (int)Roll).Send();
+                }
             }
 
             Projectile.velocity.Y *= 0.8f;

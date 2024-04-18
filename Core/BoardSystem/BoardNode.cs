@@ -46,7 +46,13 @@ public abstract class BoardNode
         return node;
     }
 
-    public abstract void LandOn(Board board, Player player);
+    /// <summary>
+    /// Run when a player lands on the node. This is run by all clients + server.
+    /// </summary>
+    /// <param name="board"></param>
+    /// <param name="player"></param>
+    public virtual void LandOn(Board board, Player player) { }
+
     public virtual void PassBy(Board board, Player player) { }
 
     internal virtual bool CanLink(BoardNode node, out string denialReasonKey)

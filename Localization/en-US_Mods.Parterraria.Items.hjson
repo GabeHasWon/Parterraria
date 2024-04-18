@@ -10,7 +10,7 @@ BoardTool: {
 }
 
 NormalDice: {
-	DisplayName: Normal Dice
+	DisplayName: Normal Die
 	Tooltip: Rolls 1-6
 }
 
@@ -52,11 +52,33 @@ MinigameTool: {
 }
 
 HighDice: {
-	DisplayName: High Dice
-	Tooltip: ""
+	DisplayName: High Die
+	Tooltip:
+		'''
+		Rolls 4-6
+		{$DisappearsWhenNotPartying}
+		'''
 }
 
 LowDice: {
-	DisplayName: Low Dice
+	DisplayName: Low Die
+	Tooltip:
+		'''
+		Rolls 1-3
+		{$DisappearsWhenNotPartying}
+		'''
+}
+
+PartyMirror: {
+	DisplayName: Party Mirror
+	Tooltip:
+		'''
+		Teleports you to a random place on the board, then rolls a Normal Die
+		{$DisappearsWhenNotPartying}
+		'''
+}
+
+BrokenDice: {
+	DisplayName: Broken Dice
 	Tooltip: ""
 }

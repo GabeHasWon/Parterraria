@@ -1,14 +1,14 @@
-﻿using System;
-using Terraria.ID;
+﻿using Terraria.ID;
 
 namespace Parterraria.Core.InventoryStorageSystem;
 
 internal class InventoryPlayer : ModPlayer
 {
-    private class StoredInventory(StoredInventory old, Item[] inv)
+    private class StoredInventory(StoredInventory old, Item[] inv, Item[] armorAndAcc)
     {
         public StoredInventory oldInv = old;
         public Item[] inv = inv;
+        public Item[] armorAndAcc = armorAndAcc;
     }
 
     private StoredInventory _inventory = null;
@@ -21,7 +21,7 @@ internal class InventoryPlayer : ModPlayer
         orig(threadContext);
     }
 
-    public void SwitchInventory(Item[] inventory)
+    public void SwitchInventory(Item[] inventory, Item[] armor)
     {
         var realInv = new Item[59];
 
@@ -37,13 +37,32 @@ internal class InventoryPlayer : ModPlayer
             }
         }
 
+        var realArmor = new Item[20];
+
+        for (int i = 0; i < realArmor.Length; ++i)
+        {
+            if (i < armor.Length)
+                realArmor[i] = armor[i];
+            else
+            {
+                var airItem = new Item(ItemID.None);
+                airItem.TurnToAir();
+                realArmor[i] = airItem;
+            }
+        }
+
         if (_inventory is null)
-            _inventory = new(new StoredInventory(null, Player.inventory), realInv);
+            _inventory = new(new StoredInventory(null, Player.inventory, Player.armor), realInv, realArmor);
         else
-            _inventory = new(_inventory, realInv);
+            _inventory = new(_inventory, realInv, realArmor);
 
         Player.inventory = _inventory.inv;
+        Player.armor = _inventory.armorAndAcc;
+        Player.itemTime = 0;
+        Player.itemAnimation = 0;
     }
+
+    public void SwitchInventory(Item[] inventory, bool preserveEquipment) => SwitchInventory(inventory, preserveEquipment ? Player.armor : []);
 
     public void ReplaceInventory()
     {
@@ -52,6 +71,9 @@ internal class InventoryPlayer : ModPlayer
 
         _inventory = _inventory.oldInv;
         Player.inventory = _inventory.inv;
+        Player.armor = _inventory.armorAndAcc;
+        Player.itemTime = 0;
+        Player.itemAnimation = 0;
     }
 
     internal void ExitWorld()

@@ -18,6 +18,9 @@ public class SyncMinigameRollUIModule(float timerSpeed, string[] minigames) : Mo
         if (Main.netMode == NetmodeID.Server)
             Send(-1, -1, false);
         else
+        {
+            WorldMinigameSystem.selectingMinigame = true;
             BoardUISystem.SetMiscUI(new MinigameSelectionUIState(ModContent.GetInstance<WorldMinigameSystem>().StartMinigame, _timerSpeed, _minigames));
+        }
     }
 }

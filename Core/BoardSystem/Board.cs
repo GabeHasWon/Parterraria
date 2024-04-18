@@ -64,18 +64,17 @@ public class Board
                             new Item(ItemID.GoldPickaxe),
                             new Item(ItemID.BladeofGrass),
                             new Item(ModContent.ItemType<BoardTool>())
-                        ]);
+                        ], true);
                 else
                     plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
                         [
                             new Item(ModContent.ItemType<NormalDice>()),
                             new Item(ItemID.GoldPickaxe),
                             new Item(ItemID.BladeofGrass)
-                        ]);
+                        ], true);
 
                 plr.GetModPlayer<PlayingBoardPlayer>().connectedNode = node;
-                plr.GetModPlayer<PlayingBoardPlayer>().connectedNode.LandOn(WorldBoardSystem.Self.playingBoard, plr);
-                plr.GetModPlayer<PlayingBoardPlayer>().storedRoll = 0;
+                plr.GetModPlayer<PlayingBoardPlayer>().StartParty();
                 plr.GetModPlayer<BoardToolPlayer>().Mode = ToolMode.None;
 
                 if (i == Main.myPlayer)

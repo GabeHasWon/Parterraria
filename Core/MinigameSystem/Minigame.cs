@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Parterraria.Common;
+using Parterraria.Core.BoardSystem.BoardUI.EditUI;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using Terraria.GameContent;
 using Terraria.Localization;
 using Terraria.ModLoader.IO;
 
@@ -25,7 +29,10 @@ internal abstract class Minigame : ModType
     public bool Beaten { get; protected set; }
     public int PlayTime { get; protected set; }
 
-    public Rectangle area = default;
+    [HideFromEdit]
+    public Rectangle area = default; // This should only be set on placement
+
+    public Point playerStartLocation = default;
 
     protected sealed override void Register()
     {
@@ -46,6 +53,11 @@ internal abstract class Minigame : ModType
     public abstract void InternalUpdate();
     public abstract MinigameRanking GetRanking();
     public virtual Minigame Clone() => MemberwiseClone() as Minigame;
+
+    /// <summary>
+    /// Called when the minigame is first placed in-world.
+    /// </summary>
+    public virtual void OnPlace() { }
     
     /// <summary>
     /// Called when the minigame is set as the next minigame.
@@ -56,7 +68,8 @@ internal abstract class Minigame : ModType
     /// Called when the minigame is set, per player.
     /// </summary>
     /// <param name="plr">Relevant player.</param>
-    public virtual void SetupPlayer(Player plr) { }
+    /// <param name="playing">Whether this is running during <see cref="Minigame.OnSet"/> or during <see cref="OnStart"/>.</param>
+    public virtual void SetupPlayer(Player plr, bool playing) { }
 
     /// <summary>
     /// Called when all players are ready to start the minigame. This is called on all clients and the server.
@@ -74,15 +87,45 @@ internal abstract class Minigame : ModType
     /// <param name="plr">Relevant player.</param>
     public virtual void ResetPlayer(Player plr) { }
 
+    public virtual void WriteNetData(BinaryWriter writer)
+    {
+
+    }
+
+    public virtual void ReadNetData(BinaryReader reader)
+    {
+
+    }
+
     internal virtual void Reward(MinigameRanking rankings, Player plr) => rankings.Reward(plr);
 
     public abstract bool ValidateRectangle(ref Rectangle rectangle);
-    public virtual void Draw() { }
+
+    public void Draw(bool debug)
+    {
+        if (debug)
+        {
+            var position = playerStartLocation.ToWorldCoordinates(0, 0) - Main.screenPosition;
+            DrawCommon.CenteredString(FontAssets.ItemStack.Value, position - new Vector2(0, 4), "Start Position", Color.White);
+
+            var rect = new Rectangle((int)position.X, (int)position.Y, 16, 16);
+            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, Color.Green);
+        }
+
+        InternalDraw(debug);
+    }
+
+    /// <summary>
+    /// Draws the minigame.
+    /// </summary>
+    /// <param name="debug">Whether the player is building or debugging minigames.</param>
+    protected virtual void InternalDraw(bool debug) { }
 
     public void SaveData(TagCompound tag)
     {
         tag.Add("type", FullName);
         tag.Add(nameof(area), area);
+        tag.Add(nameof(playerStartLocation), playerStartLocation);
         InternalSave(tag);
     }
 
@@ -96,6 +139,7 @@ internal abstract class Minigame : ModType
         {
             Minigame game = storedGame.Clone();
             game.area = tag.Get<Rectangle>(nameof(area));
+            game.playerStartLocation = tag.Get<Point>(nameof(playerStartLocation));
             game.LoadData(tag);
             return game;
         }

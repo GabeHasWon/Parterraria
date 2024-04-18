@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.UI;
 
 namespace Parterraria.Core.BoardSystem.BoardUI;
 
-internal class PromptSplitPathUIState(List<NodeLinks.Link> linksToCheck) : UIState
+internal class PromptSplitPathUIState(List<NodeLinks.Link> linksToCheck, bool goingBack) : UIState
 {
     private readonly List<NodeLinks.Link> links = linksToCheck;
+    private readonly bool goingBack = goingBack;
 
     public override void OnInitialize()
     {
@@ -29,7 +31,7 @@ internal class PromptSplitPathUIState(List<NodeLinks.Link> linksToCheck) : UISta
         
         foreach (var item in links)
         {
-            UIImageButton button = new(BoardNode.Tex(item.ToNode, true))
+            UIImageButton button = new(BoardNode.Tex(goingBack ? item.Parent : item.ToNode, true))
             {
                 Width = StyleDimension.FromPixels(60),
                 Height = StyleDimension.FromPixels(60),
@@ -37,12 +39,12 @@ internal class PromptSplitPathUIState(List<NodeLinks.Link> linksToCheck) : UISta
             };
 
             NodeLinks.Link link = item;
-            button.OnLeftClick += (_, _) => ConfirmChoice(link);
-            button.OnUpdate += (ui) => HoverOverButton(ui, link.ToNode);
+            button.OnLeftClick += (_, _) => ConfirmChoice(link, goingBack);
+            button.OnUpdate += (ui) => HoverOverButton(ui, goingBack ? link.Parent : link.ToNode);
             panel.Append(button);
         }
 
-        panel.Append(new UIText("Choose a path, any path") { HAlign = 0.5f, VAlign = -1 });
+        panel.Append(new UIText(Language.GetTextValue("Mods.Parterraria.MiscUI.PromptSplitPathUIState.Choose")) { HAlign = 0.5f, VAlign = -1 });
     }
 
     private static void HoverOverButton(UIElement ui, BoardNode node)
@@ -51,11 +53,11 @@ internal class PromptSplitPathUIState(List<NodeLinks.Link> linksToCheck) : UISta
             WorldBoardSystem.Self.hoverNode = node;
     }
 
-    private static void ConfirmChoice(NodeLinks.Link link)
+    private static void ConfirmChoice(NodeLinks.Link link, bool backwards)
     {
         var boardPlayer = Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>();
         boardPlayer.prompingSplitPath = false;
-        boardPlayer.nextNode = link.ToNode;
+        boardPlayer.nextNode = backwards ? link.Parent : link.ToNode;
 
         if (Main.netMode == NetmodeID.MultiplayerClient)
             new SyncConfirmSplitPathModule(Main.myPlayer, boardPlayer.nextNode.nodeId).Send();

@@ -2,5 +2,4 @@
 
 public class EmptyNode() : BoardNode
 {
-    public override void LandOn(Board board, Player player) { }
 }

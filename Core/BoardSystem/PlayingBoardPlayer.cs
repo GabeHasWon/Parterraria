@@ -7,6 +7,7 @@ using Parterraria.Core.MinigameSystem;
 using Parterraria.Core.Synchronization.BoardItemSyncing;
 using Parterraria.Core.Synchronization.MinigameSyncing;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -49,7 +50,36 @@ internal class PlayingBoardPlayer : ModPlayer
     {
         On_Player.ShimmerCollision += HijackShimmer;
         On_Player.UpdateTouchingTiles += UnsetCheckNodes;
+        On_Player.Spawn += HijackSpawnPosition;
         On_Collision.TileCollision += HijackTileCollision;
+        On_Player.DropTombstone += StopTombstoneOnBoard;
+    }
+
+    private void StopTombstoneOnBoard(On_Player.orig_DropTombstone orig, Player self, long coinsOwned, Terraria.Localization.NetworkText deathText, int hitDirection)
+    {
+        if (!WorldBoardSystem.PlayingParty)
+            orig(self, coinsOwned, deathText, hitDirection);
+    }
+
+    private void HijackSpawnPosition(On_Player.orig_Spawn orig, Player self, PlayerSpawnContext context)
+    {
+        orig(self, context);
+
+        if (!WorldMinigameSystem.InMinigame)
+        {
+            if (connectedNode != null)
+            {
+                Board board = WorldBoardSystem.Self.playingBoard;
+                BoardNode node = board.nodes.First(x => x is StartNode);
+                connectedNode = node;
+                self.Center = connectedNode.position;
+            }
+        }
+        else
+            self.Center = WorldMinigameSystem.Self.playingMinigame.playerStartLocation.ToWorldCoordinates();
+
+        self.fallStart = (int)(self.position.Y / 16f);
+        self.fallStart2 = self.fallStart;
     }
 
     private Vector2 HijackTileCollision(On_Collision.orig_TileCollision orig, Vector2 Position, Vector2 Velocity, int Width, int Height, bool fallThrough, bool fall2, int gravDir)
@@ -93,9 +123,6 @@ internal class PlayingBoardPlayer : ModPlayer
                 connectedNode = nextNode;
                 connectedNode.PassBy(WorldBoardSystem.Self.playingBoard, Player);
                 CheckNextRoll();
-
-                if (nextNode is null)
-                    hasGoneOnCurrentTurn = true;
             }
         }
 
@@ -111,16 +138,6 @@ internal class PlayingBoardPlayer : ModPlayer
         }
         else
             minigameReady = false;
-    }
-
-    public override void OnRespawn()
-    {
-        if (connectedNode != null)
-        {
-            Board board = WorldBoardSystem.Self.playingBoard;
-            BoardNode node = board.nodes.First(x => x is StartNode);
-            connectedNode = node;
-        }
     }
 
     private bool CollideWithNode()
@@ -159,16 +176,24 @@ internal class PlayingBoardPlayer : ModPlayer
 
     internal void SetDiceCount(int count)
     {
+        if (!WorldBoardSystem.PlayingParty)
+            return;
+
         if (Main.netMode == NetmodeID.SinglePlayer)
             diceCount = count;
         else
-            new SyncDieCount(Main.myPlayer, count).Send();
+            new SyncDieCount(Main.myPlayer, count).Send(-1, -1, false);
     }
 
     public void RolledDice(int roll)
     {
-        if (roll > 0 && storedRoll == 0)
-            roll++;
+        if (storedRoll == 0)
+        {
+            if (roll > 0)
+                roll++;
+            else
+                roll--;
+        }
 
         storedRoll += roll;
 
@@ -181,33 +206,65 @@ internal class PlayingBoardPlayer : ModPlayer
         if (!WorldBoardSystem.PlayingParty)
             return;
 
-        storedRoll--;
+        if (storedRoll > 0)
+            storedRoll--;
+        else
+            storedRoll++;
 
-        if (storedRoll <= 0)
+        if (storedRoll == 0)
         {
             nextNode = null;
             isMoving = false;
             connectedNode.LandOn(WorldBoardSystem.Self.playingBoard, Player);
+            hasGoneOnCurrentTurn = true;
             return;
         }
 
         moveTimer = 0;
-
         BoardNode node;
 
-        if (connectedNode.links.LinkCount == 1)
-            node = connectedNode.links.First().ToNode;
+        if (storedRoll > 0)
+        {
+            if (connectedNode.links.LinkCount == 1)
+                node = connectedNode.links.First().ToNode;
+            else
+            {
+                if (Main.myPlayer == Player.whoAmI)
+                    BoardUISystem.SetMiscUI(new PromptSplitPathUIState(connectedNode.links.links, false));
+
+                prompingSplitPath = true;
+                node = null;
+            }
+
+            nextNode = node;
+            isMoving = true;
+        }
         else
         {
-            if (Main.myPlayer == Player.whoAmI)
-                BoardUISystem.SetMiscUI(new PromptSplitPathUIState(connectedNode.links.links));
+            List<BoardNode> nodes = [];
 
-            prompingSplitPath = true;
-            node = null;
+            foreach (var item in WorldBoardSystem.Self.playingBoard.nodes.Where(x => x.links.HasLinkTo(connectedNode) && x is not StartNode))
+                nodes.Add(item);
+
+            if (nodes.Count == 1)
+                node = nodes[0].links.GetLinkTo(connectedNode).Parent;
+            else
+            {
+                List<NodeLinks.Link> links = [];
+
+                foreach (var item in nodes)
+                    links.Add(item.links.GetLinkTo(connectedNode));
+
+                if (Main.myPlayer == Player.whoAmI)
+                    BoardUISystem.SetMiscUI(new PromptSplitPathUIState(links, true));
+
+                prompingSplitPath = true;
+                node = null;
+            }
+
+            nextNode = node;
+            isMoving = true;
         }
-
-        nextNode = node;
-        isMoving = true;
     }
 
     internal void ExitParty()
@@ -217,6 +274,8 @@ internal class PlayingBoardPlayer : ModPlayer
         moveTimer = 0;
         isMoving = false;
         hasGoneOnCurrentTurn = false;
+        diceCount = 0;
+        storedRoll = 0;
 
         Player.GetModPlayer<InventoryPlayer>().ReplaceInventory();
     }
@@ -249,5 +308,11 @@ internal class PlayingBoardPlayer : ModPlayer
             var pos = Player.Center - new Vector2(0, 48 - Player.gfxOffY) - Main.screenPosition;
             DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos.Floor(), minigameReady ? "READY" : "NOT READY", minigameReady ? Color.Green : Color.Orange);
         }
+    }
+
+    internal void StartParty()
+    {
+        connectedNode.LandOn(WorldBoardSystem.Self.playingBoard, Player);
+        storedRoll = 0;
     }
 }

@@ -6,24 +6,20 @@ using Terraria.Localization;
 
 namespace Parterraria.Core.BoardSystem;
 
+/// <summary>
+/// Handles the usage of all of the tools in <see cref="BoardUI.ToolUIState"/>.
+/// </summary>
 internal class ToolUsage
 {
     private static string BuildNodeType => NodeLoader.Get(_buildNodeIndex).GetType().AssemblyQualifiedName;
 
     public static BoardNode buildingNode = null;
-    public static bool blockUse = false;
 
     private static int _placementStage = 0;
     private static int _buildNodeIndex = 0;
 
     internal static void UseTool(ToolMode mode)
     {
-        if (blockUse)
-        {
-            blockUse = false;
-            return;
-        }
-
         if (Main.LocalPlayer.lastMouseInterface)
             return;
 

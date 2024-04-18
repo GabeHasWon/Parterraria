@@ -1,7 +1,9 @@
 ﻿using NetEasy;
 using Parterraria.Core.MinigameSystem;
 using System;
+using System.IO;
 using Terraria.ID;
+using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.Synchronization;
 
@@ -15,7 +17,15 @@ public class RequestMinigamesFromServerModule(int fromWho) : Module
         if (Main.netMode == NetmodeID.Server)
         {
             foreach (var game in WorldMinigameSystem.worldMinigames)
-                new SyncMinigameModule(game.FullName, game.area).Send(_fromWho, -1, false);
+            {
+                using MemoryStream mem = new();
+                using BinaryWriter writer = new(mem);
+                game.WriteNetData(writer);
+                writer.Flush();
+                mem.Position = 0;
+                byte[] bytes = mem.ReadBytes(mem.Length);
+                new SyncMinigameModule(game.FullName, game.area, game.playerStartLocation, bytes).Send(_fromWho, -1, false);
+            }
         }
     }
 }

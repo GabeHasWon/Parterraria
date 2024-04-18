@@ -1,4 +1,5 @@
 ﻿using Parterraria.Common;
+using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.Synchronization;
 using ReLogic.Content;
 using System;
@@ -106,7 +107,7 @@ internal partial class ToolUIState(Player player) : UIState
             Main.isMouseLeftConsumedByUI = true;
 
             if (Main.netMode == NetmodeID.MultiplayerClient)
-                new SyncStartPartyModule(Main.myPlayer, _boardKey).Send();
+                new SyncStartPartyModule(Main.myPlayer, _boardKey).Send(-1, -1, false);
             else
             {
                 WorldBoardSystem.Self.boardHost = Main.myPlayer;

@@ -18,7 +18,7 @@ internal class BoardMapLayer : ModMapLayer
             foreach (var node in board.nodes)
             {
                 var tex = BoardNode.Tex(node, true).Value;
-                float zoom = Main.mapFullscreenScale / MathF.Max(tex.Width, tex.Height) * node.halfWidth / 16f;
+                float zoom = (Main.mapFullscreen ? Main.mapFullscreenScale : Main.mapMinimapScale * 1.5f) / MathF.Max(tex.Width, tex.Height) * node.halfWidth / 8f;
 
                 if (context.Draw(tex, (node.position / 16f).Floor(), Color.White, new SpriteFrame(1, 1, 0, 0), zoom, zoom, Alignment.Center).IsMouseOver)
                     text = Language.GetTextValue(item.Key);

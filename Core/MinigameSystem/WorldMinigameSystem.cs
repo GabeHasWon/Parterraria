@@ -1,11 +1,14 @@
 ﻿using Parterraria.Common;
 using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem;
+using Parterraria.Core.MinigameSystem.Games;
 using Parterraria.Core.MinigameSystem.MinigameUI;
 using Parterraria.Core.Synchronization.MinigameSyncing;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.Localization;
@@ -34,7 +37,7 @@ internal class WorldMinigameSystem : ModSystem
 
     public Minigame playingMinigame = null;
 
-    public static bool TryAddMinigame(string name, Rectangle rectangle)
+    public static bool TryAddMinigame(string name, Rectangle rectangle, Point? playerSpawnLocation = null, byte[] data = null)
     {
         Minigame.MinigamesByModAndName[name].ValidateRectangle(ref rectangle);
 
@@ -46,6 +49,16 @@ internal class WorldMinigameSystem : ModSystem
 
         var game = Minigame.MinigamesByModAndName[name].Clone();
         game.area = rectangle;
+        game.playerStartLocation = playerSpawnLocation ?? rectangle.Center;
+        game.OnPlace();
+
+        if (data is not null)
+        {
+            using var stream = data.ToMemoryStream();
+            using var reader = new BinaryReader(stream);
+            game.ReadNetData(reader);
+        }
+
         worldMinigames.Add(game);
         return true;
     }
@@ -61,7 +74,7 @@ internal class WorldMinigameSystem : ModSystem
         if (!InMinigame)
             return;
 
-        Self.playingMinigame.Draw();
+        Self.playingMinigame.Draw(false);
 
         if (_minigamePreviewTimer++ < 240)
         {
@@ -87,6 +100,8 @@ internal class WorldMinigameSystem : ModSystem
 
         Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, loc, Color.White * 0.1f);
         DrawCommon.CenteredString(FontAssets.DeathText.Value, loc.Location.ToVector2() + new Vector2(loc.Width / 2, 20), game.DisplayName.Value, Color.White);
+
+        game.Draw(true);
     }
 
     public override void PreUpdatePlayers()
@@ -112,6 +127,9 @@ internal class WorldMinigameSystem : ModSystem
                 {
                     NotReady = false;
                     playingMinigame.OnStart();
+
+                    foreach (var plr in Main.ActivePlayers)
+                        playingMinigame.SetupPlayer(plr, true);
                 }
             }
             else
@@ -172,6 +190,13 @@ internal class WorldMinigameSystem : ModSystem
             StartMinigame(_minigames[_selectedMinigame]);
     }
 
+    internal void StopParty()
+    {
+        playingMinigame = null;
+        selectingMinigame = false;
+        NotReady = true;
+    }
+
     private void CompleteMinigame()
     {
         for (int i = 0; i < Main.maxPlayers; ++i)
@@ -201,11 +226,21 @@ internal class WorldMinigameSystem : ModSystem
         worldMinigames.Clear();
     }
 
-    public void StartMinigame(string minigameName)
+    public void StartMinigame(string minigameName) => StartMinigame(minigameName, -1);
+
+    public void StartMinigame(string minigameName, int minigameSlot = -1)
     {
+        if (Main.netMode == NetmodeID.MultiplayerClient && minigameSlot == -1)
+            return;
+
         _minigamePreviewTimer = 0;
         _minigameOverTimer = 0;
-        playingMinigame = Main.rand.Next(worldMinigames.Where(x => x.FullName == minigameName).ToArray()).Clone();
+        var choices = worldMinigames.Where(x => x.FullName == minigameName).ToArray();
+
+        if (minigameSlot == -1)
+            minigameSlot = Main.rand.Next(choices.Length);
+
+        playingMinigame = choices[minigameSlot].Clone();
         playingMinigame.OnSet();
         NotReady = true;
         selectingMinigame = false;
@@ -217,13 +252,15 @@ internal class WorldMinigameSystem : ModSystem
             if (!plr.active)
                 continue;
 
-            plr.Center = playingMinigame.area.Center();
+            plr.Center = playingMinigame.playerStartLocation.ToWorldCoordinates();
             plr.GetModPlayer<PlayingBoardPlayer>().minigameReady = false;
-            playingMinigame.SetupPlayer(plr);
+            playingMinigame.SetupPlayer(plr, false);
         }
 
         if (Main.netMode != NetmodeID.Server)
             BoardUISystem.CloseMiscUI();
+        else
+            new SyncMinigameStartModule(minigameName, minigameSlot).Send(-1, -1, false);
     }
 
     public override void SaveWorldData(TagCompound tag)
@@ -248,12 +285,5 @@ internal class WorldMinigameSystem : ModSystem
             TagCompound game = tag.GetCompound("game" + i);
             worldMinigames.Add(Minigame.LoadMinigame(game));
         }
-    }
-
-    internal void StopParty()
-    {
-        playingMinigame = null;
-        selectingMinigame = false;
-        NotReady = true;
     }
 }

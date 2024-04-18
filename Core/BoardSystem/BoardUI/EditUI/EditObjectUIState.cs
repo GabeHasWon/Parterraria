@@ -5,7 +5,7 @@ using System.Reflection;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 
-namespace Parterraria.Core.BoardSystem.BoardUI;
+namespace Parterraria.Core.BoardSystem.BoardUI.EditUI;
 
 internal class EditObjectUIState(object objectToEdit, Action<object> setObjectFunc) : UIState
 {
@@ -51,7 +51,7 @@ internal class EditObjectUIState(object objectToEdit, Action<object> setObjectFu
         list.SetScrollbar(bar);
         panel.Append(bar);
 
-        foreach (var item in _objectToEdit.GetType().GetFields())
+        foreach (var item in _objectToEdit.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
         {
             if (item.DeclaringType == typeof(object))
                 continue;

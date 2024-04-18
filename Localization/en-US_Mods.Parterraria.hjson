@@ -2,6 +2,7 @@ Projectiles: {
 	NormalDice_Dice.DisplayName: Dice
 	HighDice_Dice.DisplayName: High Dice_ Dice
 	LowDice_Dice.DisplayName: Low Dice_ Dice
+	BrokenDice_Dice.DisplayName: Broken Dice_ Dice
 }
 
 NPCs: {
@@ -27,5 +28,15 @@ Party: {
 			Name: Diamond Dash
 			Description: Various diamonds will spawn around the arena. Mine them, craft a Large Diamond, and win!
 		}
+
+		GetCrownGame: {
+			Name: Crown Craze
+			Description: Somewhere, there is a crown on the ground. Pick it up and wear it to win!
+		}
 	}
+}
+
+Microevents: {
+	GainMoneyEvent: Got {0} amethyst coins!
+	LoseMoneyEvent: Lost {0} amethyst coins...
 }

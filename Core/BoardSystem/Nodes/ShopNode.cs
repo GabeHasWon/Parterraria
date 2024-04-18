@@ -68,7 +68,8 @@ public class ShopNPC : ModNPC
             .Add(new NPCShop.Entry(new Item(ModContent.ItemType<DoubleDice>()) { shopSpecialCurrency = Parterraria.AmethystCurrencyID, shopCustomPrice = 4 }))
             .Add(new NPCShop.Entry(new Item(ModContent.ItemType<TripleDice>()) { shopSpecialCurrency = Parterraria.AmethystCurrencyID, shopCustomPrice = 9 }))
             .Add(new NPCShop.Entry(new Item(ModContent.ItemType<HighDice>()) { shopSpecialCurrency = Parterraria.AmethystCurrencyID, shopCustomPrice = 3 }))
-            .Add(new NPCShop.Entry(new Item(ModContent.ItemType<LowDice>()) { shopSpecialCurrency = Parterraria.AmethystCurrencyID, shopCustomPrice = 1 }));
+            .Add(new NPCShop.Entry(new Item(ModContent.ItemType<LowDice>()) { shopSpecialCurrency = Parterraria.AmethystCurrencyID, shopCustomPrice = 1 }))
+            .Add(new NPCShop.Entry(new Item(ModContent.ItemType<PartyMirror>()) { shopSpecialCurrency = Parterraria.AmethystCurrencyID, shopCustomPrice = 5 }));
         shop.Register();
     }
 }

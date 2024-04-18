@@ -1,4 +1,5 @@
 ﻿using Parterraria.Common;
+using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Terraria.GameContent.UI.Elements;
 using Terraria.Localization;
 using Terraria.ModLoader.UI;

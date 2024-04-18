@@ -15,9 +15,7 @@ public class RequestBoardsFromServerModule(int fromWho) : Module
         if (Main.netMode == NetmodeID.Server)
         {
             foreach (var board in WorldBoardSystem.Self.worldBoards)
-            {
                 new SyncBoardModule(board.Value.GetData(board.Key)).Send(_fromWho, -1, false);
-            }
         }
     }
 }

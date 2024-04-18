@@ -26,13 +26,16 @@ public class NodeLinks(BoardNode parent) : IEnumerable<NodeLinks.Link>
         links.Add(link);
     }
 
-    public void RemoveLink(BoardNode node) => links.Remove(links.First(x => x.ToNode == node));
+    public void RemoveLink(BoardNode node) => links.Remove(GetLinkTo(node));
 
     public void RemoveLink(Link link)
     {
         links.Remove(link);
         link.ToNode.links.links.Remove(link);
     }
+
+    public Link GetLinkTo(BoardNode node) => links.First(x => x.ToNode == node);
+    public bool HasLinkTo(BoardNode node) => links.Any(x => x.ToNode == node);
 
     public IEnumerator<Link> GetEnumerator() => links.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => links.GetEnumerator();

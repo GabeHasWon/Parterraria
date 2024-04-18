@@ -2,6 +2,7 @@
 using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem.BoardUI;
 using Parterraria.Core.MinigameSystem;
+using Parterraria.Core.MinigameSystem.MinigameUI;
 using System;
 using System.Collections.Generic;
 using Terraria.GameContent;
@@ -45,8 +46,8 @@ internal class BoardUISystem : ModSystem
         }
     }
 
-    public static bool ToolUIOpen() => Self.toolUI.CurrentState is ToolUIState;
-    public static void OpenToolUI() => Self.toolUI.SetState(new ToolUIState(Main.LocalPlayer));
+    public static bool ToolUIOpen() => Self.toolUI.CurrentState is not null;
+    public static void OpenToolUI(bool minigame = false) => Self.toolUI.SetState(minigame ? new MinigameEditUI(Main.LocalPlayer) : new ToolUIState(Main.LocalPlayer));
     internal static void CloseToolUI() => Self.toolUI.SetState(null);
 
     public static void OpenKeyboard(UIVirtualKeyboard.KeyboardSubmitEvent submitEvent, Action cancelAction)

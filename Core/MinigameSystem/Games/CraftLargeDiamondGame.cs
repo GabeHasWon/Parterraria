@@ -1,4 +1,5 @@
-﻿using Parterraria.Core.InventoryStorageSystem;
+﻿using Parterraria.Core.BoardSystem.BoardUI.EditUI;
+using Parterraria.Core.InventoryStorageSystem;
 using System.Collections.Generic;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -9,7 +10,8 @@ internal class CraftLargeDiamondGame : Minigame
 {
     public override MinigameWinType WinType => MinigameWinType.First;
 
-    private HashSet<Point16> _diamondLocations = [];
+    [HideFromEdit]
+    private readonly HashSet<Point16> _diamondLocations = [];
 
     public override bool ValidateRectangle(ref Rectangle rectangle)
     {
@@ -54,13 +56,16 @@ internal class CraftLargeDiamondGame : Minigame
         }
     }
 
-    public override void SetupPlayer(Player plr)
+    public override void SetupPlayer(Player plr, bool playing)
     {
-        plr.GetModPlayer<AdventurePlayer>().AddPick(TileID.Diamond);
-        plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
-            [
-                new Item(ItemID.ChlorophytePickaxe),
-            ]);
+        if (!playing)
+        {
+            plr.GetModPlayer<AdventurePlayer>().AddPick(TileID.Diamond);
+            plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
+                [
+                    new Item(ItemID.ChlorophytePickaxe),
+                ], false);
+        }
     }
 
     public override void ResetPlayer(Player plr)

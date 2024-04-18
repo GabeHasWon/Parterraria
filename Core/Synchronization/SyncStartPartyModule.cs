@@ -1,6 +1,6 @@
 ﻿using NetEasy;
 using Parterraria.Core.BoardSystem;
-using Parterraria.Core.BoardSystem.BoardUI;
+using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using System;
 using Terraria.ID;
 

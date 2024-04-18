@@ -5,11 +5,12 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 
-namespace Parterraria.Core.BoardSystem.BoardUI;
+namespace Parterraria.Core.BoardSystem.BoardUI.EditUI;
 
 internal class MemberEditUI(object reference, FieldInfo info) : UIState
 {
-    public static List<Type> EditableTypes = [ typeof(int), typeof(short), typeof(ushort), typeof(byte), typeof(bool), typeof(float), typeof(string), typeof(Vector2), typeof(Enum) ];
+    public static List<Type> EditableTypes = [typeof(int), typeof(short), typeof(ushort), typeof(byte), typeof(bool), typeof(float), typeof(string), typeof(Vector2), 
+        typeof(Enum), typeof(Point)];
 
     public object GetValue => _info.GetValue(_reference);
 
@@ -42,6 +43,11 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
             case ushort:
                 BuildInteger(panel);
                 break;
+
+            case Point:
+                BuildPoint(panel);
+                break;
+
             default:
                 return;
         }
@@ -54,8 +60,27 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
         {
             int or short or byte or ushort => _info.Name + ": " + value,
             Enum => _info.Name + ": " + value + $" ({Convert.ToInt32((Enum)value)})",
+            Point or Vector2 => _info.Name + $": {value}",
             _ => "[Unknown data type, how'd you get here?]"
         });
+    }
+
+    private void BuildPoint(UIPanel panel)
+    {
+        var incButton = new UIButton<string>("Set")
+        {
+            Width = StyleDimension.FromPixels(60),
+            Height = StyleDimension.Fill,
+        };
+
+        incButton.OnLeftClick += (_, _) =>
+        {
+            Main.LocalPlayer.GetModPlayer<EditToolPlayer>().placeDelay = 5;
+            Main.LocalPlayer.GetModPlayer<EditToolPlayer>().placingType = new Point();
+            Main.LocalPlayer.GetModPlayer<EditToolPlayer>().placeResult = (object value) => _info.SetValue(_reference, (Point)value);
+        };
+        
+        panel.Append(incButton);
     }
 
     private void BuildInteger(UIPanel panel)
@@ -77,7 +102,7 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
         decButton.OnLeftClick += (_, _) => ModifyValue(false);
         panel.Append(decButton);
 
-        void ModifyValue(bool increase) 
+        void ModifyValue(bool increase)
         {
             switch (_info.GetValue(_reference))
             {
