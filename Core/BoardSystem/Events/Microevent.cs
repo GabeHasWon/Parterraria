@@ -7,8 +7,8 @@ internal abstract class Microevent : ILoadable
 {
     public enum Quality : byte
     {
-        Perfect,
         Excellent,
+        Great,
         Good,
         Neutral,
         Bad,

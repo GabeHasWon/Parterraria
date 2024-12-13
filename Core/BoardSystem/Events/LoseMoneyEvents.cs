@@ -6,7 +6,7 @@ namespace Parterraria.Core.BoardSystem.Events;
 
 internal class LoseMoneyEvent : Microevent
 {
-    public override Quality EventQuality => Quality.Good;
+    public override Quality EventQuality => Quality.Bad;
     protected virtual int Loss => WorldBoardSystem.Self.playingBoard.config.CoinDeltaFromNodes;
     public override LocalizedText Text => Language.GetOrRegister("Mods.Parterraria.Microevents.LoseMoneyEvent", () => "").WithFormatArgs(Loss);
 
@@ -15,12 +15,12 @@ internal class LoseMoneyEvent : Microevent
 
 internal class DoubleLoseMoneyEvent : LoseMoneyEvent
 {
-    public override Quality EventQuality => Quality.Excellent;
+    public override Quality EventQuality => Quality.Terrible;
     protected override int Loss => base.Loss * 2;
 }
 
 internal class ThreeHalvesLoseMoneyEvent : LoseMoneyEvent
 {
-    public override Quality EventQuality => Quality.Good;
+    public override Quality EventQuality => Quality.Bad;
     protected override int Loss => (int)(base.Loss * 1.5f);
 }

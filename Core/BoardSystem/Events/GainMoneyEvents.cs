@@ -15,7 +15,7 @@ internal class GainMoneyEvent : Microevent
 
 internal class DoubleGainMoneyEvent : GainMoneyEvent
 {
-    public override Quality EventQuality => Quality.Excellent;
+    public override Quality EventQuality => Quality.Great;
     protected override int Gain => base.Gain * 2;
 }
 

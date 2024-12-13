@@ -39,4 +39,5 @@ Party: {
 Microevents: {
 	GainMoneyEvent: Got {0} amethyst coins!
 	LoseMoneyEvent: Lost {0} amethyst coins...
+	GetItemEvent: Got item!
 }
