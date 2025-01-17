@@ -10,6 +10,11 @@ internal class MinigameRanking
 {
     public Dictionary<int, MinigameReward> Ranking = [];
 
+    /// <summary>
+    /// Used for minigames where one player comes in first, everyone else comes in last (or, technically, comes in <see cref="MinigameReward.Placement.Otherwise"/>).
+    /// </summary>
+    /// <param name="winnerId">The winner of the game.</param>
+    /// <returns>The resultant ranking.</returns>
     public static MinigameRanking ByFirst(int winnerId)
     {
         var rank = new MinigameRanking();

@@ -5,7 +5,6 @@ using System.IO;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
-using Terraria.UI.Chat;
 
 namespace Parterraria.Core.MinigameSystem.Games;
 

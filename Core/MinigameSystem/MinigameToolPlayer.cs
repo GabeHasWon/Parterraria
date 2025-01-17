@@ -91,6 +91,18 @@ internal class MinigameToolPlayer : ModPlayer
                 if (_selectedWorldMinigame is not null)
                     BoardUISystem.SetMiscUI(new EditObjectUIState(_selectedWorldMinigame, (obj) => _selectedWorldMinigame = (Minigame)obj));
             }
+            else if (toolMode == ToolMode.Erase)
+            {
+                if (_selectedWorldMinigame is null)
+                {
+                    _selectedWorldMinigame = WorldMinigameSystem.worldMinigames.FirstOrDefault(x => x.area.Contains(Main.MouseWorld.ToPoint()));
+                    Main.NewText("You sure you want to erase?");
+                }
+                else
+                {
+                    WorldMinigameSystem.RemoveMinigame(_selectedWorldMinigame);
+                }
+            }
         }
     }
 

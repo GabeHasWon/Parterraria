@@ -33,6 +33,16 @@ Party: {
 			Name: Crown Craze
 			Description: Somewhere, there is a crown on the ground. Pick it up and wear it to win!
 		}
+
+		CookingDashGame: {
+			Name: Bug Searching
+			Description: You forgot one piece of the Grub Soup! Find a Buggy by breaking ferns and make the soup to win!
+		}
+
+		ProjectileRainGame: {
+			Name: Danger Falls
+			Description: Projectiles rain from the ceiling. The player with the most health at the end wins!
+		}
 	}
 }
 

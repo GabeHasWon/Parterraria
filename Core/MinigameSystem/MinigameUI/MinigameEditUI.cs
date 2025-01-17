@@ -103,6 +103,7 @@ internal partial class MinigameEditUI(Player player) : UIState
         };
 
         button.OnLeftClick += onClick;
+        button.OnUpdate += StopUseOnHover;
 
         if (rightClick is not null)
             button.OnRightClick += rightClick;
@@ -110,5 +111,11 @@ internal partial class MinigameEditUI(Player player) : UIState
         panel.Append(button);
 
         number++;
+    }
+
+    private static void StopUseOnHover(UIElement affectedElement)
+    {
+        if (affectedElement.GetDimensions().ToRectangle().Contains(Main.MouseScreen.ToPoint()))
+            Main.LocalPlayer.mouseInterface = true;
     }
 }

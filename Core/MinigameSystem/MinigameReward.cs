@@ -12,6 +12,10 @@ public class MinigameReward(string text, MinigameReward.Placement place)
         Second,
         Third,
         Fourth,
+        
+        /// <summary>
+        /// Any non-number placement, such as anything but 1st for <see cref="Minigame.MinigameWinType.First"/> games.
+        /// </summary>
         Otherwise
     }
 

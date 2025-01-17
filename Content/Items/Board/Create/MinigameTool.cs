@@ -35,7 +35,7 @@ class MinigameTool : ModItem
         return true;
     }
 
-    public void DrawTool()
+    public static void DrawTool()
     {
         var toolPlayer = Main.LocalPlayer.GetModPlayer<MinigameToolPlayer>();
 

@@ -130,7 +130,7 @@ internal class BoardUISystem : ModSystem
         ToolUsage.DrawBuilding();
 
         if (Main.LocalPlayer.HeldItem.ModItem is MinigameTool tool)
-            tool.DrawTool();
+            MinigameTool.DrawTool();
 
         if (WorldBoardSystem.PlayingParty)
         {
