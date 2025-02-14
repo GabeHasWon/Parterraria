@@ -1,8 +1,8 @@
-﻿using Parterraria.Common.TileCommon;
+﻿using Parterraria.Core.BoardSystem;
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
-using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.MinigameSystem.Games;
 
@@ -10,10 +10,17 @@ internal class ProjectileRainGame : Minigame
 {
     public override MinigameWinType WinType => MinigameWinType.Last;
 
-    public int MaxTime = 0;
+    public int MinigameTimeInSeconds = 0;
+    public float ProjectilesPerSecond = 2;
+    public Point Left = Point.Zero;
+    public Point Right = Point.Zero;
+    public int ProjId = ProjectileID.WoodenArrowHostile;
 
     [HideFromEdit]
-    private int _timer = 0;
+    private float _timer = 0;
+
+    [HideFromEdit]
+    private float _overallTimer = 0;
 
     public override bool ValidateRectangle(ref Rectangle rectangle)
     {
@@ -31,6 +38,8 @@ internal class ProjectileRainGame : Minigame
             modified = true;
         }
 
+        Left = new Point(rectangle.Left, rectangle.Center.Y);
+        Right = new Point(rectangle.Right, rectangle.Center.Y);
         return modified;
     }
 
@@ -47,44 +56,53 @@ internal class ProjectileRainGame : Minigame
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
 
-    public override MinigameRanking GetRanking()
-    {
-        for (int i = 0; i < Main.maxPlayers; ++i)
-        {
-            Player plr = Main.player[i];
-
-            if (!plr.dead && (plr.HasItem(ItemID.GrubSoup) || plr.HeldItem.type == ItemID.GrubSoup))
-                return MinigameRanking.ByFirst(plr.whoAmI);
-        }
-
-        return null;
-    }
+    public override MinigameRanking GetRanking() => MinigameRanking.ByLiving();
 
     public override void InternalUpdate()
     {
-        Point16 topLeft = area.TopLeft().ToTileCoordinates16();
-        Point16 size = area.Size().ToTileCoordinates16();
+        _overallTimer++;
 
-        for (int x = topLeft.X; x < topLeft.X + size.X; ++x)
+        if (_overallTimer > MinigameTimeInSeconds * 60)
         {
-            for (int y = topLeft.Y; y < topLeft.Y + size.Y; ++y)
-            {
-                Tile tile = Main.tile[x, y];
-
-                if (tile.HasTile && tile.TileType == TileID.JungleGrass && Main.rand.NextBool(5))
-                    RandomUpdating.Auto(x, y, false, 0);
-            }
+            Beaten = true;
+            return;
         }
 
-        for (int i = 0; i < Main.maxPlayers; ++i)
-        {
-            Player plr = Main.player[i];
+        if (Main.netMode == NetmodeID.MultiplayerClient)
+            return;
 
-            if (plr.active && !plr.dead && (plr.HasItem(ItemID.GrubSoup) || plr.HeldItem.type == ItemID.GrubSoup))
+        _timer += ProjectilesPerSecond;
+
+        while (_timer > 60)
+        {
+            float factor = Main.rand.NextFloat();
+            int x = (int)MathHelper.Lerp(Left.X, Right.X, factor);
+            int y = (int)MathHelper.Lerp(Left.Y, Right.Y, factor);
+
+            while (!WorldGen.SolidOrSlopedTile(x, y))
             {
-                Beaten = true;
-                break;
+                y--;
             }
+
+            y++;
+
+            Projectile.NewProjectile(new EntitySource_Minigame(WorldBoardSystem.Self.playingBoard, this), new Vector2(x, y).ToWorldCoordinates(), Vector2.Zero, ProjId, 40, 0);
+
+            _timer -= 60;
         }
+    }
+
+    protected override void InternalSave(TagCompound tag)
+    {
+        tag.Add("maxTime", MinigameTimeInSeconds);
+        tag.Add("left", Left);
+        tag.Add("right", Right);
+    }
+
+    public override void LoadData(TagCompound tag)
+    {
+        MinigameTimeInSeconds = tag.GetInt("maxTime");
+        Left = tag.Get<Point>("left");
+        Right = tag.Get<Point>("right");
     }
 }

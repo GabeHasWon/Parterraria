@@ -29,6 +29,24 @@ internal class MinigameRanking
         return rank;
     }
 
+    /// <summary>
+    /// Used for minigames where one player comes in first, everyone else comes in last (or, technically, comes in <see cref="MinigameReward.Placement.Otherwise"/>).
+    /// </summary>
+    /// <param name="winnerId">The winner of the game.</param>
+    /// <returns>The resultant ranking.</returns>
+    public static MinigameRanking ByLiving()
+    {
+        var rank = new MinigameRanking();
+
+        foreach (var player in Main.ActivePlayers)
+        {
+            MinigameReward reward = player.dead ? new("Last", MinigameReward.Placement.Otherwise) : new("First", MinigameReward.Placement.First);
+            rank.Ranking.Add(player.whoAmI, reward);
+        }
+
+        return rank;
+    }
+
     internal void Draw(float alphaFade)
     {
         int step = 0;

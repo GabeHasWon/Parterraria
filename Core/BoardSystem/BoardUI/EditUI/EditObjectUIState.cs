@@ -1,5 +1,4 @@
-﻿using Steamworks;
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 using Terraria.GameContent.UI.Elements;
@@ -29,6 +28,14 @@ internal class EditObjectUIState(object objectToEdit, Action<object> setObjectFu
             VAlign = 0.2f
         };
 
+        panel.OnUpdate += self =>
+        {
+            if (self.GetDimensions().ToRectangle().Contains(Main.MouseScreen.ToPoint()))
+            {
+                Main.LocalPlayer.mouseInterface = true;
+            }
+        };
+
         Append(panel);
         AddMemberEdits(panel);
     }
@@ -53,7 +60,7 @@ internal class EditObjectUIState(object objectToEdit, Action<object> setObjectFu
 
         foreach (var item in _objectToEdit.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
         {
-            if (item.DeclaringType == typeof(object))
+            if (item.DeclaringType == typeof(object) || Attribute.IsDefined(item, typeof(HideFromEditAttribute)))
                 continue;
 
             if (!MemberEditUI.EditableTypes.Contains(item.FieldType) && !MemberEditUI.EditableTypes.Any(x => x.IsAssignableFrom(item.FieldType)))

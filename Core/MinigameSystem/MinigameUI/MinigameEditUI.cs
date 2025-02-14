@@ -35,6 +35,14 @@ internal partial class MinigameEditUI(Player player) : UIState
             VAlign = 0.4f
         };
 
+        mainPanel.OnUpdate += self =>
+        {
+            if (self.GetDimensions().ToRectangle().Contains(Main.MouseScreen.ToPoint()))
+            {
+                Main.LocalPlayer.mouseInterface = true;
+            }
+        };
+
         Append(mainPanel);
 
         UIText toolSelect = new(GetToolModeName(), 1)

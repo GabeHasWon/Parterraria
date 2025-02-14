@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Parterraria.Core.MinigameSystem.Games;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
-using Terraria.ModLoader.UI;
 using Terraria.UI;
 
 namespace Parterraria.Core.MinigameSystem.MinigameUI;
@@ -43,7 +42,11 @@ internal class MinigameSelectionUIState(MinigameSelectionUIState.SetMinigameDele
             _selectedMinigame = 0;
 
         if ((Main.netMode != NetmodeID.SinglePlayer || Main.instance.IsActive) && _timerSpeed < 0.005f)
-            _setMinigame(_minigames[_selectedMinigame]);
+        {
+            var mini = ModContent.GetInstance<ProjectileRainGame>();
+            _setMinigame(mini.FullName);
+            //_setMinigame(_minigames[_selectedMinigame]);
+         }
     }
 
     public override void OnInitialize()
@@ -106,8 +109,7 @@ internal class MinigameSelectionUIState(MinigameSelectionUIState.SetMinigameDele
 
         foreach (var item in WorldMinigameSystem.worldMinigames)
         {
-            if (!games.Contains(item))
-                games.Add(item);
+            games.Add(item);
         }
 
         for (int i = 0; i < 4; ++i)

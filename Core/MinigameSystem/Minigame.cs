@@ -3,6 +3,8 @@ using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.Localization;
 using Terraria.ModLoader.IO;
@@ -105,14 +107,35 @@ internal abstract class Minigame : ModType
     {
         if (debug)
         {
-            var position = playerStartLocation.ToWorldCoordinates(0, 0) - Main.screenPosition;
-            DrawCommon.CenteredString(FontAssets.ItemStack.Value, position - new Vector2(0, 4), "Start Position", Color.White);
+            DrawPositionMarker(playerStartLocation.ToWorldCoordinates(0, 0), "Start Position");
 
-            var rect = new Rectangle((int)position.X, (int)position.Y, 16, 16);
-            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, Color.Green);
+            foreach (var item in GetType().GetFields().Where(x => (typeof(Point).IsAssignableFrom(x.FieldType) || typeof(Vector2).IsAssignableFrom(x.FieldType)
+                || typeof(Point16).IsAssignableFrom(x.FieldType)) && !x.IsStatic && x.DeclaringType != typeof(Minigame)))
+            {
+                object value = item.GetValue(this);
+
+                Vector2 position = value switch
+                {
+                    Point16 point16 => point16.ToWorldCoordinates(0, 0),
+                    Vector2 vecPosition => vecPosition,
+                    Point point => point.ToWorldCoordinates(0, 0),
+                    _ => throw null,
+                };
+
+                DrawPositionMarker(position, item.Name);
+            }
         }
 
         InternalDraw(debug);
+    }
+
+    private static void DrawPositionMarker(Vector2 worldPosition, string text)
+    {
+        var position = worldPosition - Main.screenPosition;
+        DrawCommon.CenteredString(FontAssets.ItemStack.Value, position - new Vector2(0, 4), text, Color.White);
+
+        var rect = new Rectangle((int)position.X, (int)position.Y, 16, 16);
+        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, Color.Green);
     }
 
     /// <summary>
