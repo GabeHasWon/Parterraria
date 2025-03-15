@@ -255,6 +255,7 @@ internal class WorldMinigameSystem : ModSystem
                 continue;
 
             plr.Center = playingMinigame.playerStartLocation.ToWorldCoordinates();
+            plr.fallStart = (int)(plr.Center.Y / 16f);
             plr.GetModPlayer<PlayingBoardPlayer>().minigameReady = false;
             playingMinigame.SetupPlayer(plr, false);
         }

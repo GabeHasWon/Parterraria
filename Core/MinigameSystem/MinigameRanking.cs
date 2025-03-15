@@ -47,6 +47,24 @@ internal class MinigameRanking
         return rank;
     }
 
+    /// <summary>
+    /// Used for minigames where one or more players complete the win condition, or otherwise tie.
+    /// </summary>
+    /// <param name="players">The winners of the game.</param>
+    /// <returns>The resultant ranking.</returns>
+    public static MinigameRanking ByTie(HashSet<int> players)
+    {
+        var rank = new MinigameRanking();
+
+        foreach (var player in Main.ActivePlayers)
+        {
+            MinigameReward reward = players.Contains(player.whoAmI) ? new("Tie", MinigameReward.Placement.First) : new("Last", MinigameReward.Placement.Otherwise);
+            rank.Ranking.Add(player.whoAmI, reward);
+        }
+
+        return rank;
+    }
+
     internal void Draw(float alphaFade)
     {
         int step = 0;

@@ -43,6 +43,11 @@ Party: {
 			Name: Danger Falls
 			Description: Projectiles rain from the ceiling. The player with the most health at the end wins!
 		}
+
+		SplashArtGame: {
+			Name: Splash Art
+			Description: Each player paints the wall behind them. The one with the most paint at the end wins!
+		}
 	}
 }
 

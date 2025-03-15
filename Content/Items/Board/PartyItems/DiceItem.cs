@@ -77,8 +77,8 @@ internal abstract class DiceItem : ModItem
 
             if (Spinning && plr.active && !plr.dead && plr.velocity.Y < -0.5f && plr.Hitbox.Intersects(Projectile.Hitbox))
             {
-                Main.NewText(plr.GetModPlayer<PlayingBoardPlayer>().storedRoll);
-                Main.NewText(plr.GetModPlayer<PlayingBoardPlayer>().diceCount);
+                //Main.NewText(plr.GetModPlayer<PlayingBoardPlayer>().storedRoll);
+                //Main.NewText(plr.GetModPlayer<PlayingBoardPlayer>().diceCount);
 
                 Roll = Main.rand.Next(PipChoices);
                 HitY = Projectile.Center.Y;

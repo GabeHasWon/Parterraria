@@ -56,6 +56,7 @@ public class Board
 
                 BoardNode node = nodes.First(x => x is StartNode);
                 plr.Center = node.position;
+                plr.fallStart = (int)(node.position.Y / 16f);
 
                 if (i == WorldBoardSystem.Self.boardHost)
                     plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
