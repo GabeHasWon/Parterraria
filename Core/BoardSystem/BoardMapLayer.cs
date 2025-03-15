@@ -13,7 +13,6 @@ internal class BoardMapLayer : ModMapLayer
         foreach (var item in WorldBoardSystem.Self.worldBoards)
         {
             Board board = item.Value;
-            //Vector2 position = Vector2.Zero;
 
             foreach (var node in board.nodes)
             {
@@ -22,8 +21,6 @@ internal class BoardMapLayer : ModMapLayer
 
                 if (context.Draw(tex, (node.position / 16f).Floor(), Color.White, new SpriteFrame(1, 1, 0, 0), zoom, zoom, Alignment.Center).IsMouseOver)
                     text = Language.GetTextValue(item.Key);
-
-                //position += node.position;
             }
         }
     }

@@ -3,6 +3,7 @@ using Parterraria.Common;
 using System;
 using System.Collections.Generic;
 using Terraria.GameContent;
+using Terraria.Localization;
 
 namespace Parterraria.Core.MinigameSystem;
 
@@ -18,12 +19,12 @@ internal class MinigameRanking
     public static MinigameRanking ByFirst(int winnerId)
     {
         var rank = new MinigameRanking();
-        rank.Ranking.Add(winnerId, new("First", MinigameReward.Placement.First));
+        rank.Ranking.Add(winnerId, new(Language.GetTextValue("Mods.Parterraria.Rankings.First"), MinigameReward.Placement.First));
 
         foreach (var item in Main.ActivePlayers)
         {
             if (item.whoAmI != winnerId)
-                rank.Ranking.Add(item.whoAmI, new("Last", MinigameReward.Placement.Otherwise));
+                rank.Ranking.Add(item.whoAmI, new(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise));
         }
 
         return rank;
@@ -40,7 +41,8 @@ internal class MinigameRanking
 
         foreach (var player in Main.ActivePlayers)
         {
-            MinigameReward reward = player.dead ? new("Last", MinigameReward.Placement.Otherwise) : new("First", MinigameReward.Placement.First);
+            MinigameReward reward = player.dead ? new(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise) 
+                : new(Language.GetTextValue("Mods.Parterraria.Rankings.First"), MinigameReward.Placement.First);
             rank.Ranking.Add(player.whoAmI, reward);
         }
 
@@ -58,7 +60,8 @@ internal class MinigameRanking
 
         foreach (var player in Main.ActivePlayers)
         {
-            MinigameReward reward = players.Contains(player.whoAmI) ? new("Tie", MinigameReward.Placement.First) : new("Last", MinigameReward.Placement.Otherwise);
+            MinigameReward reward = players.Contains(player.whoAmI) ? new(Language.GetTextValue("Mods.Parterraria.Rankings.Tie"), MinigameReward.Placement.First) 
+                : new(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise);
             rank.Ranking.Add(player.whoAmI, reward);
         }
 

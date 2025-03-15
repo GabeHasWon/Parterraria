@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.UI;
 
 namespace Parterraria.Core.MinigameSystem.MinigameUI;
@@ -61,7 +62,7 @@ internal class MinigameSelectionUIState(MinigameSelectionUIState.SetMinigameDele
         };
         Append(minigamePanel);
 
-        var minigame = new UIText("Minigame!", 1, true)
+        var minigame = new UIText(Language.GetText("Mods.Parterraria.MiscUI.Minigame"), 1, true)
         {
             HAlign = 0.5f,
             VAlign = 0.5f,

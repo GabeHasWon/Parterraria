@@ -2,6 +2,7 @@
 using Parterraria.Core.BoardSystem;
 using System.Linq;
 using Parterraria.Content.Items.Board.Create;
+using Terraria.Localization;
 
 namespace Parterraria.Core.MinigameSystem;
 
@@ -57,7 +58,7 @@ internal class MinigameToolPlayer : ModPlayer
                 if (_selectedMinigameId >= Minigame.MinigamesById.Count)
                     _selectedMinigameId = 0;
 
-                Main.NewText($"Minigame {SelectedMinigame.DisplayName.Value} selected.");
+                Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolUI.MinigameSelected"));
             }
             else
                 _minigameArea = null;
@@ -96,7 +97,7 @@ internal class MinigameToolPlayer : ModPlayer
                 if (_selectedWorldMinigame is null)
                 {
                     _selectedWorldMinigame = WorldMinigameSystem.worldMinigames.FirstOrDefault(x => x.area.Contains(Main.MouseWorld.ToPoint()));
-                    Main.NewText("You sure you want to erase?");
+                    Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolUI.EraseConfirm"));
                 }
                 else
                 {

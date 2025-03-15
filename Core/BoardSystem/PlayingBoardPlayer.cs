@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Terraria.GameContent;
 using Terraria.ID;
+using Terraria.Localization;
 
 namespace Parterraria.Core.BoardSystem;
 
@@ -285,7 +286,7 @@ internal class PlayingBoardPlayer : ModPlayer
         if (!WorldMinigameSystem.InMinigame)
         {
             var pos = Player.Center - new Vector2(0, 120 - Player.gfxOffY) - Main.screenPosition;
-            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, "Roll: " + storedRoll, Color.White);
+            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, $"{Language.GetTextValue("Mods.Parterraria.MiscUI.Roll")} " + storedRoll, Color.White);
 
             pos = Player.Center - new Vector2(0, 96 - Player.gfxOffY) - Main.screenPosition;
             string coin = $"[i:{ModContent.ItemType<AmethystCoin>()}]: " + Player.CountItem(ModContent.ItemType<AmethystCoin>());
@@ -299,14 +300,15 @@ internal class PlayingBoardPlayer : ModPlayer
             {
                 pos = Player.Center - new Vector2(0, 48 - Player.gfxOffY) - Main.screenPosition;
                 float moveTime = Math.Max(MaxMoveTimer / 60f - moveTimer / 60f, 0);
-                string timeLeft = $"Move timer: " + moveTime.ToString("#0.#") + "s";
+                string timeLeft = $"{Language.GetTextValue("Mods.Parterraria.MiscUI.MoveTimer")} " + moveTime.ToString("#0.#") + "s";
                 DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, timeLeft, Color.White);
             }
         }
         else if (WorldMinigameSystem.NotReady)
         {
             var pos = Player.Center - new Vector2(0, 48 - Player.gfxOffY) - Main.screenPosition;
-            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos.Floor(), minigameReady ? "READY" : "NOT READY", minigameReady ? Color.Green : Color.Orange);
+            string text = minigameReady ? Language.GetTextValue("Mods.Parterraria.MiscUI.Ready") : Language.GetTextValue("Mods.Parterraria.MiscUI.NotReady");
+            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos.Floor(), text, minigameReady ? Color.Green : Color.Orange);
         }
     }
 
