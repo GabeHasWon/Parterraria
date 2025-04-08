@@ -20,6 +20,8 @@ NPCs: {
 			Princess_LovesNPC: I like {NPCName}.
 		}
 	}
+
+	GoldFaerie.DisplayName: Gold Faerie
 }
 
 Party: {
@@ -47,6 +49,11 @@ Party: {
 		SplashArtGame: {
 			Name: Splash Art
 			Description: Each player paints the wall behind them. The one with the most paint at the end wins!
+		}
+
+		BugChaseGame: {
+			Name: Fairy Flurry
+			Description: A Golden Faerie flits about the arena. Catch it to win!
 		}
 	}
 }

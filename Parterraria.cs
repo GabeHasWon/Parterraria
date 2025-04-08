@@ -16,7 +16,14 @@ public class Parterraria : Mod
 {
     public static int AmethystCurrencyID { get; private set; }
 
-    public override void Load() => AmethystCurrencyID = CustomCurrencyManager.RegisterCurrency(new AmethystCurrency(ModContent.ItemType<AmethystCoin>(), 999L));
+    public override void Load()
+    {
+        AmethystCurrencyID = CustomCurrencyManager.RegisterCurrency(new AmethystCurrency(ModContent.ItemType<AmethystCoin>(), 999L));
+        NPCUtils.NPCUtils.AutoloadModBannersAndCritters(this);
+    }
+
+    public override void Unload() => NPCUtils.NPCUtils.UnloadMod(this);
+
     public override void PostSetupContent() => NetEasy.NetEasy.Register(this);
     public override void HandlePacket(BinaryReader reader, int whoAmI) => NetEasy.NetEasy.HandleModule(reader, whoAmI);
 

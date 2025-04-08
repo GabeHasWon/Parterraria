@@ -2,6 +2,7 @@
 using Parterraria.Common;
 using System;
 using System.Collections.Generic;
+using Terraria;
 using Terraria.GameContent;
 using Terraria.Localization;
 
@@ -63,6 +64,18 @@ internal class MinigameRanking
             MinigameReward reward = players.Contains(player.whoAmI) ? new(Language.GetTextValue("Mods.Parterraria.Rankings.Tie"), MinigameReward.Placement.First) 
                 : new(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise);
             rank.Ranking.Add(player.whoAmI, reward);
+        }
+
+        return rank;
+    }
+
+    public static MinigameRanking ByOrder(int[] playerWhoAmIInOrderOfPlacement)
+    {
+        var rank = new MinigameRanking();
+
+        foreach (int who in playerWhoAmIInOrderOfPlacement)
+        {
+            rank.Ranking.Add(who, reward);
         }
 
         return rank;

@@ -1,27 +1,34 @@
 ﻿using Parterraria.Content.NPCs;
-using Parterraria.Core.BoardSystem;
+using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
+using System.Collections.Generic;
 using Terraria.ID;
 
 namespace Parterraria.Core.MinigameSystem.Games;
 
-internal class BugChaseGame : Minigame
+internal class ReverseRaceGame : Minigame
 {
-    public override MinigameWinType WinType => MinigameWinType.Last;
+    public override MinigameWinType WinType => MinigameWinType.InOrder;
+
+    Point endPosition = Point.Zero;
+    float distanceToWin = 60f;
+
+    [HideFromEdit]
+    private readonly Dictionary<int, int> RankingByWhoAmI = [];
 
     public override bool ValidateRectangle(ref Rectangle rectangle)
     {
         bool modified = false;
 
-        if (rectangle.Width < 40 * 16)
+        if (rectangle.Width < 20 * 16)
         {
             rectangle.Width = 40 * 16;
             modified = true;
         }
 
-        if (rectangle.Height < 30 * 16)
+        if (rectangle.Height < 20 * 16)
         {
-            rectangle.Height = 30 * 16;
+            rectangle.Height = 20 * 16;
             modified = true;
         }
 
@@ -34,19 +41,13 @@ internal class BugChaseGame : Minigame
         {
             plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
                 [
-                    new Item(ItemID.BugNet),
-                    new Item(ItemID.DontHurtComboBook),
-                    new Item(ItemID.LunarHook),
-                    new Item(ItemID.TerrasparkBoots),
-                    new Item(ItemID.AngelWings)
+                    new Item(ItemID.LightningBoots),
                 ], false);
         }
     }
 
     public override void OnStart()
     {
-        var src = new EntitySource_Minigame(WorldBoardSystem.Self.playingBoard, WorldMinigameSystem.Self.playingMinigame);
-        NPC.NewNPC(src, area.Center.X, area.Center.Y, ModContent.NPCType<GoldFaerie>());
     }
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
@@ -58,7 +59,7 @@ internal class BugChaseGame : Minigame
             Player plr = Main.player[i];
 
             if (plr.HasItem(Mod.Find<ModItem>(nameof(GoldFaerie) + "Item").Type))
-                return MinigameRanking.ByFirst(plr.whoAmI);
+                return MinigameRanking.Ordered(plr.whoAmI);
         }
 
         return null;
@@ -70,11 +71,11 @@ internal class BugChaseGame : Minigame
         {
             Player plr = Main.player[i];
 
-            if (plr.HasItem(Mod.Find<ModItem>(nameof(GoldFaerie) + "Item").Type))
-            {
-                Beaten = true;
-                return;
-            }
+            if (!RankingByWhoAmI.ContainsKey(i) && plr.DistanceSQ(endPosition.ToWorldCoordinates()) < distanceToWin * distanceToWin)
+                RankingByWhoAmI.Add(i, RankingByWhoAmI.Count);
         }
+
+        if (RankingByWhoAmI.Count >= Main.CurrentFrameFlags.ActivePlayersCount - 1)
+            Beaten = true;
     }
 }

@@ -82,3 +82,8 @@ BrokenDice: {
 	DisplayName: Broken Dice
 	Tooltip: ""
 }
+
+GoldFaerieItem: {
+	DisplayName: Gold Faerie Item
+	Tooltip: ""
+}

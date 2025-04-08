@@ -40,6 +40,7 @@ internal class MinigameToolPlayer : ModPlayer
             area.Width = (int)(Main.MouseWorld.X - area.X);
             area.Height = (int)(Main.MouseWorld.Y - area.Y);
             SelectedMinigame.ValidateRectangle(ref area);
+            SelectedMinigame.playerStartLocation = area.TopLeft().ToTileCoordinates();
             _minigameArea = area;
         }
 
