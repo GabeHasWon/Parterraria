@@ -41,7 +41,7 @@ public class ShopNode() : EmptyNode
 /// </summary>
 public class ShopNPC : ModNPC
 {
-    public override string Texture => "Terraria/Images/NPC_" + NPCID.Guide;
+    //public override string Texture => "Terraria/Images/NPC_" + NPCID.Guide;
 
     public override void SetStaticDefaults() => Main.npcFrameCount[Type] = Main.npcFrameCount[NPCID.Guide];
 

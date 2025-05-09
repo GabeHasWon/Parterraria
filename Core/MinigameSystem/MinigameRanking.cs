@@ -1,8 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Parterraria.Common;
-using System;
+﻿using Parterraria.Common;
 using System.Collections.Generic;
-using Terraria;
 using Terraria.GameContent;
 using Terraria.Localization;
 
@@ -73,9 +70,16 @@ internal class MinigameRanking
     {
         var rank = new MinigameRanking();
 
-        foreach (int who in playerWhoAmIInOrderOfPlacement)
+        for (int i = 0; i < playerWhoAmIInOrderOfPlacement.Length; i++)
         {
-            rank.Ranking.Add(who, reward);
+            int who = playerWhoAmIInOrderOfPlacement[i];
+            rank.Ranking.Add(who, i switch
+            {
+                0 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.First"), MinigameReward.Placement.First),
+                1 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Second"), MinigameReward.Placement.Second),
+                2 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Third"), MinigameReward.Placement.Third),
+                _ => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Failed"), MinigameReward.Placement.Fourth),
+            });
         }
 
         return rank;

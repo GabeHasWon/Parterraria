@@ -1,8 +1,10 @@
 ﻿using Parterraria.Common;
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.Localization;
@@ -104,12 +106,25 @@ internal abstract class Minigame : ModType
 
     public void Draw(bool debug)
     {
+        Rectangle screenRect = new ((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenHeight);
+        screenRect.Inflate(400, 400);
+
+        if (!area.Intersects(screenRect))
+        {
+            return;
+        }
+
         if (debug)
         {
             DrawPositionMarker(playerStartLocation.ToWorldCoordinates(0, 0), "Start Position");
 
-            foreach (var item in GetType().GetFields().Where(x => (typeof(Point).IsAssignableFrom(x.FieldType) || typeof(Vector2).IsAssignableFrom(x.FieldType)
-                || typeof(Point16).IsAssignableFrom(x.FieldType)) && !x.IsStatic && x.DeclaringType != typeof(Minigame)))
+            var points = GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
+                .Where(x => (typeof(Point).IsAssignableFrom(x.FieldType) || typeof(Vector2).IsAssignableFrom(x.FieldType)
+                    || typeof(Point16).IsAssignableFrom(x.FieldType)) && x.DeclaringType != typeof(Minigame));
+
+            FieldInfo[] points2 = [.. points];
+
+            foreach (var item in points)
             {
                 object value = item.GetValue(this);
 

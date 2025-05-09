@@ -55,6 +55,11 @@ Party: {
 			Name: Fairy Flurry
 			Description: A Golden Faerie flits about the arena. Catch it to win!
 		}
+
+		PointRaceGame: {
+			Name: Dangerous Dash
+			Description: Somewhere there is a finish point. Approach it to win!
+		}
 	}
 }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Terraria.DataStructures;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
@@ -44,7 +45,7 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
                 BuildInteger(panel);
                 break;
 
-            case Point:
+            case Point or Vector2 or Point16:
                 BuildPoint(panel);
                 break;
 
@@ -58,7 +59,7 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
         object value = _info.GetValue(_reference);
         text.SetText(value switch
         {
-            int or short or byte or ushort => _info.Name + ": " + value,
+            int or short or byte or ushort or float => _info.Name + ": " + value,
             Enum => _info.Name + ": " + value + $" ({Convert.ToInt32((Enum)value)})",
             Point or Vector2 => _info.Name + $": {value}",
             _ => "[Unknown data type, how'd you get here?]"
@@ -77,7 +78,17 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
         {
             Main.LocalPlayer.GetModPlayer<EditToolPlayer>().placeDelay = 5;
             Main.LocalPlayer.GetModPlayer<EditToolPlayer>().placingType = new Point();
-            Main.LocalPlayer.GetModPlayer<EditToolPlayer>().placeResult = (object value) => _info.SetValue(_reference, (Point)value);
+            Main.LocalPlayer.GetModPlayer<EditToolPlayer>().placeResult = (object value) =>
+            {
+                var point = (Point)value;
+
+                if (_info.FieldType == typeof(Point))
+                    _info.SetValue(_reference, point);
+                else if (_info.FieldType == typeof(Point16))
+                    _info.SetValue(_reference, new Point16(point.X, point.Y));
+                else if (_info.FieldType == typeof(Vector2))
+                    _info.SetValue(_reference, point.ToWorldCoordinates());
+            };
         };
         
         panel.Append(incButton);
@@ -120,6 +131,10 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
 
                 case byte byteVal:
                     _info.SetValue(_reference, (byte)MathHelper.Clamp(byteVal + (increase ? 1 : -1), 0, 255));
+                    break;
+
+                case float floatVal:
+                    _info.SetValue(_reference, MathHelper.Clamp(floatVal + (increase ? 1 : -1), float.MinValue, float.MaxValue));
                     break;
 
                 default:

@@ -2,15 +2,18 @@
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
 using System.Collections.Generic;
+using System.Net;
+using System.Runtime.Intrinsics;
 using Terraria.ID;
+using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.MinigameSystem.Games;
 
-internal class ReverseRaceGame : Minigame
+internal class PointRaceGame : Minigame
 {
     public override MinigameWinType WinType => MinigameWinType.InOrder;
 
-    Point endPosition = Point.Zero;
+    Vector2 endPosition = Vector2.Zero;
     float distanceToWin = 60f;
 
     [HideFromEdit]
@@ -42,28 +45,21 @@ internal class ReverseRaceGame : Minigame
             plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
                 [
                     new Item(ItemID.LightningBoots),
+                    new Item(ItemID.ShinyRedBalloon),
                 ], false);
         }
+        else
+            plr.Center = playerStartLocation.ToWorldCoordinates();
     }
 
     public override void OnStart()
     {
+        RankingByWhoAmI.Clear();
     }
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
 
-    public override MinigameRanking GetRanking()
-    {
-        for (int i = 0; i < Main.maxPlayers; ++i)
-        {
-            Player plr = Main.player[i];
-
-            if (plr.HasItem(Mod.Find<ModItem>(nameof(GoldFaerie) + "Item").Type))
-                return MinigameRanking.Ordered(plr.whoAmI);
-        }
-
-        return null;
-    }
+    public override MinigameRanking GetRanking() => MinigameRanking.ByOrder([.. RankingByWhoAmI.Values]);
 
     public override void InternalUpdate()
     {
@@ -71,11 +67,14 @@ internal class ReverseRaceGame : Minigame
         {
             Player plr = Main.player[i];
 
-            if (!RankingByWhoAmI.ContainsKey(i) && plr.DistanceSQ(endPosition.ToWorldCoordinates()) < distanceToWin * distanceToWin)
+            if (!RankingByWhoAmI.ContainsKey(i) && plr.DistanceSQ(endPosition) < distanceToWin * distanceToWin)
                 RankingByWhoAmI.Add(i, RankingByWhoAmI.Count);
         }
 
-        if (RankingByWhoAmI.Count >= Main.CurrentFrameFlags.ActivePlayersCount - 1)
+        if (RankingByWhoAmI.Count > Main.CurrentFrameFlags.ActivePlayersCount - 1)
             Beaten = true;
     }
+
+    protected override void InternalSave(TagCompound tag) => tag.Add("end", endPosition);
+    public override void LoadData(TagCompound tag) => endPosition = tag.Get<Vector2>("end");
 }
