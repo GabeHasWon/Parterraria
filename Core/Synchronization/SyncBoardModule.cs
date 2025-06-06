@@ -28,7 +28,10 @@ public class SyncBoardModule(BoardData boardData) : Module
                 setLinkActions.Add(() =>
                 {
                     foreach (int item in data.Links)
-                        node.links.AddLink(board.nodesById[item]);
+                    {
+                        if (board.nodesById.TryGetValue(item, out BoardNode newNode))
+                            node.links.AddLink(newNode);
+                    }
                 });
             }
 

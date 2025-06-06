@@ -66,7 +66,7 @@ internal class MinigameRanking
         return rank;
     }
 
-    public static MinigameRanking ByOrder(int[] playerWhoAmIInOrderOfPlacement)
+    public static MinigameRanking ByOrderAbsolute(int[] playerWhoAmIInOrderOfPlacement)
     {
         var rank = new MinigameRanking();
 
@@ -74,6 +74,24 @@ internal class MinigameRanking
         {
             int who = playerWhoAmIInOrderOfPlacement[i];
             rank.Ranking.Add(who, i switch
+            {
+                0 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.First"), MinigameReward.Placement.First),
+                1 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Second"), MinigameReward.Placement.Second),
+                2 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Third"), MinigameReward.Placement.Third),
+                _ => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Failed"), MinigameReward.Placement.Fourth),
+            });
+        }
+
+        return rank;
+    }
+
+    public static MinigameRanking ByOrderContaining(List<(int, int)> playerWhoAmIInOrderOfPlacement)
+    {
+        var rank = new MinigameRanking();
+
+        foreach ((int who, int placement) in playerWhoAmIInOrderOfPlacement)
+        {
+            rank.Ranking.Add(who, placement switch
             {
                 0 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.First"), MinigameReward.Placement.First),
                 1 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Second"), MinigameReward.Placement.Second),

@@ -59,7 +59,7 @@ internal class PointRaceGame : Minigame
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
 
-    public override MinigameRanking GetRanking() => MinigameRanking.ByOrder([.. RankingByWhoAmI.Values]);
+    public override MinigameRanking GetRanking() => MinigameRanking.ByOrderAbsolute([.. RankingByWhoAmI.Values]);
 
     public override void InternalUpdate()
     {

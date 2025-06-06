@@ -1,14 +1,16 @@
-﻿using Terraria.ID;
+﻿using Iced.Intel;
+using Terraria.ID;
 
 namespace Parterraria.Core.InventoryStorageSystem;
 
 internal class InventoryPlayer : ModPlayer
 {
-    private class StoredInventory(StoredInventory old, Item[] inv, Item[] armorAndAcc)
+    private class StoredInventory(StoredInventory old, Item[] inv, Item[] armorAndAcc, Item[] miscAccessories)
     {
         public StoredInventory oldInv = old;
         public Item[] inv = inv;
         public Item[] armorAndAcc = armorAndAcc;
+        public Item[] miscAccessories = miscAccessories;
     }
 
     private StoredInventory _inventory = null;
@@ -21,7 +23,7 @@ internal class InventoryPlayer : ModPlayer
         orig(threadContext);
     }
 
-    public void SwitchInventory(Item[] inventory, Item[] armor)
+    public void SwitchInventory(Item[] inventory, Item[] armor, Item[] misc)
     {
         var realInv = new Item[59];
 
@@ -51,18 +53,34 @@ internal class InventoryPlayer : ModPlayer
             }
         }
 
+        var realMisc = new Item[Player.SupportedMiscSlotCount];
+
+        for (int i = 0; i < realMisc.Length; ++i)
+        {
+            if (i < misc.Length)
+                realMisc[i] = misc[i];
+            else
+            {
+                var airItem = new Item(ItemID.None);
+                airItem.TurnToAir();
+                realMisc[i] = airItem;
+            }
+        }
+
         if (_inventory is null)
-            _inventory = new(new StoredInventory(null, Player.inventory, Player.armor), realInv, realArmor);
+            _inventory = new(new StoredInventory(null, Player.inventory, Player.armor, Player.miscEquips), realInv, realArmor, realMisc);
         else
-            _inventory = new(_inventory, realInv, realArmor);
+            _inventory = new(_inventory, realInv, realArmor, realMisc);
 
         Player.inventory = _inventory.inv;
         Player.armor = _inventory.armorAndAcc;
+        Player.miscEquips = _inventory.miscAccessories;
         Player.itemTime = 0;
         Player.itemAnimation = 0;
     }
 
-    public void SwitchInventory(Item[] inventory, bool preserveEquipment) => SwitchInventory(inventory, preserveEquipment ? Player.armor : []);
+    public void SwitchInventory(Item[] inventory, bool preserveEquipment, bool preserveMisc = true) 
+        => SwitchInventory(inventory, preserveEquipment ? Player.armor : [], preserveMisc ? Player.miscEquips : []);
 
     public void ReplaceInventory()
     {
@@ -72,6 +90,7 @@ internal class InventoryPlayer : ModPlayer
         _inventory = _inventory.oldInv;
         Player.inventory = _inventory.inv;
         Player.armor = _inventory.armorAndAcc;
+        Player.miscEquips = _inventory.miscAccessories;
         Player.itemTime = 0;
         Player.itemAnimation = 0;
     }

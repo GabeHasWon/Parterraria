@@ -60,6 +60,11 @@ Party: {
 			Name: Dangerous Dash
 			Description: Somewhere there is a finish point. Approach it to win!
 		}
+
+		GetHeightGame: {
+			Name: Peak Performance
+			Description: Race to be the highest up competitor!
+		}
 	}
 }
 

@@ -286,7 +286,12 @@ internal class WorldMinigameSystem : ModSystem
         for (int i = 0; i < count; ++i)
         {
             TagCompound game = tag.GetCompound("game" + i);
-            worldMinigames.Add(Minigame.LoadMinigame(game));
+            Minigame minigame = Minigame.LoadMinigame(game);
+
+            if (minigame is null)
+                continue;
+
+            worldMinigames.Add(minigame);
         }
     }
 }
