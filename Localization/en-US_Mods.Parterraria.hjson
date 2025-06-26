@@ -7,7 +7,7 @@ Projectiles: {
 
 NPCs: {
 	ShopNPC: {
-		DisplayName: Shop N P C
+		DisplayName: Vartor
 
 		TownNPCMood: {
 			Content: I am content.

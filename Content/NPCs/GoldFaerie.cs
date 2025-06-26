@@ -41,8 +41,12 @@ internal class GoldFaerie : ModNPC
 
         if (Position == Vector2.Zero || Position.DistanceSQ(NPC.Center) < 60 * 60)
         {
-            var area = WorldMinigameSystem.Self.playingMinigame.area;
-            Position = new Vector2(Main.rand.Next(area.Left, area.Right), Main.rand.Next(area.Top, area.Bottom));
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+            {
+                var area = WorldMinigameSystem.Self.playingMinigame.area;
+                Position = new Vector2(Main.rand.Next(area.Left, area.Right), Main.rand.Next(area.Top, area.Bottom));
+                NPC.netUpdate = true;
+            }
         }
         else
         {

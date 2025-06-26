@@ -182,7 +182,7 @@ internal class PlayingBoardPlayer : ModPlayer
 
         if (Main.netMode == NetmodeID.SinglePlayer)
             diceCount = count;
-        else
+        else if (Main.netMode == NetmodeID.MultiplayerClient)
             new SyncDieCount(Main.myPlayer, count).Send(-1, -1, false);
     }
 

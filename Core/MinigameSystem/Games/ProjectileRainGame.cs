@@ -1,6 +1,7 @@
 ﻿using Parterraria.Core.BoardSystem;
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
+using System.IO;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
 
@@ -104,5 +105,23 @@ internal class ProjectileRainGame : Minigame
         MinigameTimeInSeconds = tag.GetInt("maxTime");
         Left = tag.Get<Point>("left");
         Right = tag.Get<Point>("right");
+    }
+
+    public override void ReadNetData(BinaryReader reader)
+    {
+        MinigameTimeInSeconds = reader.ReadInt16();
+        ProjId = reader.ReadInt16();
+        Left = new Point(reader.ReadInt32(), reader.ReadInt32());
+        Right = new Point(reader.ReadInt32(), reader.ReadInt32());
+    }
+
+    public override void WriteNetData(BinaryWriter writer)
+    {
+        writer.Write((short)MinigameTimeInSeconds);
+        writer.Write((short)ProjId);
+        writer.Write(Left.X);
+        writer.Write(Left.Y);
+        writer.Write(Right.X);
+        writer.Write(Right.Y);
     }
 }

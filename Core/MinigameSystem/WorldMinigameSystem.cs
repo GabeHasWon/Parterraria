@@ -146,7 +146,7 @@ internal class WorldMinigameSystem : ModSystem
             }
         }
 
-        if (!WorldBoardSystem.PlayingParty || InMinigame || worldMinigames.Count == 0 || Main.netMode == NetmodeID.MultiplayerClient || selectingMinigame)
+        if (!WorldBoardSystem.PlayingParty || InMinigame || worldMinigames.Count == 0 || Main.netMode == NetmodeID.MultiplayerClient || selectingMinigame || Main.npcShop > 0)
         {
             if (selectingMinigame && Main.netMode == NetmodeID.Server)
                 RollMinigameOnServer();

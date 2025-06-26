@@ -1,7 +1,9 @@
 ﻿using Parterraria.Common;
+using Parterraria.Core.Synchronization;
 using System;
 using System.Linq;
 using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.Localization;
 
 namespace Parterraria.Core.BoardSystem;
@@ -92,7 +94,10 @@ internal class ToolUsage
             if (node is null)
                 return;
 
-            board.RemoveNode(node);
+            if (Main.netMode == NetmodeID.SinglePlayer)
+                board.RemoveNode(node);
+            else if (Main.netMode == NetmodeID.MultiplayerClient)
+                new RemoveNodeModule(Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().editingBoard, (short)board.nodes.IndexOf(node)).Send(runLocally: false);
         }
     }
 
@@ -161,8 +166,17 @@ internal class ToolUsage
         {
             if (_placementStage == 1)
             {
-                var board = WorldBoardSystem.GetBoard(Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().editingBoard);
-                board.AddNode(BoardNode.GenerateNode(board, buildingNode.GetType(), buildingNode.position, buildingNode.halfWidth));
+                if (Main.netMode == NetmodeID.SinglePlayer)
+                {
+                    var board = WorldBoardSystem.GetBoard(Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().editingBoard);
+                    board.AddNode(BoardNode.GenerateNode(board, buildingNode.GetType(), buildingNode.position, buildingNode.halfWidth));
+                }
+                else if (Main.netMode == NetmodeID.MultiplayerClient)
+                {
+                    string boardName = Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().editingBoard;
+                    new AddNodeModule(boardName, buildingNode.GetType().AssemblyQualifiedName, buildingNode.position, buildingNode.halfWidth).Send();
+                }
+
                 buildingNode = null;
                 _placementStage = 0;
             }

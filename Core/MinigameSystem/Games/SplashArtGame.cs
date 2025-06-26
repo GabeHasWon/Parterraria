@@ -1,4 +1,5 @@
-﻿using Parterraria.Core.BoardSystem.BoardUI.EditUI;
+﻿using Parterraria.Common;
+using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,16 +42,12 @@ internal class SplashArtGame : Minigame
         if (!playing)
         {
             plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
-                [
-                    new Item(ItemID.EoCShield)
-                ], false);
+                [], [CommonUtils.AirItem, CommonUtils.AirItem, CommonUtils.AirItem, new Item(ItemID.EoCShield), 
+                    new Item(ItemID.CloudinaBalloon), new Item(ItemID.LightningBoots)], []);
         }
     }
 
-    public override void ResetPlayer(Player plr)
-    {
-        plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
-    }
+    public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
 
     public override MinigameRanking GetRanking()
     {

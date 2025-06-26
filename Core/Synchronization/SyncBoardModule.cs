@@ -2,6 +2,7 @@
 using Parterraria.Core.BoardSystem;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria.ID;
 
 namespace Parterraria.Core.Synchronization;
@@ -19,8 +20,9 @@ public class SyncBoardModule(BoardData boardData) : Module
         {
             var board = new Board();
             List<Action> setLinkActions = [];
+            BoardData.NodeData[] orderedNodes = [.. data.Nodes.OrderBy(x => x.Id)];
 
-            foreach (BoardData.NodeData data in data.Nodes)
+            foreach (BoardData.NodeData data in orderedNodes)
             {
                 var node = BoardNode.GenerateNode(board, Type.GetType(data.Type), data.Position, data.HalfWidth);
                 board.AddNode(node);

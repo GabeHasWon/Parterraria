@@ -1,9 +1,7 @@
-﻿using Parterraria.Content.NPCs;
-using Parterraria.Core.BoardSystem.BoardUI.EditUI;
+﻿using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
 using System.Collections.Generic;
-using System.Net;
-using System.Runtime.Intrinsics;
+using System.IO;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
 
@@ -46,16 +44,13 @@ internal class PointRaceGame : Minigame
                 [
                     new Item(ItemID.LightningBoots),
                     new Item(ItemID.ShinyRedBalloon),
-                ], false);
+                ], false, false);
         }
         else
             plr.Center = playerStartLocation.ToWorldCoordinates();
     }
 
-    public override void OnStart()
-    {
-        RankingByWhoAmI.Clear();
-    }
+    public override void OnStart() => RankingByWhoAmI.Clear();
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
 
@@ -77,4 +72,7 @@ internal class PointRaceGame : Minigame
 
     protected override void InternalSave(TagCompound tag) => tag.Add("end", endPosition);
     public override void LoadData(TagCompound tag) => endPosition = tag.Get<Vector2>("end");
+
+    public override void ReadNetData(BinaryReader reader) => endPosition = reader.ReadVector2();
+    public override void WriteNetData(BinaryWriter writer) => writer.WriteVector2(endPosition);
 }

@@ -32,8 +32,11 @@ internal abstract class Minigame : ModType
     public bool Beaten { get; protected set; }
     public int PlayTime { get; protected set; }
 
+    /// <summary>
+    /// The area, in tile coordinates, of this minigame. This should only be set on placement.
+    /// </summary> 
     [HideFromEdit]
-    public Rectangle area = default; // This should only be set on placement
+    public Rectangle area = default;
 
     public Point playerStartLocation = default;
 

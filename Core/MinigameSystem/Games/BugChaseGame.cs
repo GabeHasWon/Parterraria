@@ -45,8 +45,13 @@ internal class BugChaseGame : Minigame
 
     public override void OnStart()
     {
-        var src = new EntitySource_Minigame(WorldBoardSystem.Self.playingBoard, WorldMinigameSystem.Self.playingMinigame);
-        NPC.NewNPC(src, area.Center.X, area.Center.Y, ModContent.NPCType<GoldFaerie>());
+        if (Main.netMode != NetmodeID.MultiplayerClient)
+        {
+            var src = new EntitySource_Minigame(WorldBoardSystem.Self.playingBoard, WorldMinigameSystem.Self.playingMinigame);
+            var area = WorldMinigameSystem.Self.playingMinigame.area;
+            var pos = new Vector2(Main.rand.Next(area.Left, area.Right), Main.rand.Next(area.Top, area.Bottom));
+            NPC.NewNPC(src, (int)pos.X, (int)pos.Y, ModContent.NPCType<GoldFaerie>());
+        }
     }
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();

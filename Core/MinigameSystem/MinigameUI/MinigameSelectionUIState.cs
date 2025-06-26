@@ -44,10 +44,10 @@ internal class MinigameSelectionUIState(MinigameSelectionUIState.SetMinigameDele
 
         if ((Main.netMode != NetmodeID.SinglePlayer || Main.instance.IsActive) && _timerSpeed < 0.005f)
         {
-            var mini = ModContent.GetInstance<GetHeightGame>();
-            _setMinigame(mini.FullName);
-            //_setMinigame(_minigames[_selectedMinigame]);
-         }
+            //var mini = ModContent.GetInstance<MannequinGame>();
+            //_setMinigame(mini.FullName);
+            _setMinigame(_minigames[_selectedMinigame]);
+        }
     }
 
     public override void OnInitialize()
