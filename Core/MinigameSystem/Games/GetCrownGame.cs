@@ -102,16 +102,4 @@ internal class GetCrownGame : Minigame
         (plr.armor[0].type == ItemID.PlatinumCrown && !plr.armor[0].IsAir || plr.armor[10].type == ItemID.PlatinumCrown && !plr.armor[10].IsAir);
     protected override void InternalSave(TagCompound tag) => tag.Add(nameof(_crownSpawnLocation), _crownSpawnLocation);
     public override void LoadData(TagCompound tag) => _crownSpawnLocation = tag.Get<Point>(nameof(_crownSpawnLocation));
-
-    protected override void InternalDraw(bool debug)
-    {
-        if (debug)
-        {
-            var position = _crownSpawnLocation.ToWorldCoordinates(0, 0) - Main.screenPosition;
-            DrawCommon.CenteredString(FontAssets.ItemStack.Value, position - new Vector2(0, 4), "Crown", Color.White);
-
-            var rect = new Rectangle((int)position.X, (int)position.Y, 16, 16);
-            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, Color.Gold);
-        }
-    }
 }

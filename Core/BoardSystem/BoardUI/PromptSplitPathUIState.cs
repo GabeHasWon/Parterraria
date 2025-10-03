@@ -56,7 +56,7 @@ internal class PromptSplitPathUIState(List<NodeLinks.Link> linksToCheck, bool go
     private static void ConfirmChoice(NodeLinks.Link link, bool backwards)
     {
         var boardPlayer = Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>();
-        boardPlayer.prompingSplitPath = false;
+        boardPlayer.promptingSplit = false;
         boardPlayer.nextNode = backwards ? link.Parent : link.ToNode;
 
         if (Main.netMode == NetmodeID.MultiplayerClient)

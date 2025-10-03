@@ -17,7 +17,8 @@ internal class MannequinGame : Minigame
         public readonly int Body = Body; 
         public readonly int Legs = Legs;
 
-        public readonly bool PlayerMatches(Player player) => IsType(player.armor[0], Head) && IsType(player.armor[1], Body) && IsType(player.armor[2], Legs);
+        public readonly bool PlayerMatches(Player player) => (IsType(player.armor[0], Head) && IsType(player.armor[1], Body) && IsType(player.armor[2], Legs))
+            || (IsType(player.armor[10], Head) && IsType(player.armor[11], Body) && IsType(player.armor[12], Legs));
 
         static bool IsType(Item item, int type) => item is not null && !item.IsAir && item.type == type;
     }
@@ -37,8 +38,6 @@ internal class MannequinGame : Minigame
         new Set(ItemID.UnicornMask, ItemID.UnicornShirt, ItemID.UnicornPants)];
 
     public override MinigameWinType WinType => MinigameWinType.First;
-
-    public override bool IsLoadingEnabled(Mod mod) => false;
 
     public override void Load() => teDollInventory = typeof(TEDisplayDoll).GetField("_items", BindingFlags.Instance | BindingFlags.NonPublic);
 
@@ -77,6 +76,9 @@ internal class MannequinGame : Minigame
 
     public override void OnStart()
     {
+        if (Main.netMode == NetmodeID.MultiplayerClient)
+            return;
+
         PriorityQueue<int, float> head = new();
         PriorityQueue<int, float> body = new();
         PriorityQueue<int, float> legs = new();
@@ -88,18 +90,20 @@ internal class MannequinGame : Minigame
             legs.Enqueue(item.Legs, Main.rand.NextFloat());
         }
 
-        Dictionary<int, TEDisplayDoll> displayDolls = [];
-        Dictionary<int, DollInventoryCache> dollInventories = [];
+        Dictionary<Point16, TEDisplayDoll> displayDolls = [];
+        Dictionary<Point16, DollInventoryCache> dollInventories = [];
 
         for (int i = area.X; i < area.Right; ++i)
         {
             for (int j = area.Y; j < area.Bottom; ++j)
             {
-                if (TileEntity.ByPosition.TryGetValue(new Point16(i, j), out TileEntity te) && te is TEDisplayDoll mannequin)
+                int x = i / 16;
+                int y = j / 16;
+
+                if (TileEntity.ByPosition.TryGetValue(new Point16(x, y), out TileEntity te) && te is TEDisplayDoll mannequin)
                 {
-                    int count = displayDolls.Count;
-                    displayDolls.Add(count, mannequin);
-                    dollInventories.Add(count, new DollInventoryCache([new(), new(), new(), new(), new(), new(), new(), new()], false, false, false));
+                    if (displayDolls.TryAdd(new Point16(x, y), mannequin))
+                        dollInventories.Add(new Point16(x, y), new DollInventoryCache([new(), new(), new(), new(), new(), new(), new(), new()], false, false, false));
                 }
             }
         }
@@ -113,36 +117,49 @@ internal class MannequinGame : Minigame
         while (legs.Count > displayDolls.Count)
             legs.Dequeue();
 
+        Point16[] keys = [.. displayDolls.Keys];
+
         while (head.Count > 0)
         {
-            int random = Main.rand.Next(displayDolls.Count);
+            Point16 random = Main.rand.Next(keys);
             dollInventories[random].Inventory[0] = new Item(head.Dequeue());
         }
 
         while (body.Count > 0)
         {
-            int random = Main.rand.Next(displayDolls.Count);
+            Point16 random = Main.rand.Next(keys);
             dollInventories[random].Inventory[1] = new Item(body.Dequeue());
         }
 
         while (legs.Count > 0)
         {
-            int random = Main.rand.Next(displayDolls.Count);
+            Point16 random = Main.rand.Next(keys);
             dollInventories[random].Inventory[2] = new Item(legs.Dequeue());
         }
 
-        //Set set = Main.rand.Next(Sets);
-        //Item[] inv = [new(set.Head), new(set.Body), new(set.Legs), new(), new(), new(), new(), new()];
+        foreach (Point16 key in keys)
+        {
+            Item[] inv = dollInventories[key].Inventory;
+            teDollInventory.SetValue(displayDolls[key], inv);
 
-        //teDollInventory.SetValue(mannequin, inv);
+            if (Main.netMode == NetmodeID.Server)
+                NetMessage.SendData(MessageID.TileEntitySharing, -1, 1, null, displayDolls[key].ID);
+        }
     }
 
     public override void OnStop()
     {
         for (int i = area.X; i < area.Right; ++i)
+        {
             for (int j = area.Y; j < area.Bottom; ++j)
-                if (TileEntity.ByPosition.TryGetValue(new Point16(i, j), out TileEntity te) && te is TEDisplayDoll mannequin)
-                    teDollInventory.SetValue(mannequin, new Item[] { new(), new(), new(), new(), new(), new(), new(), new() });
+            {
+                int x = i / 16;
+                int y = j / 16;
+
+                if (TileEntity.ByPosition.TryGetValue(new Point16(x, y), out TileEntity te) && te is TEDisplayDoll mannequin)
+                    teDollInventory.SetValue(mannequin, (Item[])[new(), new(), new(), new(), new(), new(), new(), new()]);
+            }
+        }
     }
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
@@ -162,9 +179,9 @@ internal class MannequinGame : Minigame
 
     public override void InternalUpdate()
     {
-        for (int i = 0; i < Main.maxPlayers; ++i)
+        foreach (Player plr in Main.ActivePlayers)
         {
-            Player plr = Main.player[i];
+            plr.GetModPlayer<SlipperyPlayer>().Slippery = true;
 
             if (Sets.Any(x => x.PlayerMatches(plr)))
             {
@@ -172,5 +189,61 @@ internal class MannequinGame : Minigame
                 return;
             }
         }
+    }
+}
+
+internal class SlipperyPlayer : ModPlayer
+{
+    public bool Slippery = false;
+    public bool LastSlippery = false;
+
+    public override void ResetEffects()
+    {
+        LastSlippery = Slippery;
+        Slippery = false;
+    }
+}
+
+public class SlipperyItem : GlobalItem
+{
+    public override bool InstancePerEntity => true;
+
+    private int _slipTimer = 0;
+
+    public override void UpdateEquip(Item item, Player player)
+    {
+        if (!player.GetModPlayer<SlipperyPlayer>().LastSlippery)
+            return;
+
+        SlipFunctionality(item, player);
+    }
+
+    public override void UpdateAccessory(Item item, Player player, bool hideVisual)
+    {
+        if (!player.GetModPlayer<SlipperyPlayer>().LastSlippery)
+            return;
+
+        _slipTimer--;
+    }
+
+    private void SlipFunctionality(Item item, Player player)
+    {
+        _slipTimer++;
+
+        if (_slipTimer > 40 * 60)
+        {
+            _slipTimer = 0;
+            item.noGrabDelay = 60;
+            player.QuickSpawnItem(player.GetSource_DropAsItem(), item);
+            item.TurnToAir();
+        }
+    }
+
+    public override void UpdateInventory(Item item, Player player)
+    {
+        if (!player.GetModPlayer<SlipperyPlayer>().LastSlippery)
+            return;
+
+        SlipFunctionality(item, player);
     }
 }

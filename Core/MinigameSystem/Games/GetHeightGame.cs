@@ -51,7 +51,10 @@ internal class GetHeightGame : Minigame
                 ], false, false);
         }
         else
+        {
             plr.Center = playerStartLocation.ToWorldCoordinates();
+            plr.RemoveAllGrapplingHooks();
+        }
     }
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();

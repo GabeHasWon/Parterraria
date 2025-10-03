@@ -4,6 +4,7 @@ using Parterraria.Core.BoardSystem.BoardUI;
 using Parterraria.Core.BoardSystem.Nodes;
 using Parterraria.Core.InventoryStorageSystem;
 using Parterraria.Core.MinigameSystem;
+using Parterraria.Core.Synchronization;
 using Parterraria.Core.Synchronization.BoardItemSyncing;
 using Parterraria.Core.Synchronization.MinigameSyncing;
 using System;
@@ -40,7 +41,7 @@ internal class PlayingBoardPlayer : ModPlayer
     /// <summary>
     /// Whether the UI for prompting a split path is open or not.
     /// </summary>
-    public bool prompingSplitPath = false;
+    public bool promptingSplit = false;
     
     /// <summary>
     /// How many dice the player has out.
@@ -56,7 +57,7 @@ internal class PlayingBoardPlayer : ModPlayer
         On_Player.DropTombstone += StopTombstoneOnBoard;
     }
 
-    private void StopTombstoneOnBoard(On_Player.orig_DropTombstone orig, Player self, long coinsOwned, Terraria.Localization.NetworkText deathText, int hitDirection)
+    private void StopTombstoneOnBoard(On_Player.orig_DropTombstone orig, Player self, long coinsOwned, NetworkText deathText, int hitDirection)
     {
         if (!WorldBoardSystem.PlayingParty)
             orig(self, coinsOwned, deathText, hitDirection);
@@ -92,7 +93,12 @@ internal class PlayingBoardPlayer : ModPlayer
             var boardPlayer = CheckNodes.GetModPlayer<PlayingBoardPlayer>();
 
             if (!boardPlayer.isMoving && boardPlayer.CollideWithNode())
+            {
                 vel = Vector2.Zero;
+
+                if (Main.netMode != NetmodeID.SinglePlayer && Main.myPlayer == CheckNodes.whoAmI)
+                    NetMessage.SendData(MessageID.PlayerControls, -1, -1, null, CheckNodes.whoAmI);
+            }
         }
 
         return vel;
@@ -114,8 +120,12 @@ internal class PlayingBoardPlayer : ModPlayer
     {
         if (!WorldBoardSystem.PlayingParty)
             connectedNode = null;
-        else if (!prompingSplitPath && Player.talkNPC == -1 && ++moveTimer >= MaxMoveTimer && nextNode is not null)
+        else if (!promptingSplit && Player.talkNPC == -1 && ++moveTimer >= MaxMoveTimer && nextNode is not null)
+        {
             Player.Teleport(nextNode.position);
+            Player.fallStart = (int)(Player.position.Y / 16f);
+            Player.fallStart2 = Player.fallStart;
+        }
 
         if (nextNode is not null)
         {
@@ -214,10 +224,11 @@ internal class PlayingBoardPlayer : ModPlayer
 
         if (storedRoll == 0)
         {
-            nextNode = null;
-            isMoving = false;
-            connectedNode.LandOn(WorldBoardSystem.Self.playingBoard, Player);
-            hasGoneOnCurrentTurn = true;
+            FinishedRolling();
+
+            if (Main.netMode == NetmodeID.MultiplayerClient && Player.whoAmI == Main.myPlayer)
+                new SyncPlayerNodeInfoModule((byte)Player.whoAmI, (short)connectedNode.nodeId, -1).Send(-1, -1, false);
+
             return;
         }
 
@@ -233,7 +244,7 @@ internal class PlayingBoardPlayer : ModPlayer
                 if (Main.myPlayer == Player.whoAmI)
                     BoardUISystem.SetMiscUI(new PromptSplitPathUIState(connectedNode.links.links, false));
 
-                prompingSplitPath = true;
+                promptingSplit = true;
                 node = null;
             }
 
@@ -259,13 +270,26 @@ internal class PlayingBoardPlayer : ModPlayer
                 if (Main.myPlayer == Player.whoAmI)
                     BoardUISystem.SetMiscUI(new PromptSplitPathUIState(links, true));
 
-                prompingSplitPath = true;
+                promptingSplit = true;
                 node = null;
             }
 
             nextNode = node;
             isMoving = true;
         }
+
+        if (Main.netMode == NetmodeID.MultiplayerClient && Player.whoAmI == Main.myPlayer)
+            new SyncPlayerNodeInfoModule((byte)Player.whoAmI, (short)connectedNode.nodeId, nextNode is null ? (short)-2 : (short)nextNode.nodeId).Send(-1, -1, false);
+    }
+
+    public void FinishedRolling()
+    {
+        storedRoll = 0;
+        nextNode = null;
+        isMoving = false;
+        connectedNode.LandOn(WorldBoardSystem.Self.playingBoard, Player);
+        hasGoneOnCurrentTurn = true;
+        promptingSplit = false;
     }
 
     internal void ExitParty()
@@ -296,13 +320,21 @@ internal class PlayingBoardPlayer : ModPlayer
             coin = $"[i:{ModContent.ItemType<CelestialCore>()}]: " + Player.CountItem(ModContent.ItemType<CelestialCore>());
             DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
 
-            if (isMoving && !prompingSplitPath)
+            if (isMoving && !promptingSplit)
             {
                 pos = Player.Center - new Vector2(0, 48 - Player.gfxOffY) - Main.screenPosition;
                 float moveTime = Math.Max(MaxMoveTimer / 60f - moveTimer / 60f, 0);
                 string timeLeft = $"{Language.GetTextValue("Mods.Parterraria.MiscUI.MoveTimer")} " + moveTime.ToString("#0.#") + "s";
                 DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, timeLeft, Color.White);
             }
+
+            pos = Player.Center - new Vector2(0, 144 - Player.gfxOffY) - Main.screenPosition;
+            BoardNode curNode = Player.GetModPlayer<PlayingBoardPlayer>().connectedNode;
+            BoardNode nexNode = Player.GetModPlayer<PlayingBoardPlayer>().nextNode;
+            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, curNode is null ? "NO C NODE" : "C: " + curNode.nodeId.ToString(), Color.White);
+
+            pos = Player.Center - new Vector2(0, 168 - Player.gfxOffY) - Main.screenPosition;
+            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, nexNode is null ? "NO N NODE" : "N: " + nexNode.nodeId.ToString(), Color.White);
         }
         else if (WorldMinigameSystem.NotReady)
         {

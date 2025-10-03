@@ -115,7 +115,7 @@ internal class BoardUISystem : ModSystem
                 InterfaceScaleType.UI)
             );
 
-            layers.Add(new LegacyGameInterfaceLayer("Parterraria: Minigame UI", DrawMinigame, InterfaceScaleType.UI));
+            layers.Add(new LegacyGameInterfaceLayer("Parterraria: Minigame UI", DrawMinigame, InterfaceScaleType.Game));
         }
     }
 

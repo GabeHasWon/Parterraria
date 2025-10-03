@@ -25,6 +25,7 @@ public class SyncBoardModule(BoardData boardData) : Module
             foreach (BoardData.NodeData data in orderedNodes)
             {
                 var node = BoardNode.GenerateNode(board, Type.GetType(data.Type), data.Position, data.HalfWidth);
+                node.nodeId = data.Id;
                 board.AddNode(node);
 
                 setLinkActions.Add(() =>

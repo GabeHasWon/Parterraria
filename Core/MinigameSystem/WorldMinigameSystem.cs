@@ -3,6 +3,7 @@ using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem;
 using Parterraria.Core.MinigameSystem.Games;
 using Parterraria.Core.MinigameSystem.MinigameUI;
+using Parterraria.Core.Synchronization.BoardItemSyncing;
 using Parterraria.Core.Synchronization.MinigameSyncing;
 using System;
 using System.Collections.Generic;
@@ -158,7 +159,12 @@ internal class WorldMinigameSystem : ModSystem
         {
             Player plr = Main.player[i];
 
-            if (plr.active && (!plr.GetModPlayer<PlayingBoardPlayer>().hasGoneOnCurrentTurn || plr.GetModPlayer<PlayingBoardPlayer>().isMoving))
+            if (!plr.active)
+                continue;
+
+            PlayingBoardPlayer board = plr.GetModPlayer<PlayingBoardPlayer>();
+            
+            if (!board.hasGoneOnCurrentTurn || board.isMoving || board.promptingSplit)
                 return;
         }
 
@@ -213,6 +219,12 @@ internal class WorldMinigameSystem : ModSystem
                 plr.Center = plr.GetModPlayer<PlayingBoardPlayer>().connectedNode.position;
                 plr.GetModPlayer<PlayingBoardPlayer>().hasGoneOnCurrentTurn = false;
                 playingMinigame.ResetPlayer(plr);
+
+                plr.fallStart = (int)(plr.position.Y / 16f);
+                plr.fallStart2 = plr.fallStart;
+
+                if (Main.myPlayer == i)
+                    new ForceResetInformation((byte)i).Send();
             }
 
             playingMinigame.Reward(_rankings, plr);

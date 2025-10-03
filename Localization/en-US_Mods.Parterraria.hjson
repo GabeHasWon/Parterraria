@@ -65,6 +65,11 @@ Party: {
 			Name: Peak Performance
 			Description: Race to be the highest up competitor!
 		}
+
+		MannequinGame: {
+			Name: Speedy Outfitters
+			Description: Put on one complete vanity set to win!
+		}
 	}
 }
 

@@ -61,17 +61,17 @@ public class Board
                 if (i == WorldBoardSystem.Self.boardHost)
                     plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
                         [
-                            new Item(ModContent.ItemType<NormalDice>()),
                             new Item(ItemID.GoldPickaxe),
                             new Item(ItemID.BladeofGrass),
-                            new Item(ModContent.ItemType<BoardTool>())
+                            new Item(ModContent.ItemType<BoardTool>()),
+                            new Item(ModContent.ItemType<NormalDice>()),
                         ], true);
                 else
                     plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
                         [
-                            new Item(ModContent.ItemType<NormalDice>()),
                             new Item(ItemID.GoldPickaxe),
-                            new Item(ItemID.BladeofGrass)
+                            new Item(ItemID.BladeofGrass),
+                            new Item(ModContent.ItemType<NormalDice>()),
                         ], true);
 
                 plr.GetModPlayer<PlayingBoardPlayer>().connectedNode = node;
