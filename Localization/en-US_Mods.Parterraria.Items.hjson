@@ -80,10 +80,15 @@ PartyMirror: {
 
 BrokenDice: {
 	DisplayName: Broken Dice
-	Tooltip: ""
+	Tooltip:
+		'''
+		Rolls one of the following: -2, 0, 2, 4, 6, 8
+		{$DisappearsWhenNotPartying}
+		'It feels...off.'
+		'''
 }
 
 GoldFaerieItem: {
 	DisplayName: Gold Faerie
-	Tooltip: ""
+	Tooltip: Hey! Listen!
 }

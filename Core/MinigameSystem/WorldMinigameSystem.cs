@@ -66,6 +66,14 @@ internal class WorldMinigameSystem : ModSystem
 
     internal static void RemoveMinigame(Minigame minigame) => worldMinigames.Remove(minigame);
 
+    internal static void DrawMinigameUI()
+    {
+        if (!InMinigame)
+            return;
+
+        Self.playingMinigame.DrawUI();
+    }
+
     internal static void DrawMinigames()
     {
         if (Main.LocalPlayer.HeldItem.ModItem is MinigameTool)

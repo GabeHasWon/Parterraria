@@ -10,6 +10,7 @@ namespace Parterraria.Core.MinigameSystem.Games;
 internal class PointRaceGame : Minigame
 {
     public override MinigameWinType WinType => MinigameWinType.InOrder;
+    public override int MaxPlayTime => 0;
 
     Vector2 endPosition = Vector2.Zero;
     float distanceToWin = 60f;

@@ -12,11 +12,15 @@ namespace Parterraria.Core.MinigameSystem.Games;
 internal class SplashArtGame : Minigame
 {
     public override MinigameWinType WinType => MinigameWinType.First;
+    public override int MaxPlayTime => MinigameTimeInSeconds * 60;
 
     public int MinigameTimeInSeconds = 15;
     
     [HideFromEdit]
     private int _timer = 0;
+
+    [HideFromEdit]
+    private Dictionary<int, int> _countsByPaintId = [];
 
     public override bool ValidateRectangle(ref Rectangle rectangle)
     {
@@ -51,25 +55,30 @@ internal class SplashArtGame : Minigame
 
     public override MinigameRanking GetRanking()
     {
-        Dictionary<int, int> CountsByPaintId = [];
+        RecountPaint();
+
+        bool max = HasMax(_countsByPaintId, out HashSet<int> players);
+
+        if (max)
+            return MinigameRanking.ByFirst(players.First() - 1);
+        else
+            return MinigameRanking.ByTie(players);
+    }
+
+    private void RecountPaint()
+    {
+        _countsByPaintId.Clear();
 
         for (int i = area.X / 16; i < area.Right / 16; ++i)
         {
             for (int j = area.Top / 16; j < area.Bottom / 16; ++j)
             {
                 Tile tile = Main.tile[i, j];
-                
-                if (!CountsByPaintId.TryAdd(tile.WallColor, 1))
-                    CountsByPaintId[tile.WallColor]++;
+
+                if (tile.WallColor != PaintID.None && !_countsByPaintId.TryAdd(tile.WallColor, 1))
+                    _countsByPaintId[tile.WallColor]++;
             }
         }
-
-        bool max = HasMax(CountsByPaintId, out HashSet<int> players);
-
-        if (max)
-            return MinigameRanking.ByFirst(players.First());
-        else
-            return MinigameRanking.ByTie(players);
     }
 
     private static bool HasMax(Dictionary<int, int> countsByPaintId, out HashSet<int> player)
@@ -108,7 +117,7 @@ internal class SplashArtGame : Minigame
     {
         _timer++;
 
-        if (_timer > MinigameTimeInSeconds * 60)
+        if (_timer > MaxPlayTime)
         {
             Beaten = true;
             return;
@@ -139,4 +148,22 @@ internal class SplashArtGame : Minigame
 
     protected override void InternalSave(TagCompound tag) => tag.Add("maxTime", MinigameTimeInSeconds);
     public override void LoadData(TagCompound tag) => MinigameTimeInSeconds = tag.GetInt("maxTime");
+
+    protected override void InternalDrawUI()
+    {
+        if (PlayTime % (2 * 60) == 0)
+        {
+            RecountPaint();
+        }
+
+        var ordered = _countsByPaintId.OrderBy(x => x.Value);
+        int num = 0;
+
+        foreach (var pair in ordered)
+        {
+            Player player = Main.player[pair.Key - 1];
+            DrawCenteredTextFromTop($"{player.name}: #" + (num + 1), 60 + num * 30);
+            num++;
+        }
+    }
 }

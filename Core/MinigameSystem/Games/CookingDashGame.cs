@@ -8,6 +8,7 @@ namespace Parterraria.Core.MinigameSystem.Games;
 internal class CookingDashGame : Minigame
 {
     public override MinigameWinType WinType => MinigameWinType.First;
+    public override int MaxPlayTime => 0;
 
     public override bool ValidateRectangle(ref Rectangle rectangle)
     {

@@ -31,6 +31,9 @@ internal abstract class Minigame : ModType
 
     public bool Beaten { get; protected set; }
     public int PlayTime { get; protected set; }
+    public virtual int MaxPlayTime { get; }
+
+    protected virtual bool DrawDefaultUI => true;
 
     /// <summary>
     /// The area, in tile coordinates, of this minigame. This should only be set on placement.
@@ -160,6 +163,25 @@ internal abstract class Minigame : ModType
     /// </summary>
     /// <param name="debug">Whether the player is building or debugging minigames.</param>
     protected virtual void InternalDraw(bool debug) { }
+
+    public void DrawUI()
+    {
+        if (DrawDefaultUI && MaxPlayTime > 0)
+        {
+            string time = MathF.Max((MaxPlayTime - PlayTime) / 60f, 0).ToString("#0.##");
+            DrawCenteredTextFromTop("Time Left: " + time + "s", 30);
+        }
+
+        InternalDrawUI();
+    }
+
+    protected static void DrawCenteredTextFromTop(string text, float yOffset, float scale = 0.5f)
+    {
+        var position = new Vector2(Main.screenWidth / 2, yOffset);
+        DrawCommon.CenteredString(FontAssets.DeathText.Value, position, text, Color.White, Vector2.One * scale);
+    }
+
+    protected virtual void InternalDrawUI() { }
 
     public void SaveData(TagCompound tag)
     {

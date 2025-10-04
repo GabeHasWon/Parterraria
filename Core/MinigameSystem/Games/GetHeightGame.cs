@@ -10,6 +10,7 @@ namespace Parterraria.Core.MinigameSystem.Games;
 internal class GetHeightGame : Minigame
 {
     public override MinigameWinType WinType => MinigameWinType.First;
+    public override int MaxPlayTime => MinigameTimeInSeconds * 60;
 
     public int MinigameTimeInSeconds = 15;
 
@@ -88,7 +89,7 @@ internal class GetHeightGame : Minigame
     {
         _timer++;
 
-        if (_timer > MinigameTimeInSeconds * 60)
+        if (_timer > MaxPlayTime)
         {
             Beaten = true;
             return;

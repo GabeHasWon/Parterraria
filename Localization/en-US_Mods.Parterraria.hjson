@@ -42,7 +42,7 @@ Party: {
 		}
 
 		ProjectileRainGame: {
-			Name: Danger Falls
+			Name: Risky Rain
 			Description: Projectiles rain from the ceiling. The player with the most health at the end wins!
 		}
 
@@ -57,7 +57,7 @@ Party: {
 		}
 
 		PointRaceGame: {
-			Name: Dangerous Dash
+			Name: Expeditious Escapade
 			Description: Somewhere there is a finish point. Approach it to win!
 		}
 

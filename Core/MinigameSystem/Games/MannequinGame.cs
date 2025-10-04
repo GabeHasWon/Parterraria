@@ -38,6 +38,7 @@ internal class MannequinGame : Minigame
         new Set(ItemID.UnicornMask, ItemID.UnicornShirt, ItemID.UnicornPants)];
 
     public override MinigameWinType WinType => MinigameWinType.First;
+    public override int MaxPlayTime => 0;
 
     public override void Load() => teDollInventory = typeof(TEDisplayDoll).GetField("_items", BindingFlags.Instance | BindingFlags.NonPublic);
 

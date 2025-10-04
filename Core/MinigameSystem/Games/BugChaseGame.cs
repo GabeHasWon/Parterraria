@@ -9,6 +9,8 @@ internal class BugChaseGame : Minigame
 {
     public override MinigameWinType WinType => MinigameWinType.Last;
 
+    public override int MaxPlayTime => 0;
+
     public override bool ValidateRectangle(ref Rectangle rectangle)
     {
         bool modified = false;

@@ -1,6 +1,7 @@
 ﻿using Parterraria.Core.BoardSystem;
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
+using PathOfTerraria.Common.NPCs;
 using System.IO;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
@@ -10,12 +11,13 @@ namespace Parterraria.Core.MinigameSystem.Games;
 internal class ProjectileRainGame : Minigame
 {
     public override MinigameWinType WinType => MinigameWinType.Last;
+    public override int MaxPlayTime => MinigameTimeInSeconds * 60;
 
-    public int MinigameTimeInSeconds = 0;
+    public int MinigameTimeInSeconds = 15;
     public float ProjectilesPerSecond = 2;
     public Point Left = Point.Zero;
     public Point Right = Point.Zero;
-    public int ProjId = ProjectileID.WoodenArrowHostile;
+    public int ProjId = ProjectileID.Boulder;
 
     [HideFromEdit]
     private float _timer = 0;
@@ -63,7 +65,7 @@ internal class ProjectileRainGame : Minigame
     {
         _overallTimer++;
 
-        if (_overallTimer > MinigameTimeInSeconds * 60)
+        if (_overallTimer > MaxPlayTime)
         {
             Beaten = true;
             return;
@@ -85,9 +87,10 @@ internal class ProjectileRainGame : Minigame
                 y--;
             }
 
-            y++;
+            y += 2;
 
-            Projectile.NewProjectile(new EntitySource_Minigame(WorldBoardSystem.Self.playingBoard, this), new Vector2(x, y).ToWorldCoordinates(), Vector2.Zero, ProjId, 40, 0);
+            int damage = ModeUtils.ProjectileDamage(30);
+            Projectile.NewProjectile(new EntitySource_Minigame(WorldBoardSystem.Self.playingBoard, this), new Vector2(x, y).ToWorldCoordinates(), Vector2.Zero, ProjId, damage, 0);
 
             _timer -= 60;
         }
