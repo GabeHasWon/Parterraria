@@ -22,6 +22,7 @@ NPCs: {
 	}
 
 	GoldFaerie.DisplayName: Gold Faerie
+	SlimeOfTerraria.DisplayName: Slime Of Terraria
 }
 
 Party: {
@@ -63,12 +64,17 @@ Party: {
 
 		GetHeightGame: {
 			Name: Peak Performance
-			Description: Race to be the highest up competitor!
+			Description: Race upwards to the highest peak to win!
 		}
 
 		MannequinGame: {
 			Name: Speedy Outfitters
 			Description: Put on one complete vanity set to win!
+		}
+
+		PhotoOpGame: {
+			Name: Celebrity Photoshoot
+			Description: Stay close to the famous Slime of Terraria to win!
 		}
 	}
 }

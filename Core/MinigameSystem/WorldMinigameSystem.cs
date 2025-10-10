@@ -1,7 +1,6 @@
 ﻿using Parterraria.Common;
 using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem;
-using Parterraria.Core.MinigameSystem.Games;
 using Parterraria.Core.MinigameSystem.MinigameUI;
 using Parterraria.Core.Synchronization.BoardItemSyncing;
 using Parterraria.Core.Synchronization.MinigameSyncing;
@@ -9,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Sockets;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.Localization;
@@ -26,10 +24,10 @@ internal class WorldMinigameSystem : ModSystem
     internal static readonly List<Minigame> worldMinigames = [];
 
     internal static bool selectingMinigame = false;
+    internal static MinigameRanking rankings = null;
 
     private static int _minigameOverTimer = 0;
     private static int _minigamePreviewTimer = 0;
-    private static MinigameRanking _rankings = null;
 
     private float _minigameTime = 0;
     private float _timerSpeed = 0f;
@@ -101,7 +99,7 @@ internal class WorldMinigameSystem : ModSystem
         }
 
         if (_minigameOverTimer > 0)
-            _rankings.Draw(Math.Min(_minigameOverTimer / 120f, 1));
+            rankings.Draw(Math.Min(_minigameOverTimer / 120f, 1));
     }
 
     private static void DebugDrawMinigames(Minigame game)
@@ -148,7 +146,13 @@ internal class WorldMinigameSystem : ModSystem
 
             if (playingMinigame.Beaten)
             {
-                _rankings ??= playingMinigame.GetRanking();
+                if (Main.netMode != NetmodeID.MultiplayerClient && rankings is null)
+                {
+                    rankings = playingMinigame.GetRanking();
+
+                    if (Main.netMode == NetmodeID.Server)
+                        new SyncMinigameRankingModule(rankings).Send();
+                }
 
                 if (_minigameOverTimer++ > 240)
                     CompleteMinigame();
@@ -235,7 +239,7 @@ internal class WorldMinigameSystem : ModSystem
                     new ForceResetInformation((byte)i).Send();
             }
 
-            playingMinigame.Reward(_rankings, plr);
+            playingMinigame.Reward(rankings, plr);
         }
 
         playingMinigame.OnStop();

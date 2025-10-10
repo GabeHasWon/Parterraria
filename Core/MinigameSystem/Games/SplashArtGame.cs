@@ -152,9 +152,7 @@ internal class SplashArtGame : Minigame
     protected override void InternalDrawUI()
     {
         if (PlayTime % (2 * 60) == 0)
-        {
             RecountPaint();
-        }
 
         var ordered = _countsByPaintId.OrderBy(x => x.Value);
         int num = 0;

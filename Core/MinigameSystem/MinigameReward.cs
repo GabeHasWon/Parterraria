@@ -1,9 +1,11 @@
-﻿using Parterraria.Common;
+﻿using System;
+using Parterraria.Common;
 using Parterraria.Content.Items.Board;
 using Parterraria.Core.BoardSystem;
 
 namespace Parterraria.Core.MinigameSystem;
 
+[Serializable]
 public class MinigameReward(string text, MinigameReward.Placement place)
 {
     public enum Placement

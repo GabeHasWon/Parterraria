@@ -1,6 +1,5 @@
 ﻿using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
-using System;
 using System.Collections.Generic;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
@@ -16,11 +15,6 @@ internal class GetHeightGame : Minigame
 
     [HideFromEdit]
     private int _timer = 0;
-
-    [HideFromEdit]
-    public (int who, float minY)[] threeHighest = [(-1, Main.maxTilesY * 16), (-1, Main.maxTilesY * 16), (-1, Main.maxTilesY * 16)];
-
-    private (Player player, float minY) Tallest(int index) => (Main.player[threeHighest[index].who], threeHighest[index].minY);
 
     public override bool ValidateRectangle(ref Rectangle rectangle)
     {
@@ -62,15 +56,21 @@ internal class GetHeightGame : Minigame
 
     public override MinigameRanking GetRanking()
     {
-        List<(int, int)> order = [];
-        int count = Math.Min(3, Main.CurrentFrameFlags.ActivePlayersCount);
+        PriorityQueue<int, float> heightPrio = new();
 
-        for (int i = 0; i < count; ++i)
+        foreach (Player player in Main.ActivePlayers)
+            heightPrio.Enqueue(player.whoAmI, player.position.Y);
+
+        int[] who = new int[heightPrio.Count];
+        int index = 0;
+
+        while (heightPrio.Count > 0)
         {
-            order.Add((threeHighest[i].who, i));
+            who[index] = heightPrio.Dequeue();
+            index++;
         }
-
-        return MinigameRanking.ByOrderContaining(order);
+        
+        return MinigameRanking.ByOrderAbsolute(who);
     }
 
     public override void OnStop()
@@ -93,51 +93,6 @@ internal class GetHeightGame : Minigame
         {
             Beaten = true;
             return;
-        }
-
-        foreach (Player player in Main.ActivePlayers)
-        {
-            if (threeHighest[2].who == -1)
-            {
-                threeHighest[2].who = player.whoAmI;
-                threeHighest[2].minY = player.Center.Y;
-                continue;
-            }
-
-            if (threeHighest[1].who == -1)
-            {
-                threeHighest[1].who = player.whoAmI;
-                threeHighest[1].minY = player.Center.Y;
-                continue;
-            }
-
-            if (threeHighest[0].who == -1)
-            {
-                threeHighest[0].who = player.whoAmI;
-                threeHighest[0].minY = player.Center.Y;
-                continue;
-            }
-
-            if (Tallest(0).minY > player.Center.Y)
-            {
-                threeHighest[0].who = player.whoAmI;
-                threeHighest[0].minY = player.Center.Y;
-                continue;
-            }
-
-            if (Tallest(1).minY > player.Center.Y)
-            {
-                threeHighest[1].who = player.whoAmI;
-                threeHighest[1].minY = player.Center.Y;
-                continue;
-            }
-
-            if (Tallest(2).minY > player.Center.Y)
-            {
-                threeHighest[2].who = player.whoAmI;
-                threeHighest[2].minY = player.Center.Y;
-                continue;
-            }
         }
     }
 

@@ -5,7 +5,7 @@ using Terraria.Localization;
 
 namespace Parterraria.Core.MinigameSystem;
 
-internal class MinigameRanking
+public class MinigameRanking
 {
     public Dictionary<int, MinigameReward> Ranking = [];
 
@@ -73,13 +73,7 @@ internal class MinigameRanking
         for (int i = 0; i < playerWhoAmIInOrderOfPlacement.Length; i++)
         {
             int who = playerWhoAmIInOrderOfPlacement[i];
-            rank.Ranking.Add(who, i switch
-            {
-                0 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.First"), MinigameReward.Placement.First),
-                1 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Second"), MinigameReward.Placement.Second),
-                2 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Third"), MinigameReward.Placement.Third),
-                _ => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Failed"), MinigameReward.Placement.Fourth),
-            });
+            rank.Ranking.Add(who, DetermineStandardOrderedPlacement(i));
         }
 
         return rank;
@@ -91,17 +85,19 @@ internal class MinigameRanking
 
         foreach ((int who, int placement) in playerWhoAmIInOrderOfPlacement)
         {
-            rank.Ranking.Add(who, placement switch
-            {
-                0 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.First"), MinigameReward.Placement.First),
-                1 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Second"), MinigameReward.Placement.Second),
-                2 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Third"), MinigameReward.Placement.Third),
-                _ => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Failed"), MinigameReward.Placement.Fourth),
-            });
+            rank.Ranking.Add(who, DetermineStandardOrderedPlacement(placement));
         }
 
         return rank;
     }
+
+    private static MinigameReward DetermineStandardOrderedPlacement(int placement) => placement switch
+    {
+        0 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.First"), MinigameReward.Placement.First),
+        1 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Second"), MinigameReward.Placement.Second),
+        2 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Third"), MinigameReward.Placement.Third),
+        _ => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Failed"), MinigameReward.Placement.Fourth),
+    };
 
     internal void Draw(float alphaFade)
     {
