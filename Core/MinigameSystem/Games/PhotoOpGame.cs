@@ -1,8 +1,11 @@
-﻿using Parterraria.Content.NPCs;
+﻿using Parterraria.Common.CameraModifiers;
+using Parterraria.Content.NPCs;
 using Parterraria.Core.BoardSystem;
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
+using ReLogic.Content;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Terraria.ID;
 
@@ -10,15 +13,38 @@ namespace Parterraria.Core.MinigameSystem.Games;
 
 internal class PhotoOpGame : Minigame
 {
+    internal class PhotoOpPlayer : ModPlayer
+    {
+        public override void ModifyScreenPosition()
+        {
+            if (!WorldMinigameSystem.InMinigame || WorldMinigameSystem.Self.playingMinigame is not PhotoOpGame game)
+                return;
+
+            int secondsBetween = game.secondsBetweenPhotos * 60;
+            int mod = game.PlayTime % secondsBetween;
+            int slime = NPC.FindFirstNPC(ModContent.NPCType<SlimeOfTerraria>());
+
+            if (slime > -1 && mod == secondsBetween - 3 * 60 && game.PlayTime < secondsBetween * game.totalPhotos)
+            {
+                NPC terrariaSlime = Main.npc[slime];
+                Main.instance.CameraModifiers.Add(new ZoomTrackNPCModifier("TerrarianSlimeZoom", terrariaSlime, 2 * 60, 60, 2 * 60, 0.3f));
+            }
+        }
+    }
+
     public override MinigameWinType WinType => MinigameWinType.First;
 
     public override int MaxPlayTime => secondsBetweenPhotos * totalPhotos * 60;
 
+    private static Asset<Texture2D> Camera = null;
+
     [HideFromEdit]
     private readonly Dictionary<int, float> PlayerScoreByWhoAmI = [];
 
-    int secondsBetweenPhotos = 4;
+    int secondsBetweenPhotos = 6;
     int totalPhotos = 3;
+
+    public override void Load() => Camera = ModContent.Request<Texture2D>("Parterraria/Assets/Textures/Misc/CameraFlash");
 
     public override bool ValidateRectangle(ref Rectangle rectangle)
     {
@@ -78,11 +104,51 @@ internal class PhotoOpGame : Minigame
     private void UpdatePlayerScores()
     {
         NPC terrariaSlime = Main.npc[NPC.FindFirstNPC(ModContent.NPCType<SlimeOfTerraria>())];
+        Rectangle cameraPos = new((int)terrariaSlime.position.X - 100, (int)terrariaSlime.position.Y - 60, 200, 120);
+        Dictionary<int, float> players = [];
 
         foreach (Player player in Main.ActivePlayers)
         {
+            if (!player.Hitbox.Intersects(cameraPos))
+                continue;
+
             PlayerScoreByWhoAmI.TryAdd(player.whoAmI, 0);
-            PlayerScoreByWhoAmI[player.whoAmI] += terrariaSlime.Distance(player.Center);
+            float dist = terrariaSlime.Distance(player.Center);
+            PlayerScoreByWhoAmI[player.whoAmI] += dist;
+            players.Add(player.whoAmI, dist);
+        }
+
+        var sort = players.OrderBy(x => x.Value);
+        int count = 1;
+
+        foreach (var pair in sort)
+        {
+            Player player = Main.player[pair.Key];
+
+            AdvancedPopupRequest pop = new()
+            {
+                Color = Color.White,
+                DurationInFrames = 60,
+                Text = ""
+            };
+
+            // hey gabe finish this time
+            this breaks this
+        }
+    }
+
+    protected override void InternalDraw(bool debug)
+    {
+        if (debug)
+            return;
+
+        int secondsBetween = secondsBetweenPhotos * 60;
+        int mod = PlayTime % secondsBetween;
+        int slime = NPC.FindFirstNPC(ModContent.NPCType<SlimeOfTerraria>());
+
+        if (slime > -1 && mod > secondsBetween - 20 && PlayTime < secondsBetween * totalPhotos)
+        {
+            Main.spriteBatch.Draw(Camera.Value, Main.npc[slime].Center - Main.screenPosition, null, Color.White, 0f, Camera.Size() / 2f, 1f, SpriteEffects.None, 0);
         }
     }
 }
