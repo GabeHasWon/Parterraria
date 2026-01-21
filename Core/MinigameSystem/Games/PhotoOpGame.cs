@@ -119,7 +119,7 @@ internal class PhotoOpGame : Minigame
         }
 
         var sort = players.OrderBy(x => x.Value);
-        int count = 1;
+        int placement = 0;
 
         foreach (var pair in sort)
         {
@@ -127,13 +127,20 @@ internal class PhotoOpGame : Minigame
 
             AdvancedPopupRequest pop = new()
             {
-                Color = Color.White,
+                Color = placement switch
+                {
+                    0 => Color.Gold,
+                    1 => Color.Silver,
+                    2 => Color.SaddleBrown,
+                    _ => Color.White
+                },
                 DurationInFrames = 60,
-                Text = ""
+                Text = player.name,
+                Velocity = new Vector2(0, -18)
             };
 
-            // hey gabe finish this time
-            this breaks this
+            PopupText.NewText(pop, player.Top);
+            placement++;
         }
     }
 
@@ -146,9 +153,12 @@ internal class PhotoOpGame : Minigame
         int mod = PlayTime % secondsBetween;
         int slime = NPC.FindFirstNPC(ModContent.NPCType<SlimeOfTerraria>());
 
-        if (slime > -1 && mod > secondsBetween - 20 && PlayTime < secondsBetween * totalPhotos)
-        {
+        if (slime == -1)
+            return;
+
+        if (mod > secondsBetween - 20 && PlayTime < secondsBetween * totalPhotos)
             Main.spriteBatch.Draw(Camera.Value, Main.npc[slime].Center - Main.screenPosition, null, Color.White, 0f, Camera.Size() / 2f, 1f, SpriteEffects.None, 0);
-        }
+        else if (PlayTime > secondsBetweenPhotos * 60 && mod < 20)
+            Main.spriteBatch.Draw(Camera.Value, Main.npc[slime].Center - Main.screenPosition, null, Color.White * (1 - mod / 20f), 0f, Camera.Size() / 2f, 1f, SpriteEffects.None, 0);
     }
 }
