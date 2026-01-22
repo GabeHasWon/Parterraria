@@ -5,7 +5,6 @@ using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
 using ReLogic.Content;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Terraria.ID;
 

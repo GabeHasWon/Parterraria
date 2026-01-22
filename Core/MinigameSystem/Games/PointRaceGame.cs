@@ -1,5 +1,7 @@
 ﻿using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
+using ReLogic.Content;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Terraria.ID;
@@ -9,6 +11,8 @@ namespace Parterraria.Core.MinigameSystem.Games;
 
 internal class PointRaceGame : Minigame
 {
+    private static Asset<Texture2D> Flag = null;
+
     public override MinigameWinType WinType => MinigameWinType.InOrder;
     public override int MaxPlayTime => 0;
 
@@ -17,6 +21,8 @@ internal class PointRaceGame : Minigame
 
     [HideFromEdit]
     private readonly Dictionary<int, int> RankingByWhoAmI = [];
+
+    public override void Load() => Flag = ModContent.Request<Texture2D>("Parterraria/Assets/Textures/Misc/CheckeredFlag");
 
     public override bool ValidateRectangle(ref Rectangle rectangle)
     {
@@ -69,6 +75,13 @@ internal class PointRaceGame : Minigame
 
         if (RankingByWhoAmI.Count > Main.CurrentFrameFlags.ActivePlayersCount - 1)
             Beaten = true;
+    }
+
+    protected override void InternalDraw(bool debug)
+    {
+        Vector2 position = endPosition - Main.screenPosition - new Vector2(0, MathF.Sin(Main.GameUpdateCount * 0.03f) * 5f);
+        float alpha = 0.2f * MathF.Sin(Main.GameUpdateCount * 0.04f);
+        Main.spriteBatch.Draw(Flag.Value, position, null, Color.White * (0.7f + alpha), 0f, Flag.Size() / 2f, 1f, SpriteEffects.None, 0);
     }
 
     protected override void InternalSave(TagCompound tag) => tag.Add("end", endPosition);
