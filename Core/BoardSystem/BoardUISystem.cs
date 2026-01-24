@@ -1,11 +1,9 @@
-﻿using Parterraria.Common;
-using Parterraria.Content.Items.Board.Create;
+﻿using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem.BoardUI;
 using Parterraria.Core.MinigameSystem;
 using Parterraria.Core.MinigameSystem.MinigameUI;
 using System;
 using System.Collections.Generic;
-using Terraria.GameContent;
 using Terraria.GameContent.UI.States;
 using Terraria.ID;
 using Terraria.UI;
@@ -46,7 +44,23 @@ internal class BoardUISystem : ModSystem
         }
     }
 
-    public static bool ToolUIOpen() => Self.toolUI.CurrentState is not null;
+    public static bool ToolUIOpen(bool? isMinigame = null)
+    {
+        if (isMinigame == true)
+            return Self.toolUI.CurrentState is MinigameEditUI;
+
+        if (isMinigame == false)
+            return Self.toolUI.CurrentState is ToolUIState;
+
+        return Self.toolUI.CurrentState is not null;
+    }
+
+    public static bool ToolUIOpen(out UIState state, bool? isMinigame = null)
+    {
+        state = Self.toolUI.CurrentState;
+        return ToolUIOpen(isMinigame);
+    }
+
     public static void OpenToolUI(bool minigame = false) => Self.toolUI.SetState(minigame ? new MinigameEditUI(Main.LocalPlayer) : new ToolUIState(Main.LocalPlayer));
     internal static void CloseToolUI() => Self.toolUI.SetState(null);
 
@@ -68,7 +82,9 @@ internal class BoardUISystem : ModSystem
         if (_keyboardUI.CurrentState is not null && Main.playerInventory)
             _keyboardUI.SetState(null);
 
-        toolUI.Update(gameTime);
+        if (_keyboardUI.CurrentState is null)
+            toolUI.Update(gameTime);
+
         _keyboardUI.Update(gameTime);
         miscUI.Update(gameTime);
     }
@@ -99,7 +115,9 @@ internal class BoardUISystem : ModSystem
                 "Parterraria: Tool UI",
                 delegate
                 {
-                    toolUI.Draw(Main.spriteBatch, Main.gameTimeCache);
+                    if (_keyboardUI.CurrentState is null)
+                        toolUI.Draw(Main.spriteBatch, Main.gameTimeCache);
+
                     return true;
                 },
                 InterfaceScaleType.UI)

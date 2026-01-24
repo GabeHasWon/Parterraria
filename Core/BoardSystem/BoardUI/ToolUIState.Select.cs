@@ -17,7 +17,7 @@ internal partial class ToolUIState : UIState
         if (_state == OpenPanelState.Select)
         {
             _state = OpenPanelState.None;
-            _openPanel.Remove();
+            _openPanel?.Remove();
         }
         else
         {

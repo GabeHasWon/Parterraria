@@ -48,7 +48,13 @@ CelestialCore: {
 
 MinigameTool: {
 	DisplayName: Minigame Tool
-	Tooltip: ""
+	Tooltip:
+		'''
+		Right click to open tool menu
+		Allows you to place, modify and remove minigame locations
+		Minigame locations are automatically used by boards
+		Minigames can be placed infinitely, and will be chosen randomly per board
+		'''
 }
 
 HighDice: {

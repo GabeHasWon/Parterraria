@@ -2,7 +2,9 @@
 using ReLogic.Content;
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Terraria.GameContent;
+using Terraria.Localization;
 using Terraria.ModLoader.IO;
 using Terraria.UI.Chat;
 
@@ -10,6 +12,13 @@ namespace Parterraria.Core.BoardSystem;
 
 public abstract class BoardNode
 {
+    public Asset<Texture2D> Texture => Tex(this);
+    public Asset<Texture2D> Icon => Tex(this, true);
+
+    public virtual string Name => GetType().Name;
+    public virtual LocalizedText DisplayName => Language.GetOrRegister("Mods.Parterraria.Nodes." + Name + ".DisplayName");
+    public virtual LocalizedText Tooltip => Language.GetOrRegister("Mods.Parterraria.Nodes." + Name + ".Tooltip");
+
     public Vector2 position;
     public float halfWidth;
     public NodeLinks links;
@@ -23,7 +32,10 @@ public abstract class BoardNode
 
     public BoardNode() => links = new NodeLinks(this);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Asset<Texture2D> Tex(BoardNode node, bool icon = false) => Tex(node.GetType().Name.Replace("Node", "") + (icon ? "_Icon" : ""));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Asset<Texture2D> Tex(string node) => ModContent.Request<Texture2D>("Parterraria/Assets/Textures/Nodes/" + node.Replace("Node", ""));
 
     public static BoardNode GenerateNode(Board board, Type type, Vector2 position, float halfWidth)

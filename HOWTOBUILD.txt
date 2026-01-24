@@ -1,0 +1,60 @@
+--------------------------------------------
+BUILD TOOL:
+Right click to open tool menu
+
+FOLDER: 
+Select or create a board on click - click again to hide list
+(no alternate tool)
+
+PAINT/ERASE:
+Click to select
+Click in-world to place a node
+Right click to open node selection menu, right click again to toggle
+Middle click while placing a node to move the node
+Right click while placing a node to delete the node
+
+Right click paint tool to swap to Erase, right click again to swap to Paint
+Double click a node to erase it
+
+LINK/UNLINK:
+Click to select
+Click in-world to select a node
+Click another node to link it.
+	This will force the order to be from node 1 to node 2.
+	All nodes can have (functionally) infinite collections without issues.
+	Note: You can link two nodes to each other, allowing you to move between them infinitely. This is purposeful, but unlikely to be useful
+Right click while having a selected node to unselect it
+
+Right click link tool to swap to Unlink, right click again to swap to Link
+Click a node to select it
+Hover over a link and click to unlink it
+Right click while having a selected node to unselect it
+
+PLAY/STOP:
+Click to start playing the current board
+Right click to stop playing the current board
+
+CLOSE:
+Closes the menu
+
+VALIDATE:
+Validates the current board
+If the board has no hanging nodes, that is, every node goes to at least one other node, the board is valid
+Otherwise, you will be unable to properly play the board
+
+--------------------------------------------
+MINIGAME TOOL:
+Right click to open minigame tool menu
+
+Unlike the BUILD TOOL, the tool is always selected, and clicking off-UI will do the respective action.
+Click the tool (pencil, eraser or wrench) to go to the next tool
+
+PENCIL (PLACE): Places the selected minigame
+ERASER (ERASE): Erases a minigame (with confirmation)
+WRENCH (EDIT): Edits a selected minigame.
+	Minigames have individual values that can be edited, which can be arbitrary.
+	Some elements may not be modifiable.
+
+LIST:
+Opens a list of minigames to select.
+These are listed by mod, name and internal name.

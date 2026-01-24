@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.Localization;
+using Terraria.ModLoader.UI;
 using Terraria.UI;
 
 namespace Parterraria.Core.BoardSystem.BoardUI;
@@ -22,9 +23,12 @@ internal partial class ToolUIState(Player player) : UIState
 
     private readonly Player _player = player;
 
+    public static bool HoveringList = true;
+
     // UI stuff
     private UIPanel _openPanel = null;
     private OpenPanelState _state = OpenPanelState.None;
+    private UIPanel listPanel = null;
 
     // Info / tracking
     private string _boardKey = string.Empty;
@@ -72,6 +76,142 @@ internal partial class ToolUIState(Player player) : UIState
         AppendToolButton("Edit", EditBoard, (_, ui) => BoardUISystem.CloseMiscUI(), mainPanel, ref number);
         
         AppendToolButton("Close", ExitMenu, null, mainPanel, ref number);
+        AppendToolButton("Validate", ValidateBoard, null, mainPanel, ref number);
+    }
+
+    private void ValidateBoard(UIMouseEvent evt, UIElement listeningElement)
+    {
+        if (_boardKey == string.Empty)
+        {
+            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.NoBoard"), CommonColors.Error);
+            return;
+        }
+
+        Board board = WorldBoardSystem.Self.worldBoards[_boardKey];
+        List<int> invalidNodes = [];
+
+        foreach (BoardNode node in board.nodes)
+            if (node.links.LinkCount == 0)
+                invalidNodes.Add(node.nodeId);
+
+        if (invalidNodes.Count == 0)
+            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.ValidBoard"));
+        else
+        {
+            string nodes = "";
+
+            foreach (int nodeId in invalidNodes)
+            {
+                nodes += $"ID: {nodeId} (a {board.nodesById[nodeId].DisplayName}), ";
+            }
+
+            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.HangingNodes", nodes[..^2]), Color.Lerp(Color.Red, Color.White, 0.5f));
+        }
+    }
+
+    internal void ToggleMinigameNodeList()
+    {
+        if (listPanel is not null)
+        {
+            listPanel.Remove();
+            listPanel = null;
+            return;
+        }
+
+        if (_openPanel is not null)
+        {
+            _openPanel.Remove();
+            _openPanel = null;
+        }
+
+        listPanel = new UIPanel()
+        {
+            Width = StyleDimension.FromPixels(400),
+            Height = StyleDimension.FromPixels(200),
+            HAlign = 0.5f,
+            VAlign = 0.4f,
+            Top = StyleDimension.FromPixels(-160)
+        };
+
+        listPanel.OnUpdate += self =>
+        {
+            if (self.ContainsPoint(Main.MouseScreen))
+            {
+                HoveringList = true;
+            }
+        };
+
+        Append(listPanel);
+
+        UIText buildingText = new UIText("[c/CCCCCC:Now building:] " + ToolUsage.buildingNode?.DisplayName.Value ?? "None")
+        {
+            Width = StyleDimension.Fill,
+            Top = StyleDimension.FromPixels(-20)
+        };
+
+        buildingText.OnUpdate += self => (self as UIText).SetText("[c/CCCCCC:Now building:] " + NodeLoader.Get(ToolUsage.buildNodeIndex)?.DisplayName.Value ?? "None");
+        listPanel.Append(buildingText);
+
+        UIList list = new UIList()
+        {
+            Width = StyleDimension.FromPixelsAndPercent(-24, 1),
+            Height = StyleDimension.FromPercent(1)
+        };
+
+        listPanel.Append(list);
+
+        UIScrollbar bar = new()
+        {
+            Width = StyleDimension.FromPixels(20),
+            Height = StyleDimension.FromPercent(1),
+            HAlign = 1f
+        };
+
+        list.SetScrollbar(bar);
+        listPanel.Append(bar);
+
+        list.Add(new UIElement() { Height = StyleDimension.FromPixels(4) });
+
+        for (int i = 0; i < NodeLoader.NodeCount; ++i)
+        {
+            BoardNode node = NodeLoader.Get(i);
+
+            UIElement element = new()
+            {
+                Height = StyleDimension.FromPixels(40),
+                Width = StyleDimension.FromPercent(1)
+            };
+
+            UIImage image = new(node.Icon) { ImageScale = 0.6f, Left = StyleDimension.FromPixels(-12), Top = StyleDimension.FromPixels(-12) };
+            element.Append(image);
+
+            var nodeButton = new UIButton<string>(node.DisplayName.Value + $" [c/AAAAAA:({node.Name})]")
+            {
+                Left = StyleDimension.FromPixels(40),
+                Width = StyleDimension.FromPixelsAndPercent(-40 - 10, 1),
+                Height = StyleDimension.FromPixels(34),
+                VAlign = 0.1f
+            };
+
+            int index = i;
+
+            nodeButton.OnLeftClick += (_, _) =>
+            {
+                ToolUsage.buildNodeIndex = index;
+
+                ref var buildingNode = ref ToolUsage.buildingNode;
+                Vector2 position = buildingNode.position;
+                float width = buildingNode.halfWidth;
+                buildingNode = Activator.CreateInstance(Type.GetType(ToolUsage.BuildNodeType)) as BoardNode;
+                buildingNode.position = position;
+                buildingNode.halfWidth = width;
+            };
+
+            element.Append(nodeButton);
+            list.Add(element);
+        }
+
+        list.Add(new UIElement() { Height = StyleDimension.FromPixels(4) });
     }
 
     private void EditBoard(UIMouseEvent evt, UIElement listeningElement)

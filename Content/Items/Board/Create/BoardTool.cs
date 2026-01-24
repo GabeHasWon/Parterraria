@@ -13,6 +13,7 @@ class BoardTool : ModItem
         Item.useTime = 8;
         Item.useAnimation = 8;
         Item.useStyle = ItemUseStyleID.Swing;
+        Item.rare = ItemRarityID.Blue;
     }
 
     public override bool AltFunctionUse(Player player) => true;
@@ -23,9 +24,12 @@ class BoardTool : ModItem
         {
             if (!BoardUISystem.ToolUIOpen())
                 BoardUISystem.OpenToolUI();
+
             return true;
         }
 
         return true;
     }
+
+    public override void AddRecipes() => CreateRecipe().AddIngredient(ItemID.Wood, 5).AddIngredient(ItemID.Ruby).AddTile(TileID.Anvils).Register();
 }

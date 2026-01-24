@@ -17,6 +17,7 @@ class MinigameTool : ModItem
         Item.useTime = 8;
         Item.useAnimation = 8;
         Item.useStyle = ItemUseStyleID.Swing;
+        Item.rare = ItemRarityID.Blue;
     }
 
     public override bool AltFunctionUse(Player player) => true;
@@ -26,9 +27,17 @@ class MinigameTool : ModItem
         if (Main.netMode == NetmodeID.Server)
             return false;
 
-        if (BoardUISystem.Self.toolUI.CurrentState is not MinigameEditUI)
+        if (player.altFunctionUse == 2)
         {
-            BoardUISystem.OpenToolUI(true);
+            if (BoardUISystem.Self.toolUI.CurrentState is not MinigameEditUI)
+            {
+                BoardUISystem.OpenToolUI(true);
+            }
+            else
+            {
+                BoardUISystem.CloseToolUI();
+            }
+
             return false;
         }
 
@@ -48,4 +57,6 @@ class MinigameTool : ModItem
             DrawCommon.CenteredString(FontAssets.DeathText.Value, Main.ScreenSize.ToVector2() / 2f, toolPlayer.SelectedMinigame.DisplayName.Value, Color.White);
         }
     }
+
+    public override void AddRecipes() => CreateRecipe().AddIngredient(ItemID.Wood, 5).AddIngredient(ItemID.Sapphire).AddTile(TileID.Anvils).Register();
 }

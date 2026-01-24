@@ -3,6 +3,7 @@ using Parterraria.Core.BoardSystem;
 using System.Linq;
 using Parterraria.Content.Items.Board.Create;
 using Terraria.Localization;
+using Mono.Cecil.Cil;
 
 namespace Parterraria.Core.MinigameSystem;
 
@@ -52,18 +53,6 @@ internal class MinigameToolPlayer : ModPlayer
 
         if (rightClick)
         {
-            if (!_minigameArea.HasValue)
-            {
-                _selectedMinigameId++;
-
-                if (_selectedMinigameId >= Minigame.MinigamesById.Count)
-                    _selectedMinigameId = 0;
-
-                Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolUI.MinigameSelected"));
-            }
-            else
-                _minigameArea = null;
-
             _selectedWorldMinigame = null;
             return;
         }
@@ -98,7 +87,9 @@ internal class MinigameToolPlayer : ModPlayer
                 if (_selectedWorldMinigame is null)
                 {
                     _selectedWorldMinigame = WorldMinigameSystem.worldMinigames.FirstOrDefault(x => x.area.Contains(Main.MouseWorld.ToPoint()));
-                    Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolUI.EraseConfirm"));
+
+                    if (_selectedWorldMinigame is not null)
+                        Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolUI.EraseConfirm"), Color.Pink);
                 }
                 else
                 {
@@ -113,7 +104,6 @@ internal class MinigameToolPlayer : ModPlayer
     public void ClearTool()
     {
         _selectedWorldMinigame = null;
-        _selectedMinigameId = 0;
         _minigameArea = null;
     }
 }

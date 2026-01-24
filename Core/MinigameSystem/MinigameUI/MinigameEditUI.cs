@@ -1,11 +1,9 @@
-﻿using Parterraria.Content.Items.Board.Create;
-using Parterraria.Core.BoardSystem;
-using Parterraria.Core.BoardSystem.BoardUI.EditUI;
+﻿using Parterraria.Core.BoardSystem;
 using ReLogic.Content;
-using System;
 using System.Linq;
 using Terraria.GameContent.UI.Elements;
 using Terraria.Localization;
+using Terraria.ModLoader.UI;
 using Terraria.UI;
 
 namespace Parterraria.Core.MinigameSystem.MinigameUI;
@@ -21,9 +19,10 @@ internal partial class MinigameEditUI(Player player) : UIState
 
     private readonly Player _player = player;
 
+    private UIPanel listPanel = null;
+
     private static Asset<Texture2D> Texture(string name, bool immediate = false) => ModContent.Request<Texture2D>("Parterraria/Assets/Textures/UI/Tool/" + name,
         immediate ? AssetRequestMode.ImmediateLoad : AssetRequestMode.AsyncLoad);
-    private static LocalizedText Text(string name) => Language.GetText("Mods.Parterraria.ToolUI." + name);
 
     public override void OnInitialize()
     {
@@ -37,7 +36,7 @@ internal partial class MinigameEditUI(Player player) : UIState
 
         mainPanel.OnUpdate += self =>
         {
-            if (self.GetDimensions().ToRectangle().Contains(Main.MouseScreen.ToPoint()))
+            if (self.ContainsPoint(Main.MouseScreen))
             {
                 Main.LocalPlayer.mouseInterface = true;
             }
@@ -45,11 +44,23 @@ internal partial class MinigameEditUI(Player player) : UIState
 
         Append(mainPanel);
 
-        UIText toolSelect = new(GetToolModeName(), 1)
+        UIText toolSelect = new(GetToolModeName(Main.LocalPlayer.GetModPlayer<MinigameToolPlayer>().toolMode), 1)
         {
             Top = StyleDimension.FromPixels(-20)
         };
-        toolSelect.OnUpdate += (self) => (self as UIText).SetText(GetToolModeName());
+
+        toolSelect.OnUpdate += (self) =>
+        {
+            MinigameToolPlayer.ToolMode toolMode = Main.LocalPlayer.GetModPlayer<MinigameToolPlayer>().toolMode;
+            toolMode++;
+
+            if (toolMode > MinigameToolPlayer.ToolMode.Erase)
+            {
+                toolMode = MinigameToolPlayer.ToolMode.Place;
+            }
+
+            (self as UIText).SetText(GetToolModeName(Main.LocalPlayer.GetModPlayer<MinigameToolPlayer>().toolMode) + "[c/AAAAAA: -> " + GetToolModeName(toolMode) + "]");
+        };
         mainPanel.Append(toolSelect);
 
         UIText boardSelect = new(Main.LocalPlayer.GetModPlayer<MinigameToolPlayer>().SelectedMinigame.DisplayName.Value, 1)
@@ -64,9 +75,90 @@ internal partial class MinigameEditUI(Player player) : UIState
         int number = 0;
         AppendToolButton("Place", SwitchMode, null, mainPanel, ref number);
         AppendToolButton("Close", ExitMenu, null, mainPanel, ref number);
+        AppendToolButton("List", ToggleList, null, mainPanel, ref number);
     }
 
-    public static string GetToolModeName() => Main.LocalPlayer.GetModPlayer<MinigameToolPlayer>().toolMode switch
+    private void ToggleList(UIMouseEvent evt, UIElement listeningElement)
+    {
+        if (listPanel is not null)
+        {
+            listPanel.Remove();
+            listPanel = null;
+            return;
+        }
+
+        listPanel = new UIPanel()
+        {
+            Width = StyleDimension.FromPixels(400),
+            Height = StyleDimension.FromPixels(200),
+            HAlign = 0.5f,
+            VAlign = 0.4f,
+            Left = StyleDimension.FromPixels(280)
+        };
+
+        Append(listPanel);
+
+        UIList list = new UIList()
+        {
+            Width = StyleDimension.FromPixelsAndPercent(-24, 1),
+            Height = StyleDimension.FromPercent(1)
+        };
+
+        listPanel.Append(list);
+
+        UIScrollbar bar = new()
+        {
+            Width = StyleDimension.FromPixels(20),
+            Height = StyleDimension.FromPercent(1),
+            HAlign = 1f
+        };
+
+        list.SetScrollbar(bar);
+        listPanel.Append(bar);
+
+        list.Add(new UIElement() { Height = StyleDimension.FromPixels(4) });
+
+        foreach ((string name, Minigame game) in Minigame.MinigamesByModAndName)
+        {
+            string modName = name.Split('/')[0];
+            Mod mod = ModLoader.GetMod(modName);
+            int offset = 0;
+
+            UIElement element = new() 
+            { 
+                Height = StyleDimension.FromPixels(40), 
+                Width = StyleDimension.FromPercent(1)
+            };
+
+            if (ModContent.RequestIfExists(mod.Name + "/icon_small", out Asset<Texture2D> tex))
+            {
+                UIImage image = new(tex);
+                element.Append(image);
+                offset = 40;
+            }
+
+            var minigameText = new UIButton<string>(game.DisplayName.Value + $" [c/AAAAAA:({game.Name})]")
+            {
+                Left = StyleDimension.FromPixels(offset),
+                Width = StyleDimension.FromPixelsAndPercent(-offset - 10, 1),
+                Height = StyleDimension.FromPixels(34),
+                VAlign = 0.1f
+            };
+
+            minigameText.OnLeftClick += (_, _) =>
+            {
+                Main.LocalPlayer.GetModPlayer<MinigameToolPlayer>()._selectedMinigameId = Minigame.MinigamesById.First(x => x.Value == game).Key;
+                Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolUI.MinigameSelected", game.DisplayName.Value));
+            };
+
+            element.Append(minigameText);
+            list.Add(element);
+        }
+
+        list.Add(new UIElement() { Height = StyleDimension.FromPixels(4) });
+    }
+
+    public static string GetToolModeName(MinigameToolPlayer.ToolMode mode) => mode switch
     {
         MinigameToolPlayer.ToolMode.None => "None",
         MinigameToolPlayer.ToolMode.Place => "Place",
@@ -85,7 +177,7 @@ internal partial class MinigameEditUI(Player player) : UIState
 
         Main.isMouseLeftConsumedByUI = true;
 
-        (listeningElement as UIImageButton).SetImage(Texture(GetToolModeName()));
+        (listeningElement as UIImageButton).SetImage(Texture(GetToolModeName(Main.LocalPlayer.GetModPlayer<MinigameToolPlayer>().toolMode)));
         listeningElement.Width = StyleDimension.FromPixels(32);
         listeningElement.Height = StyleDimension.FromPixels(32);
         listeningElement.Recalculate();

@@ -1,24 +1,27 @@
 ﻿using Parterraria.Common;
+using Parterraria.Core.BoardSystem.BoardUI;
 using Parterraria.Core.Synchronization;
 using System;
 using System.Linq;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.Localization;
+using Terraria.UI;
 
 namespace Parterraria.Core.BoardSystem;
 
 /// <summary>
-/// Handles the usage of all of the tools in <see cref="BoardUI.ToolUIState"/>.
+/// Handles the usage of all of the tools in <see cref="ToolUIState"/>.
 /// </summary>
 internal class ToolUsage
 {
-    private static string BuildNodeType => NodeLoader.Get(_buildNodeIndex).GetType().AssemblyQualifiedName;
+    internal static string BuildNodeType => NodeLoader.Get(buildNodeIndex).GetType().AssemblyQualifiedName;
 
     public static BoardNode buildingNode = null;
 
+    internal static int buildNodeIndex = 0;
+
     private static int _placementStage = 0;
-    private static int _buildNodeIndex = 0;
 
     internal static void UseTool(ToolMode mode)
     {
@@ -144,25 +147,18 @@ internal class ToolUsage
 
     private static void PaintNodes()
     {
-        bool leftClick = Main.mouseLeft && Main.mouseLeftRelease;
-        bool rightClick = Main.mouseRight && Main.mouseRightRelease;
-        buildingNode ??= Activator.CreateInstance(Type.GetType(BuildNodeType)) as BoardNode;
+        bool leftClick = Main.mouseLeft && Main.mouseLeftRelease && !Main.LocalPlayer.mouseInterface;
+        bool rightCLick = Main.mouseRight && Main.mouseRightRelease;
 
-        if (rightClick)
+        if (rightCLick && BoardUISystem.ToolUIOpen(out UIState state, false))
         {
-            _buildNodeIndex++;
-
-            if (_buildNodeIndex >= NodeLoader.NodeCount)
-                _buildNodeIndex = 0;
-
-            Vector2 position = buildingNode.position;
-            float width = buildingNode.halfWidth;
-            buildingNode = Activator.CreateInstance(Type.GetType(BuildNodeType)) as BoardNode;
-            buildingNode.position = position;
-            buildingNode.halfWidth = width;
+            var tool = state as ToolUIState;
+            tool.ToggleMinigameNodeList();
         }
 
-        if (leftClick)
+        buildingNode ??= Activator.CreateInstance(Type.GetType(BuildNodeType)) as BoardNode;
+
+        if (leftClick && !ToolUIState.HoveringList)
         {
             if (_placementStage == 1)
             {
@@ -191,14 +187,25 @@ internal class ToolUsage
         {
             if (_placementStage == 0)
                 buildingNode.position = Main.MouseWorld;
-            else
+            else if (!Main.mouseMiddle)
             {
                 buildingNode.halfWidth = Math.Max(Math.Abs(buildingNode.position.X - Main.MouseWorld.X), Math.Abs(buildingNode.position.Y - Main.MouseWorld.Y));
 
                 if (buildingNode.halfWidth < 40)
                     buildingNode.halfWidth = 40;
             }
+
+            if (Main.mouseMiddle)
+                buildingNode.position = Main.MouseWorld - new Vector2(buildingNode.halfWidth);
+
+            if (Main.mouseRight)
+            {
+                buildingNode = null;
+                _placementStage = 0;
+            }
         }
+
+        ToolUIState.HoveringList = false;
     }
 
     internal static void DrawBuilding()

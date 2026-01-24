@@ -1,1 +1,8 @@
-Parterraria is a pretty cool mod, it does...this. Modify this file with a description of your mod.
+----- Parterraria! -----
+by GabeHasWon
+commissioned & concepted by Megaswave
+
+Parterraria! is a mod that adds in the ability to play Mario Party-styled games within Terraria.
+You can build the boards, build the minigames, and play with any amount of friends!
+
+The mod is fairly complex as it has a ton of moving parts, but starting is easy:

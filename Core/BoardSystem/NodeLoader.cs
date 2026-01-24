@@ -26,6 +26,9 @@ internal class NodeLoader : ILoadable
             var node = Activator.CreateInstance(type) as BoardNode;
             NodesByName.Add(type.Name, node);
             Nodes.Add(node);
+
+            _ = node.DisplayName;
+            _ = node.Tooltip;
         }
     }
 
