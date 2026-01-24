@@ -6,3 +6,5 @@ Parterraria! is a mod that adds in the ability to play Mario Party-styled games 
 You can build the boards, build the minigames, and play with any amount of friends!
 
 The mod is fairly complex as it has a ton of moving parts, but starting is easy:
+
+(beta 1)

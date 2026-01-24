@@ -1,5 +1,6 @@
 --------------------------------------------
 BUILD TOOL:
+Crafted with 5 wood, 1 ruby @ anvil
 Right click to open tool menu
 
 FOLDER: 
@@ -44,6 +45,7 @@ Otherwise, you will be unable to properly play the board
 
 --------------------------------------------
 MINIGAME TOOL:
+Crafted with 5 wood, 1 sapphire @ anvil
 Right click to open minigame tool menu
 
 Unlike the BUILD TOOL, the tool is always selected, and clicking off-UI will do the respective action.
