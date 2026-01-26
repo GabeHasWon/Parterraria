@@ -13,7 +13,6 @@ public class MinigameRanking
     /// Used for minigames where one player comes in first, everyone else comes in last (or, technically, comes in <see cref="MinigameReward.Placement.Otherwise"/>).
     /// </summary>
     /// <param name="winnerId">The winner of the game.</param>
-    /// <returns>The resultant ranking.</returns>
     public static MinigameRanking ByFirst(int winnerId)
     {
         var rank = new MinigameRanking();
@@ -29,17 +28,15 @@ public class MinigameRanking
     }
 
     /// <summary>
-    /// Used for minigames where one player comes in first, everyone else comes in last (or, technically, comes in <see cref="MinigameReward.Placement.Otherwise"/>).
+    /// Used for minigames where living players come in first, everyone else comes in last (or, technically, comes in <see cref="MinigameReward.Placement.Otherwise"/>).
     /// </summary>
-    /// <param name="winnerId">The winner of the game.</param>
-    /// <returns>The resultant ranking.</returns>
     public static MinigameRanking ByLiving()
     {
         var rank = new MinigameRanking();
 
         foreach (var player in Main.ActivePlayers)
         {
-            MinigameReward reward = player.dead ? new(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise) 
+            MinigameReward reward = player.dead ? new(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise)
                 : new(Language.GetTextValue("Mods.Parterraria.Rankings.First"), MinigameReward.Placement.First);
             rank.Ranking.Add(player.whoAmI, reward);
         }
@@ -58,7 +55,7 @@ public class MinigameRanking
 
         foreach (var player in Main.ActivePlayers)
         {
-            MinigameReward reward = players.Contains(player.whoAmI) ? new(Language.GetTextValue("Mods.Parterraria.Rankings.Tie"), MinigameReward.Placement.First) 
+            MinigameReward reward = players.Contains(player.whoAmI) ? new(Language.GetTextValue("Mods.Parterraria.Rankings.Tie"), MinigameReward.Placement.First)
                 : new(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise);
             rank.Ranking.Add(player.whoAmI, reward);
         }
@@ -108,7 +105,7 @@ public class MinigameRanking
         foreach (var (who, rank) in Ranking)
         {
             var pos = Main.ScreenSize.ToVector2() / new Vector2(2f, 4f) + new Vector2(0, step++ * 40);
-            DrawCommon.CenteredString(FontAssets.DeathText.Value, pos, $"{Main.player[who].name}: {rank.RewardText}", color, new(scale));
+            DrawCommon.CenteredString(FontAssets.DeathText.Value, pos, $"{Main.player[who].name}: {rank.RewardText} ({rank.Place})", color, new(scale));
 
             scale *= 0.75f;
 
@@ -117,5 +114,10 @@ public class MinigameRanking
         }
     }
 
-    internal void Reward(Player plr) => Ranking[plr.whoAmI].OnReward(plr);
+    internal void Reward(Player plr)
+    {
+        Ranking[plr.whoAmI].OnReward(plr);
+
+        Main.NewText($"Rewarded ranking of {plr.name}, who came in {Ranking[plr.whoAmI].Place} placement.");
+    }
 }

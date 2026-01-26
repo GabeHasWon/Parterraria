@@ -22,10 +22,34 @@ internal class PlayingBoardPlayer : ModPlayer
 
     private static int MaxMoveTimer => WorldBoardSystem.Self.playingBoard.config.MaxMoveTimerInSeconds * 60;
 
+    /// <summary>
+    /// The nodes this player *can* move to in a split path.
+    /// </summary>
+    public readonly List<BoardNode> splitNodes = [];
+
+    /// <summary>
+    /// The current node this player is on.
+    /// </summary>
     public BoardNode connectedNode = null;
+
+    /// <summary>
+    /// The next node this player needs to move to.
+    /// </summary>
     public BoardNode nextNode = null;
+
+    /// <summary>
+    /// How many nodes this player needs to move before stopping.
+    /// </summary>
     public int storedRoll = 0;
+
+    /// <summary>
+    /// Whether this player has gone on the current turn.
+    /// </summary>
     public bool hasGoneOnCurrentTurn = false;
+
+    /// <summary>
+    /// Whether the player is ready to play the minigame.
+    /// </summary>
     public bool minigameReady = false;
 
     /// <summary>
@@ -42,7 +66,7 @@ internal class PlayingBoardPlayer : ModPlayer
     /// Whether the UI for prompting a split path is open or not.
     /// </summary>
     public bool promptingSplit = false;
-    
+
     /// <summary>
     /// How many dice the player has out.
     /// </summary>
@@ -125,6 +149,19 @@ internal class PlayingBoardPlayer : ModPlayer
             Player.Teleport(nextNode.position);
             Player.fallStart = (int)(Player.position.Y / 16f);
             Player.fallStart2 = Player.fallStart;
+        }
+
+        if (promptingSplit)
+        {
+            foreach (BoardNode node in splitNodes)
+            {
+                if (Player.Hitbox.Intersects(node.Bounds))
+                {
+                    nextNode = node;
+                    promptingSplit = false;
+                    break;
+                }
+            }
         }
 
         if (nextNode is not null)
@@ -241,11 +278,12 @@ internal class PlayingBoardPlayer : ModPlayer
                 node = connectedNode.links.First().ToNode;
             else
             {
-                if (Main.myPlayer == Player.whoAmI)
-                    BoardUISystem.SetMiscUI(new PromptSplitPathUIState(connectedNode.links.links, false));
-
                 promptingSplit = true;
                 node = null;
+                splitNodes.Clear();
+
+                foreach (var link in connectedNode.links)
+                    splitNodes.Add(link.ToNode);
             }
 
             nextNode = node;
@@ -262,13 +300,8 @@ internal class PlayingBoardPlayer : ModPlayer
                 node = nodes[0].links.GetLinkTo(connectedNode).Parent;
             else
             {
-                List<NodeLinks.Link> links = [];
-
-                foreach (var item in nodes)
-                    links.Add(item.links.GetLinkTo(connectedNode));
-
-                if (Main.myPlayer == Player.whoAmI)
-                    BoardUISystem.SetMiscUI(new PromptSplitPathUIState(links, true));
+                foreach (var link in connectedNode.links)
+                    splitNodes.Add(link.ToNode);
 
                 promptingSplit = true;
                 node = null;
@@ -290,6 +323,7 @@ internal class PlayingBoardPlayer : ModPlayer
         connectedNode.LandOn(WorldBoardSystem.Self.playingBoard, Player);
         hasGoneOnCurrentTurn = true;
         promptingSplit = false;
+        splitNodes.Clear();
     }
 
     internal void ExitParty()
@@ -301,6 +335,7 @@ internal class PlayingBoardPlayer : ModPlayer
         hasGoneOnCurrentTurn = false;
         diceCount = 0;
         storedRoll = 0;
+        splitNodes.Clear();
 
         Player.GetModPlayer<InventoryPlayer>().ReplaceInventory();
     }
@@ -328,6 +363,7 @@ internal class PlayingBoardPlayer : ModPlayer
                 DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, timeLeft, Color.White);
             }
 
+#if DEBUG
             pos = Player.Center - new Vector2(0, 144 - Player.gfxOffY) - Main.screenPosition;
             BoardNode curNode = Player.GetModPlayer<PlayingBoardPlayer>().connectedNode;
             BoardNode nexNode = Player.GetModPlayer<PlayingBoardPlayer>().nextNode;
@@ -335,6 +371,7 @@ internal class PlayingBoardPlayer : ModPlayer
 
             pos = Player.Center - new Vector2(0, 168 - Player.gfxOffY) - Main.screenPosition;
             DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, nexNode is null ? "NO N NODE" : "N: " + nexNode.nodeId.ToString(), Color.White);
+#endif
         }
         else if (WorldMinigameSystem.NotReady)
         {

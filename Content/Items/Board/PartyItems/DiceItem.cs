@@ -57,7 +57,7 @@ internal abstract class DiceItem : ModItem
         public override void SetDefaults()
         {
             Projectile.Size = new(12);
-            Projectile.timeLeft = 600;
+            Projectile.timeLeft = 450;
             Projectile.penetrate = 6;
             Projectile.aiStyle = -1;
             Projectile.hostile = false;
@@ -102,9 +102,14 @@ internal abstract class DiceItem : ModItem
             Projectile.velocity.Y *= 0.8f;
             Projectile.velocity.X *= 0.9f;
 
+            if (Projectile.timeLeft < 30)
+                Projectile.Opacity = Projectile.timeLeft / 30f;
+
             if (Spinning)
             {
-                Projectile.timeLeft++;
+                if (WorldBoardSystem.PlayingParty)
+                    Projectile.timeLeft++;
+
                 var node = plr.GetModPlayer<PlayingBoardPlayer>().connectedNode;
 
                 if (node is null)
@@ -125,9 +130,6 @@ internal abstract class DiceItem : ModItem
                     Projectile.velocity.Y *= 0.8f;
                 else
                     Projectile.velocity.Y += 0.2f;
-
-                if (Projectile.timeLeft < 30)
-                    Projectile.Opacity = Projectile.timeLeft / 30f;
             }
         }
 

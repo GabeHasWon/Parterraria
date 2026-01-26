@@ -165,4 +165,6 @@ public abstract class BoardNode
         foreach (var link in links)
             NodeDrawing.DrawLink(link, position, null, fancy);
     }
+
+    public override string ToString() => $"{Name}: {nodeId} at {Bounds}";
 }

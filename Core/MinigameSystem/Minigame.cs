@@ -98,12 +98,10 @@ internal abstract class Minigame : ModType
 
     public virtual void WriteNetData(BinaryWriter writer)
     {
-
     }
 
     public virtual void ReadNetData(BinaryReader reader)
     {
-
     }
 
     internal virtual void Reward(MinigameRanking rankings, Player plr) => rankings.Reward(plr);

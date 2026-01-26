@@ -60,3 +60,33 @@ WRENCH (EDIT): Edits a selected minigame.
 LIST:
 Opens a list of minigames to select.
 These are listed by mod, name and internal name.
+
+clear mounts on risky rain
+
+risky rain had two firsts and one last (dead)
+
+speedy outfitters is broken? full outfit not found, two winners despite two losing
+
+stress test minigame selection
+
+stress test rankings
+
+time left counter doesn't work properly
+
+HUD for what players are doing/where they are
+
+deleting boards isn't synced
+
+The following error:
+[21:01:02.903] [Main Thread/WARN] [tML]: Silently Caught Exception: 
+System.ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+   at System.Collections.Generic.List`1.get_Item(Int32 index)
+   at Parterraria.Core.Synchronization.RemoveNodeModule.Receive() in Parterraria\Core\Synchronization\RemoveNodeModule.cs:line 17
+   at NetEasy.Module.Receive(Stream stream, Int32 whoAmI)
+   at NetEasy.NetEasy.HandleModule(BinaryReader reader, Int32 whoAmI)
+
+made node selection list seperate from painting tool
+
+minigame name & description at top of screen?
+
+increase shop interaction radius/spoof position

@@ -137,7 +137,7 @@ internal class CraftLargeDiamondGame : Minigame
             }    
         }
 
-        if (PlayTime > 20 * 60 && PlayTime % (3 * 60) == 0)
+        if (PlayTime > 10 * 60 && PlayTime % (3 * 60) == 0 && Main.netMode != NetmodeID.MultiplayerClient)
         {
             bool fail = false;
             Point16 pos = DeterminePlacementOfNewDiamond(ref fail);

@@ -10,18 +10,19 @@ public class ShopNode() : EmptyNode
     {
         NPC npc;
 
-        if (!NPC.AnyNPCs(ModContent.NPCType<ShopNPC>()))
-        {
-            int x = NPC.NewNPC(null, (int)player.Center.X, (int)player.Center.Y, ModContent.NPCType<ShopNPC>());
-            player.SetTalkNPC(x);
-            npc = Main.npc[x];
-        }
-        else
-        {
-            npc = Main.npc[NPC.FindFirstNPC(ModContent.NPCType<ShopNPC>())];
-            player.SetTalkNPC(npc.whoAmI);
-            npc.Center = player.Center;
-        }
+        //if (!NPC.AnyNPCs(ModContent.NPCType<ShopNPC>()))
+        //{
+        int x = NPC.NewNPC(null, (int)player.Center.X, (int)player.Center.Y, ModContent.NPCType<ShopNPC>(), 0, player.whoAmI);
+        player.SetTalkNPC(x);
+        npc = Main.npc[x];
+        //}
+        //else
+        //{
+        //    npc = Main.npc[NPC.FindFirstNPC(ModContent.NPCType<ShopNPC>())];
+        //    player.SetTalkNPC(npc.whoAmI);
+        //    npc.Center = player.Center;
+        //    npc.ai[0] = player.whoAmI;
+        //}
 
         for (int i = 0; i < 15; ++i)
             Dust.NewDust(npc.position, npc.width, npc.height, DustID.Confetti, Main.rand.NextFloat(-2, 2f), Main.rand.NextFloat(-8, -6));

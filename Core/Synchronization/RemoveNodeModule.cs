@@ -14,7 +14,7 @@ public class RemoveNodeModule(string name, short id) : Module
     protected override void Receive()
     {
         var board = WorldBoardSystem.GetBoard(_name);
-        var node = board.nodes[_id];
+        var node = board.nodesById[_id];
 
         if (Main.netMode == NetmodeID.Server)
         {

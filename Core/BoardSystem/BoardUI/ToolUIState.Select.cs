@@ -1,6 +1,7 @@
 ﻿using Parterraria.Common;
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
@@ -9,6 +10,9 @@ namespace Parterraria.Core.BoardSystem.BoardUI;
 
 internal partial class ToolUIState : UIState
 {
+    private static int confirmTimer;
+    private static UIText confirmText = null;
+
     private void OpenBoardList(UIMouseEvent evt, UIElement listeningElement)
     {
         Main.isMouseLeftConsumedByUI = true;
@@ -60,6 +64,12 @@ internal partial class ToolUIState : UIState
 
             namePlate.OnLeftClick += (_, _) =>
             {
+                if (Main.netMode == NetmodeID.MultiplayerClient && !Main.countsAsHostForGameplay[Main.myPlayer])
+                {
+                    Main.NewText(Text("FailedPerms").Value);
+                    return;
+                }
+
                 Main.playerInventory = false;
                 BoardUISystem.OpenKeyboard((value) =>
                 {
@@ -71,6 +81,17 @@ internal partial class ToolUIState : UIState
             };
 
             _openPanel.Append(namePlate);
+        }
+    }
+
+    private void UpdateRemoveText()
+    {
+        confirmTimer--;
+
+        if (confirmTimer <= 0 && confirmText is not null)
+        {
+            confirmText.Remove();
+            confirmText = null;
         }
     }
 
@@ -105,6 +126,40 @@ internal partial class ToolUIState : UIState
 
         delete.OnLeftClick += (_, _) =>
         {
+            if (Main.netMode == NetmodeID.MultiplayerClient && !Main.countsAsHostForGameplay[Main.myPlayer])
+            {
+                Main.NewText(Text("FailedPerms").Value);
+                return;
+            }
+
+            if (confirmTimer <= 0)
+            {
+                confirmTimer = 90;
+
+                confirmText = new UIText(Text("DeleteBoard"), 1.1f)
+                {
+                    HAlign = 1f,
+                    VAlign = 1f,
+                    Left = StyleDimension.FromPixels(0),
+                    Top = StyleDimension.FromPixels(40),
+                    TextColor = Color.Red
+                };
+
+                confirmText.OnUpdate += (_) => 
+                {
+                    confirmText.TextColor = Color.Red;
+                    
+                    if (confirmTimer < 30)
+                    {
+                        confirmText.TextColor = Color.Red * (confirmTimer / 30f);
+                    }
+                };
+                list.Parent.Append(confirmText);
+                return;
+            }
+
+            confirmText.Remove();
+            confirmText = null;
             list.Remove(back);
             list.RecalculateChildren();
 

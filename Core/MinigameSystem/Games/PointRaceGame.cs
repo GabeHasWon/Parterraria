@@ -1,4 +1,5 @@
-﻿using Parterraria.Core.BoardSystem.BoardUI.EditUI;
+﻿using Parterraria.Common;
+using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
 using ReLogic.Content;
 using System;
@@ -54,7 +55,10 @@ internal class PointRaceGame : Minigame
                 ], false, false);
         }
         else
+        {
             plr.Center = playerStartLocation.ToWorldCoordinates();
+            plr.QuickDismount();
+        }
     }
 
     public override void OnStart() => RankingByWhoAmI.Clear();

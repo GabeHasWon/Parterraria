@@ -96,21 +96,21 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
 
     private void BuildInteger(UIPanel panel)
     {
-        var incButton = new UIButton<string>("+")
+        var incButton = new UIButton<string>("-")
         {
             Width = StyleDimension.FromPixels(60),
             Height = StyleDimension.Fill,
         };
-        incButton.OnLeftClick += (_, _) => ModifyValue(true);
+        incButton.OnLeftClick += (_, _) => ModifyValue(false);
         panel.Append(incButton);
 
-        var decButton = new UIButton<string>("-")
+        var decButton = new UIButton<string>("+")
         {
             Width = StyleDimension.FromPixels(60),
             Height = StyleDimension.Fill,
             HAlign = 1f
         };
-        decButton.OnLeftClick += (_, _) => ModifyValue(false);
+        decButton.OnLeftClick += (_, _) => ModifyValue(true);
         panel.Append(decButton);
 
         void ModifyValue(bool increase)

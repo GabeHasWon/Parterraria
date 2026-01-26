@@ -1,4 +1,5 @@
-﻿using Parterraria.Core.BoardSystem;
+﻿using Parterraria.Common;
+using Parterraria.Core.BoardSystem;
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
 using PathOfTerraria.Common.NPCs;
@@ -53,8 +54,10 @@ internal class ProjectileRainGame : Minigame
             plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
                 [
                     new Item(ItemID.EoCShield),
-                ], false);
+                ], false, false);
         }
+        else
+            plr.QuickDismount();
     }
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();

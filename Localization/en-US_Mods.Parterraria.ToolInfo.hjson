@@ -5,8 +5,12 @@ Board: {
 	NoStart: Board has no start node!
 	InvalidBoard: Invalid board.
 	BossActive: A boss or event is active!
-	HangingNodes: The following node(s) do not have a next node: {0}
-	ValidBoard: Board has no hanging nodes!
+	HangingNodes:
+		'''
+		Validation: Failed. The following node(s) do not have a next node (called 'hanging nodes'): {0}
+		This may mean you experience softlocks or other issues when playing.
+		'''
+	ValidBoard: Validation: Success! Board has no hanging nodes.
 }
 
 CantConnectNode: {

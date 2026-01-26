@@ -73,9 +73,18 @@ internal partial class MinigameEditUI(Player player) : UIState
         mainPanel.Append(boardSelect);
 
         int number = 0;
-        AppendToolButton("Place", SwitchMode, null, mainPanel, ref number);
+        AppendToolButton("Place", SetMode, SwitchMode, mainPanel, ref number);
         AppendToolButton("Close", ExitMenu, null, mainPanel, ref number);
         AppendToolButton("List", ToggleList, null, mainPanel, ref number);
+    }
+
+    private void SetMode(UIMouseEvent evt, UIElement listeningElement)
+    {
+        _player.GetModPlayer<MinigameToolPlayer>().ClearTool();
+        //_player.GetModPlayer<MinigameToolPlayer>().toolMode++;
+
+        //if (_player.GetModPlayer<MinigameToolPlayer>().toolMode > MinigameToolPlayer.ToolMode.Erase)
+        //    _player.GetModPlayer<MinigameToolPlayer>().toolMode = MinigameToolPlayer.ToolMode.Place;
     }
 
     private void ToggleList(UIMouseEvent evt, UIElement listeningElement)
@@ -202,7 +211,9 @@ internal partial class MinigameEditUI(Player player) : UIState
             Left = StyleDimension.FromPixels(number * 40)
         };
 
-        button.OnLeftClick += onClick;
+        if (onClick is not null)
+            button.OnLeftClick += onClick;
+
         button.OnUpdate += StopUseOnHover;
 
         if (rightClick is not null)

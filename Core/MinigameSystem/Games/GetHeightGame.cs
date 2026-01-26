@@ -1,6 +1,7 @@
 ﻿using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
 
@@ -56,21 +57,12 @@ internal class GetHeightGame : Minigame
 
     public override MinigameRanking GetRanking()
     {
-        PriorityQueue<int, float> heightPrio = new();
+        Dictionary<int, float> heightPrio = [];
 
         foreach (Player player in Main.ActivePlayers)
-            heightPrio.Enqueue(player.whoAmI, player.position.Y);
+            heightPrio.Add(player.whoAmI, player.position.Y);
 
-        int[] who = new int[heightPrio.Count];
-        int index = 0;
-
-        while (heightPrio.Count > 0)
-        {
-            who[index] = heightPrio.Dequeue();
-            index++;
-        }
-        
-        return MinigameRanking.ByOrderAbsolute(who);
+        return MinigameRanking.ByOrderAbsolute([.. heightPrio.OrderByDescending(x => x.Value).Select(x => x.Key)]);
     }
 
     public override void OnStop()

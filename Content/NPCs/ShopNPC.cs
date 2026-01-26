@@ -9,7 +9,7 @@ namespace Parterraria.Content.NPCs;
 /// </summary>
 public class ShopNPC : ModNPC
 {
-    //public override string Texture => "Terraria/Images/NPC_" + NPCID.Guide;
+    private int PlayerAttached => (int)NPC.ai[0];
 
     public override void SetStaticDefaults() => Main.npcFrameCount[Type] = Main.npcFrameCount[NPCID.Guide];
 
@@ -18,9 +18,22 @@ public class ShopNPC : ModNPC
         NPC.CloneDefaults(NPCID.Guide);
         NPC.Size = new Vector2(60);
         NPC.townNPC = true;
+        NPC.aiStyle = -1;
+        NPC.hide = true;
+
+        AIType = NPCID.None;
     }
 
-    public override bool PreAI() => false;
+    public override bool PreAI()
+    {
+        NPC.Center = Main.player[PlayerAttached].Center;
+        NPC talkNPC = Main.player[PlayerAttached].TalkNPC;
+
+        if (talkNPC is null || talkNPC.type != Type)
+            NPC.active = false;
+
+        return false;
+    }
 
     public override void SetChatButtons(ref string button, ref string button2) => button = Language.GetTextValue("LegacyInterface.28");
 

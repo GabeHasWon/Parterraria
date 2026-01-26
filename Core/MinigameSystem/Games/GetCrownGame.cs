@@ -1,4 +1,5 @@
-﻿using Parterraria.Core.BoardSystem;
+﻿using Parterraria.Common;
+using Parterraria.Core.BoardSystem;
 using Parterraria.Core.InventoryStorageSystem;
 using System.IO;
 using Terraria.ID;
@@ -50,10 +51,13 @@ internal class GetCrownGame : Minigame
                 [
                     new Item(ItemID.DualHook),
                     new Item(ItemID.CloudinaBalloon)
-                ], false);
+                ], false, false);
         }
         else
+        {
             plr.Center = playerStartLocation.ToWorldCoordinates();
+            plr.QuickDismount();
+        }
     }
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();

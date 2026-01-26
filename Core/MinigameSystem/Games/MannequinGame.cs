@@ -3,6 +3,7 @@ using Parterraria.Core.InventoryStorageSystem;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Tile_Entities;
 using Terraria.ID;
@@ -83,14 +84,6 @@ internal class MannequinGame : Minigame
         PriorityQueue<int, float> head = new();
         PriorityQueue<int, float> body = new();
         PriorityQueue<int, float> legs = new();
-
-        foreach (var item in Sets)
-        {
-            head.Enqueue(item.Head, Main.rand.NextFloat());
-            body.Enqueue(item.Body, Main.rand.NextFloat());
-            legs.Enqueue(item.Legs, Main.rand.NextFloat());
-        }
-
         Dictionary<Point16, TEDisplayDoll> displayDolls = [];
         Dictionary<Point16, DollInventoryCache> dollInventories = [];
 
@@ -109,14 +102,13 @@ internal class MannequinGame : Minigame
             }
         }
 
-        while (head.Count > displayDolls.Count)
-            head.Dequeue();
-
-        while (body.Count > displayDolls.Count)
-            body.Dequeue();
-
-        while (legs.Count > displayDolls.Count)
-            legs.Dequeue();
+        for (int i = 0; i < displayDolls.Count; ++i)
+        {
+            Set set = Main.rand.Next(Sets);
+            head.Enqueue(set.Head, Main.rand.NextFloat());
+            body.Enqueue(set.Body, Main.rand.NextFloat());
+            legs.Enqueue(set.Legs, Main.rand.NextFloat());
+        }
 
         Point16[] keys = [.. displayDolls.Keys];
 
@@ -182,7 +174,7 @@ internal class MannequinGame : Minigame
     {
         foreach (Player plr in Main.ActivePlayers)
         {
-            plr.GetModPlayer<SlipperyPlayer>().Slippery = true;
+            //plr.GetModPlayer<SlipperyPlayer>().Slippery = true;
 
             if (Sets.Any(x => x.PlayerMatches(plr)))
             {

@@ -33,10 +33,18 @@ internal partial class ToolUIState(Player player) : UIState
     // Info / tracking
     private string _boardKey = string.Empty;
     private readonly Dictionary<ToolMode, bool> _toggledAlt = new() { { ToolMode.Paint, false }, { ToolMode.Link, false } };
+    private bool promptedInvalidBoard = false;
 
     private static Asset<Texture2D> Texture(string name, bool immediate = false) => ModContent.Request<Texture2D>("Parterraria/Assets/Textures/UI/Tool/" + name,
         immediate ? AssetRequestMode.ImmediateLoad : AssetRequestMode.AsyncLoad);
     private static LocalizedText Text(string name) => Language.GetText("Mods.Parterraria.ToolUI." + name);
+
+    public override void Update(GameTime gameTime)
+    {
+        base.Update(gameTime);
+
+        UpdateRemoveText();
+    }
 
     public override void OnInitialize()
     {
@@ -87,26 +95,31 @@ internal partial class ToolUIState(Player player) : UIState
             return;
         }
 
-        Board board = WorldBoardSystem.Self.worldBoards[_boardKey];
-        List<int> invalidNodes = [];
-
-        foreach (BoardNode node in board.nodes)
-            if (node.links.LinkCount == 0)
-                invalidNodes.Add(node.nodeId);
-
-        if (invalidNodes.Count == 0)
-            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.ValidBoard"));
-        else
+        if (CheckInvalidBoard(out Board board, out List<int> invalidNodes))
         {
             string nodes = "";
 
             foreach (int nodeId in invalidNodes)
             {
-                nodes += $"ID: {nodeId} (a {board.nodesById[nodeId].DisplayName}), ";
+                nodes += $"ID: {nodeId} ({board.nodesById[nodeId].DisplayName}), ";
             }
 
             Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.HangingNodes", nodes[..^2]), Color.Lerp(Color.Red, Color.White, 0.5f));
         }
+        else
+            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.ValidBoard"));
+    }
+
+    private bool CheckInvalidBoard(out Board board, out List<int> invalidNodes)
+    {
+        board = WorldBoardSystem.Self.worldBoards[_boardKey];
+        invalidNodes = [];
+
+        foreach (BoardNode node in board.nodes)
+            if (node.links.LinkCount == 0)
+                invalidNodes.Add(node.nodeId);
+
+        return invalidNodes.Count > 0;
     }
 
     internal void ToggleMinigameNodeList()
@@ -143,7 +156,7 @@ internal partial class ToolUIState(Player player) : UIState
 
         Append(listPanel);
 
-        UIText buildingText = new UIText("[c/CCCCCC:Now building:] " + ToolUsage.buildingNode?.DisplayName.Value ?? "None")
+        UIText buildingText = new("[c/CCCCCC:Now building:] " + ToolUsage.buildingNode?.DisplayName.Value ?? "None")
         {
             Width = StyleDimension.Fill,
             Top = StyleDimension.FromPixels(-20)
@@ -152,7 +165,7 @@ internal partial class ToolUIState(Player player) : UIState
         buildingText.OnUpdate += self => (self as UIText).SetText("[c/CCCCCC:Now building:] " + NodeLoader.Get(ToolUsage.buildNodeIndex)?.DisplayName.Value ?? "None");
         listPanel.Append(buildingText);
 
-        UIList list = new UIList()
+        UIList list = new()
         {
             Width = StyleDimension.FromPixelsAndPercent(-24, 1),
             Height = StyleDimension.FromPercent(1)
@@ -238,6 +251,13 @@ internal partial class ToolUIState(Player player) : UIState
         if (_boardKey == string.Empty)
         {
             Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.NoBoard"), CommonColors.Error);
+            return;
+        }
+
+        if (!promptedInvalidBoard && CheckInvalidBoard(out _, out _))
+        {
+            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolUI.InvalidPlay"), CommonColors.Error);
+            promptedInvalidBoard = true;
             return;
         }
 

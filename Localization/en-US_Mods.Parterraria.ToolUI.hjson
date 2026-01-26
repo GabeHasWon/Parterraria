@@ -5,3 +5,6 @@ BoardSelected: Board "{0}" selected!
 BoardDeleted: Editing board "{0}" deleted.
 MinigameSelected: Minigame "{0}" selected.
 EraseConfirm: Are you sure you want to erase?
+FailedPerms: You do not have permissions to do that.
+DeleteBoard: Are you sure you want to delete this board?
+InvalidPlay: Board has hanging nodes - are you sure you want to play? This prompt will not reappear unless the game is restarted.

@@ -1,6 +1,7 @@
 ﻿using Parterraria.Common;
 using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem;
+using Parterraria.Core.MinigameSystem.Games;
 using Parterraria.Core.MinigameSystem.MinigameUI;
 using Parterraria.Core.Synchronization.BoardItemSyncing;
 using Parterraria.Core.Synchronization.MinigameSyncing;
@@ -99,7 +100,7 @@ internal class WorldMinigameSystem : ModSystem
         }
 
         if (_minigameOverTimer > 0)
-            rankings.Draw(Math.Min(_minigameOverTimer / 120f, 1));
+            rankings?.Draw(Math.Min(_minigameOverTimer / 120f, 1));
     }
 
     private static void DebugDrawMinigames(Minigame game)
@@ -237,9 +238,9 @@ internal class WorldMinigameSystem : ModSystem
 
                 if (Main.myPlayer == i)
                     new ForceResetInformation((byte)i).Send();
-            }
 
-            playingMinigame.Reward(rankings, plr);
+                playingMinigame.Reward(rankings, plr);
+            }
         }
 
         playingMinigame.OnStop();
@@ -266,7 +267,7 @@ internal class WorldMinigameSystem : ModSystem
         if (minigameSlot == -1)
             minigameSlot = Main.rand.Next(choices.Length);
 
-        playingMinigame = choices[minigameSlot].Clone();
+        playingMinigame = worldMinigames.First(x => x is MannequinGame).Clone();// choices[minigameSlot].Clone();
         playingMinigame.OnSet();
         NotReady = true;
         selectingMinigame = false;
