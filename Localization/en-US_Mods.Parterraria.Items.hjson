@@ -43,7 +43,12 @@ TripleDice: {
 
 CelestialCore: {
 	DisplayName: Celestial Core
-	Tooltip: ""
+	Tooltip:
+		'''
+		The ultimate goal of a Party
+		{$DisappearsWhenNotPartying}
+		'Feels strong but intangible'
+		'''
 }
 
 MinigameTool: {
@@ -97,4 +102,13 @@ BrokenDice: {
 GoldFaerieItem: {
 	DisplayName: Gold Faerie
 	Tooltip: Hey! Listen!
+}
+
+PartyPopper: {
+	DisplayName: Party Popper
+	Tooltip:
+		'''
+		Right click to select & play a board
+		'Useful for scaring your friends!'
+		'''
 }

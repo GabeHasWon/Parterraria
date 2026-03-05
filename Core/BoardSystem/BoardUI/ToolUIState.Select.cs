@@ -66,7 +66,7 @@ internal partial class ToolUIState : UIState
             {
                 if (Main.netMode == NetmodeID.MultiplayerClient && !Main.countsAsHostForGameplay[Main.myPlayer])
                 {
-                    Main.NewText(Text("FailedPerms").Value);
+                    Main.NewText(Text("FailedPerms").Value, CommonColors.Error);
                     return;
                 }
 
@@ -128,7 +128,7 @@ internal partial class ToolUIState : UIState
         {
             if (Main.netMode == NetmodeID.MultiplayerClient && !Main.countsAsHostForGameplay[Main.myPlayer])
             {
-                Main.NewText(Text("FailedPerms").Value);
+                Main.NewText(Text("FailedPerms").Value, CommonColors.Error);
                 return;
             }
 

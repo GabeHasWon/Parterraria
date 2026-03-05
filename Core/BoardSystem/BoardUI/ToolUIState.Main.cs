@@ -37,7 +37,7 @@ internal partial class ToolUIState(Player player) : UIState
 
     private static Asset<Texture2D> Texture(string name, bool immediate = false) => ModContent.Request<Texture2D>("Parterraria/Assets/Textures/UI/Tool/" + name,
         immediate ? AssetRequestMode.ImmediateLoad : AssetRequestMode.AsyncLoad);
-    private static LocalizedText Text(string name) => Language.GetText("Mods.Parterraria.ToolUI." + name);
+    internal static LocalizedText Text(string name) => Language.GetText("Mods.Parterraria.ToolUI." + name);
 
     public override void Update(GameTime gameTime)
     {
@@ -87,15 +87,17 @@ internal partial class ToolUIState(Player player) : UIState
         AppendToolButton("Validate", ValidateBoard, null, mainPanel, ref number);
     }
 
-    private void ValidateBoard(UIMouseEvent evt, UIElement listeningElement)
+    private void ValidateBoard(UIMouseEvent evt, UIElement listeningElement) => ValidateBoard(_boardKey);
+
+    public static bool ValidateBoard(string key)
     {
-        if (_boardKey == string.Empty)
+        if (key == string.Empty)
         {
             Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.NoBoard"), CommonColors.Error);
-            return;
+            return false;
         }
 
-        if (CheckInvalidBoard(out Board board, out List<int> invalidNodes))
+        if (CheckInvalidBoard(key, out Board board, out List<int> invalidNodes))
         {
             string nodes = "";
 
@@ -108,11 +110,13 @@ internal partial class ToolUIState(Player player) : UIState
         }
         else
             Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.ValidBoard"));
+
+        return true;
     }
 
-    private bool CheckInvalidBoard(out Board board, out List<int> invalidNodes)
+    internal static bool CheckInvalidBoard(string key, out Board board, out List<int> invalidNodes)
     {
-        board = WorldBoardSystem.Self.worldBoards[_boardKey];
+        board = WorldBoardSystem.Self.worldBoards[key];
         invalidNodes = [];
 
         foreach (BoardNode node in board.nodes)
@@ -254,7 +258,7 @@ internal partial class ToolUIState(Player player) : UIState
             return;
         }
 
-        if (!promptedInvalidBoard && CheckInvalidBoard(out _, out _))
+        if (!promptedInvalidBoard && CheckInvalidBoard(_boardKey, out _, out _))
         {
             Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolUI.InvalidPlay"), CommonColors.Error);
             promptedInvalidBoard = true;

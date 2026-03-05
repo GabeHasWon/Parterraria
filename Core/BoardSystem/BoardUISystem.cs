@@ -1,12 +1,18 @@
-﻿using Parterraria.Content.Items.Board.Create;
+﻿using Microsoft.Xna.Framework.Graphics.PackedVector;
+using Parterraria.Common;
+using Parterraria.Content.Items.Board;
+using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem.BoardUI;
 using Parterraria.Core.MinigameSystem;
 using Parterraria.Core.MinigameSystem.MinigameUI;
 using System;
 using System.Collections.Generic;
+using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.States;
 using Terraria.ID;
 using Terraria.UI;
+using Terraria.UI.Chat;
 
 namespace Parterraria.Core.BoardSystem;
 
@@ -61,7 +67,18 @@ internal class BoardUISystem : ModSystem
         return ToolUIOpen(isMinigame);
     }
 
-    public static void OpenToolUI(bool minigame = false) => Self.toolUI.SetState(minigame ? new MinigameEditUI(Main.LocalPlayer) : new ToolUIState(Main.LocalPlayer));
+    public static void OpenToolUI(bool? minigame = false, PartyPopper popper = null)
+    {
+        UIState state = minigame switch
+        {
+            null => new PopperUI(popper),
+            true => new MinigameEditUI(Main.LocalPlayer),
+            false => new ToolUIState(Main.LocalPlayer)
+        };
+
+        Self.toolUI.SetState(state);
+    }
+
     internal static void CloseToolUI() => Self.toolUI.SetState(null);
 
     public static void OpenKeyboard(UIVirtualKeyboard.KeyboardSubmitEvent submitEvent, Action cancelAction)
@@ -160,9 +177,44 @@ internal class BoardUISystem : ModSystem
                 if (plr.active && !plr.dead)
                     plr.GetModPlayer<PlayingBoardPlayer>().DrawBoardInfo();
             }
+
+            DrawBoardHUD();
         }
 
         return true;
+    }
+
+    private static void DrawBoardHUD()
+    {
+        int yPos = 30;
+
+        for (int i = 0; i < Main.CurrentFrameFlags.ActivePlayersCount; ++i)
+        {
+            Player player = Main.player[i];
+
+            int type = ModContent.ItemType<AmethystCoin>();
+            int core = ModContent.ItemType<CelestialCore>();
+            var boardPlayer = player.GetModPlayer<PlayingBoardPlayer>();
+            string hasToGo = !boardPlayer.hasGoneOnCurrentTurn ? "Ready..." : "Gone";
+            BoardNode node = boardPlayer.connectedNode;
+            string text = $"{player.name}: {player.CountItem(type, 999)} [i:{type}] {player.CountItem(core, 99)} [i:{core}] - [nodeicon:{node.Name}] {node.DisplayName} - {hasToGo}";
+
+            Vector2 size = ChatManager.GetStringSize(FontAssets.MouseText.Value, text, Vector2.One);
+            var headPosition = new Vector2(Main.ScreenSize.X / 2f - size.X / 2f - 64, yPos - 8);
+            Main.PlayerRenderer.DrawPlayerHead(Main.Camera, player, headPosition, 1f, 1f, Color.White);
+            DrawCommon.CenteredString(FontAssets.MouseText.Value, new Vector2(Main.ScreenSize.X / 2f, yPos), text, Color.White);
+
+            if (new Rectangle((int)headPosition.X - 15, (int)headPosition.Y - 15, 30, 30).Contains(Main.MouseScreen.ToPoint()))
+            {
+                Main.mouseText = true;
+                Main.LocalPlayer.cursorItemIconText = player.name;
+                Main.LocalPlayer.cursorItemIconID = -1;
+                Main.LocalPlayer.noThrow = 2;
+                Main.LocalPlayer.cursorItemIconEnabled = true;
+            }
+
+            yPos += 30;
+        }
     }
 
     public static bool DrawMinigame()

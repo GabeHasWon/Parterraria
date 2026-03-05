@@ -15,6 +15,8 @@ internal class NodeLoader : ILoadable
     public static BoardNode Get(string name) => ModContent.GetInstance<NodeLoader>().NodesByName[name];
     public static BoardNode Get(int index) => ModContent.GetInstance<NodeLoader>().Nodes[index];
 
+    public static bool TryGet(string name, out BoardNode node) => ModContent.GetInstance<NodeLoader>().NodesByName.TryGetValue(name, out node);
+
     public void Load(Mod mod)
     {
         NodesByName = [];

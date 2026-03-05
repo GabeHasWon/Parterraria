@@ -5,7 +5,7 @@ using Terraria.ID;
 
 namespace Parterraria.Content.Items.Board.PartyItems;
 
-internal class PartyMirror : ModItem
+internal class PartyMirror : ModItem, IBoardClearItem
 {
     public override void SetDefaults()
     {

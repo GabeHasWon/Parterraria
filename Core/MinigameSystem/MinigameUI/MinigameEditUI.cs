@@ -37,9 +37,7 @@ internal partial class MinigameEditUI(Player player) : UIState
         mainPanel.OnUpdate += self =>
         {
             if (self.ContainsPoint(Main.MouseScreen))
-            {
                 Main.LocalPlayer.mouseInterface = true;
-            }
         };
 
         Append(mainPanel);

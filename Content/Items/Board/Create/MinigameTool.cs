@@ -29,6 +29,8 @@ class MinigameTool : ModItem
 
         if (player.altFunctionUse == 2)
         {
+            Main.LocalPlayer.GetModPlayer<MinigameToolPlayer>().toolMode = MinigameToolPlayer.ToolMode.None;
+
             if (BoardUISystem.Self.toolUI.CurrentState is not MinigameEditUI)
             {
                 BoardUISystem.OpenToolUI(true);

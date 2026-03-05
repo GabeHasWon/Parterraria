@@ -25,3 +25,9 @@ Minigame: {
 	Success: Placed minigame.
 	Intersecting: Area intersects other minigame.
 }
+
+Popper: {
+	Current: "Current board: "
+	None: (None)
+	Start: Start
+}

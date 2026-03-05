@@ -8,7 +8,12 @@ namespace Parterraria.Core.BoardSystem;
 internal partial class WorldBoardSystem : ModSystem
 {
     public static WorldBoardSystem Self => ModContent.GetInstance<WorldBoardSystem>();
+
+    /// <summary>
+    /// Whether a party is going on; that is, a board is being played.
+    /// </summary>
     public static bool PlayingParty => Self.playingBoard is not null;
+
     public static bool BuildingBoard => !PlayingParty && (Main.netMode == NetmodeID.Server || BoardUISystem.Self.toolUI.CurrentState is not null);
 
     public Dictionary<string, Board> worldBoards = [];

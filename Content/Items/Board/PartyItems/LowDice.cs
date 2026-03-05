@@ -1,6 +1,6 @@
 ﻿namespace Parterraria.Content.Items.Board.PartyItems;
 
-internal class LowDice : DiceItem
+internal class LowDice : DiceItem, IBoardClearItem
 {
     protected override int DiceType => ModContent.ProjectileType<LowDice_Dice>();
 
