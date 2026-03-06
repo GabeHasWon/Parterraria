@@ -71,6 +71,9 @@ internal class WorldMinigameSystem : ModSystem
             return;
 
         Self.playingMinigame.DrawUI();
+
+        if (_minigameOverTimer > 0)
+            rankings?.Draw(Math.Min(_minigameOverTimer / 120f, 1));
     }
 
     internal static void DrawMinigames()
@@ -98,9 +101,6 @@ internal class WorldMinigameSystem : ModSystem
             var descPos = Main.ScreenSize.ToVector2() / new Vector2(2f, 4f) + new Vector2(0, 40);
             DrawCommon.CenteredString(FontAssets.DeathText.Value, descPos, Self.playingMinigame.Description.Value, alpha, new Vector2(0.5f));
         }
-
-        if (_minigameOverTimer > 0)
-            rankings?.Draw(Math.Min(_minigameOverTimer / 120f, 1));
     }
 
     private static void DebugDrawMinigames(Minigame game)
@@ -160,7 +160,7 @@ internal class WorldMinigameSystem : ModSystem
             }
         }
 
-        if (!WorldBoardSystem.PlayingParty || InMinigame || worldMinigames.Count == 0 || Main.netMode == NetmodeID.MultiplayerClient || selectingMinigame || Main.npcShop > 0)
+        if (!WorldBoardSystem.PlayingParty || InMinigame || worldMinigames.Count == 0 || Main.netMode == NetmodeID.MultiplayerClient || selectingMinigame || !Main.dedServ && Main.npcShop > 0)
         {
             if (selectingMinigame && Main.netMode == NetmodeID.Server)
                 RollMinigameOnServer();
@@ -267,7 +267,7 @@ internal class WorldMinigameSystem : ModSystem
         if (minigameSlot == -1)
             minigameSlot = Main.rand.Next(choices.Length);
 
-        playingMinigame = worldMinigames.First(x => x is MannequinGame).Clone();// choices[minigameSlot].Clone();
+        playingMinigame = worldMinigames.First(x => x is PhotoOpGame).Clone(); //choices[minigameSlot].Clone(); //
         playingMinigame.OnSet();
         NotReady = true;
         selectingMinigame = false;

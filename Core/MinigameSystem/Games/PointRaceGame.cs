@@ -48,11 +48,8 @@ internal class PointRaceGame : Minigame
     {
         if (!playing)
         {
-            plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
-                [
-                    new Item(ItemID.LightningBoots),
-                    new Item(ItemID.ShinyRedBalloon),
-                ], false, false);
+            plr.GetModPlayer<InventoryPlayer>().SwitchInventory([],
+                [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.HermesBoots), new Item(ItemID.ShinyRedBalloon)], []);
         }
         else
         {

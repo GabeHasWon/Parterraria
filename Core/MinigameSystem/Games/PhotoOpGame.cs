@@ -1,4 +1,5 @@
-﻿using Parterraria.Common.CameraModifiers;
+﻿using Parterraria.Common;
+using Parterraria.Common.CameraModifiers;
 using Parterraria.Content.NPCs;
 using Parterraria.Core.BoardSystem;
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
@@ -67,9 +68,7 @@ internal class PhotoOpGame : Minigame
     public override void SetupPlayer(Player plr, bool playing)
     {
         if (!playing)
-        {
-            plr.GetModPlayer<InventoryPlayer>().SwitchInventory([], [new Item(0), new Item(0), new Item(0), new Item(ItemID.EoCShield), new Item(ItemID.HermesBoots)], []);
-        }
+            plr.GetModPlayer<InventoryPlayer>().SwitchInventory([], [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.EoCShield), new Item(ItemID.HermesBoots)], []);
     }
 
     public override void OnStart()

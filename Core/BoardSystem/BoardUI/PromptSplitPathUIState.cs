@@ -31,7 +31,7 @@ internal class PromptSplitPathUIState(List<NodeLinks.Link> linksToCheck, bool go
         
         foreach (var item in links)
         {
-            UIImageButton button = new(BoardNode.Tex(goingBack ? item.Parent : item.ToNode, true))
+            UIImageButton button = new(BoardNode.Tex(goingBack ? item.Parent : item.ToNode, "_Icon"))
             {
                 Width = StyleDimension.FromPixels(60),
                 Height = StyleDimension.FromPixels(60),

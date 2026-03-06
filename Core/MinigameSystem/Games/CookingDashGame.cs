@@ -47,10 +47,7 @@ internal class CookingDashGame : Minigame
         }
     }
 
-    public override void ResetPlayer(Player plr)
-    {
-        plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
-    }
+    public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
 
     public override MinigameRanking GetRanking()
     {

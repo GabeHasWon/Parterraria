@@ -1,4 +1,5 @@
-﻿using Parterraria.Core.BoardSystem.BoardUI.EditUI;
+﻿using Parterraria.Common;
+using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
 using System.Collections.Generic;
 using Terraria.DataStructures;
@@ -90,7 +91,7 @@ internal class CraftLargeDiamondGame : Minigame
             plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
                 [
                     new Item(ItemID.ChlorophytePickaxe),
-                ], false);
+                ], [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.BlizzardinaBottle)], []);
         }
     }
 

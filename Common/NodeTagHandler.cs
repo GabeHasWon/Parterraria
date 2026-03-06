@@ -3,7 +3,6 @@ using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using Terraria.GameContent;
-using Terraria.ID;
 using Terraria.UI.Chat;
 
 namespace Parterraria.Common;
@@ -16,9 +15,7 @@ public class NodeTagHandler : ITagHandler
     {
         public void Load(Mod mod) => ChatManager.Register<NodeTagHandler>("nodeicon");
 
-        public void Unload()
-        {
-        }
+        public void Unload() { }
     }
 
     private static readonly Dictionary<string, Asset<Texture2D>> TextureLookup = [];
@@ -29,8 +26,8 @@ public class NodeTagHandler : ITagHandler
         {
             if (!text.Contains(' ') && NodeLoader.TryGet(text, out BoardNode node))
             {
-                TextureLookup.Add(text, node.Texture);
-                asset = node.Texture;
+                TextureLookup.Add(text, node.ChatIcon);
+                asset = node.ChatIcon;
             }
             else
             {
@@ -41,7 +38,7 @@ public class NodeTagHandler : ITagHandler
                 {
                     if (check.DisplayName.Value == text)
                     {
-                        TextureLookup.Add(text, check.Texture);
+                        TextureLookup.Add(text, check.ChatIcon);
                         break;
                     }
                 }
@@ -50,7 +47,7 @@ public class NodeTagHandler : ITagHandler
                     asset = unknownTex;
                 else
                 {
-                    Asset<Texture2D> tex = ModContent.Request<Texture2D>("Parterraria/Assets/Textures/Nodes/Unknown_Icon");
+                    Asset<Texture2D> tex = ModContent.Request<Texture2D>("Parterraria/Assets/Textures/Nodes/Unknown_Chat");
                     TextureLookup.Add("unknown", tex);
                     asset = tex;
                 }
@@ -96,7 +93,7 @@ public class NodeTagHandler : ITagHandler
                 return true;
             }
 
-            Vector2 drawPos = position + new Vector2(0f, (allocH - texH) * 0.5f);
+            Vector2 drawPos = position + new Vector2(0f, (allocH - texH) * 0.5f - 4);
             drawPos.Floor();
 
             spriteBatch.Draw(tex, drawPos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);

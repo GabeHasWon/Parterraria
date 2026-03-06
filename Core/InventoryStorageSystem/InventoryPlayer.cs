@@ -1,5 +1,4 @@
-﻿using Iced.Intel;
-using Terraria.ID;
+﻿using Terraria.ID;
 
 namespace Parterraria.Core.InventoryStorageSystem;
 
@@ -11,16 +10,31 @@ internal class InventoryPlayer : ModPlayer
         public Item[] inv = inv;
         public Item[] armorAndAcc = armorAndAcc;
         public Item[] miscAccessories = miscAccessories;
+
+        internal StoredInventory Clone() => (StoredInventory)MemberwiseClone();
     }
 
     private StoredInventory _inventory = null;
 
-    public override void Load() => On_WorldGen.SaveAndQuitCallBack += ReplaceInventory;
+    public override void Load() => On_Player.SavePlayer += DontSaveStoredPlayer;
 
-    private void ReplaceInventory(On_WorldGen.orig_SaveAndQuitCallBack orig, object threadContext)
+    private static void DontSaveStoredPlayer(On_Player.orig_SavePlayer orig, Terraria.IO.PlayerFileData playerFile, bool skipMapSave)
     {
-        Main.ActivePlayerFileData.Player.GetModPlayer<InventoryPlayer>().ExitWorld();
-        orig(threadContext);
+        InventoryPlayer invPlr = playerFile.Player.GetModPlayer<InventoryPlayer>();
+        var clone = invPlr._inventory.Clone();
+        invPlr.FullyResetInventory();
+
+        orig(playerFile, skipMapSave);
+
+        RecursivelyResetInventory(playerFile.Player, clone);
+    }
+
+    private static void RecursivelyResetInventory(Player player, StoredInventory clone)
+    {
+        if (clone.oldInv is not null)
+            RecursivelyResetInventory(player, clone.oldInv);
+
+        player.GetModPlayer<InventoryPlayer>().SwitchInventory(clone.inv, clone.armorAndAcc, clone.miscAccessories);
     }
 
     public void SwitchInventory(Item[] inventory, Item[] armor, Item[] misc)
@@ -95,7 +109,7 @@ internal class InventoryPlayer : ModPlayer
         Player.itemAnimation = 0;
     }
 
-    internal void ExitWorld()
+    internal void FullyResetInventory()
     {
         while (_inventory is not null && _inventory.oldInv is not null)
             ReplaceInventory();

@@ -1,9 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
+using Parterraria.Common;
 using Parterraria.Core.InventoryStorageSystem;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Tile_Entities;
 using Terraria.ID;
@@ -66,11 +66,8 @@ internal class MannequinGame : Minigame
     {
         if (!playing)
         {
-            plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
-                [
-                    new Item(ItemID.LightningBoots),
-                    new Item(ItemID.ShinyRedBalloon),
-                ], false, false);
+            plr.GetModPlayer<InventoryPlayer>().SwitchInventory([], 
+                [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.LightningBoots), new Item(ItemID.EoCShield)], []);
         }
         else
             plr.Center = playerStartLocation.ToWorldCoordinates();

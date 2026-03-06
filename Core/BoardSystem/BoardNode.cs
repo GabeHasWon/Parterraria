@@ -13,7 +13,8 @@ namespace Parterraria.Core.BoardSystem;
 public abstract class BoardNode
 {
     public Asset<Texture2D> Texture => Tex(this);
-    public Asset<Texture2D> Icon => Tex(this, true);
+    public Asset<Texture2D> Icon => Tex(this, "_Icon");
+    public Asset<Texture2D> ChatIcon => Tex(this, "_Chat");
 
     public virtual string Name => GetType().Name;
     public virtual LocalizedText DisplayName => Language.GetOrRegister("Mods.Parterraria.Nodes." + Name + ".DisplayName");
@@ -33,7 +34,7 @@ public abstract class BoardNode
     public BoardNode() => links = new NodeLinks(this);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Asset<Texture2D> Tex(BoardNode node, bool icon = false) => Tex(node.GetType().Name.Replace("Node", "") + (icon ? "_Icon" : ""));
+    public static Asset<Texture2D> Tex(BoardNode node, string postfix = "") => Tex(node.GetType().Name.Replace("Node", "") + postfix);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Asset<Texture2D> Tex(string node) => ModContent.Request<Texture2D>("Parterraria/Assets/Textures/Nodes/" + node.Replace("Node", ""));

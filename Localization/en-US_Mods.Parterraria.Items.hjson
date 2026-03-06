@@ -101,7 +101,7 @@ BrokenDice: {
 
 GoldFaerieItem: {
 	DisplayName: Gold Faerie
-	Tooltip: Hey! Listen!
+	Tooltip: "'Hey! Listen!'"
 }
 
 PartyPopper: {

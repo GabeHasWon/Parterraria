@@ -1,5 +1,4 @@
-﻿using rail;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +12,11 @@ public class NodeLinks(BoardNode parent) : IEnumerable<NodeLinks.Link>
     {
         public readonly BoardNode ToNode = node;
         public readonly BoardNode Parent = parent;
+
+        /// <summary>
+        /// Gets the angle from the parent node to the connection.
+        /// </summary>
+        public float AngleToConnector => Parent.position.AngleTo(ToNode.position);
     }
 
     public readonly List<Link> links = [];
@@ -40,6 +44,9 @@ public class NodeLinks(BoardNode parent) : IEnumerable<NodeLinks.Link>
     public IEnumerator<Link> GetEnumerator() => links.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => links.GetEnumerator();
 
+    /// <summary>
+    /// Determines the link that best matches the offset from <paramref name="worldPos"/> (usually mouse), if any.
+    /// </summary>
     internal Link GetNearestLink(Vector2 worldPos, out bool noLinks)
     {
         noLinks = false;

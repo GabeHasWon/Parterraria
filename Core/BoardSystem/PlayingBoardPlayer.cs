@@ -241,9 +241,11 @@ internal class PlayingBoardPlayer : ModPlayer
                 roll++;
             else
                 roll--;
-        }
 
-        storedRoll += roll;
+            storedRoll = roll;
+        }
+        else
+            storedRoll += roll;
 
         if (--diceCount == 0)
             CheckNextRoll();
@@ -333,6 +335,7 @@ internal class PlayingBoardPlayer : ModPlayer
         moveTimer = 0;
         isMoving = false;
         hasGoneOnCurrentTurn = false;
+        minigameReady = false;
         diceCount = 0;
         storedRoll = 0;
         splitNodes.Clear();

@@ -6,7 +6,7 @@ using Terraria.ID;
 
 namespace Parterraria.Content.NPCs;
 
-[AutoloadCritter]
+[AutoloadCritter(0, ItemRarityID.Yellow)]
 internal class GoldFaerie : ModNPC
 {
     private Vector2 Position

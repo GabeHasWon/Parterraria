@@ -41,7 +41,7 @@ internal class BugChaseGame : Minigame
                     new Item(ItemID.LunarHook),
                     new Item(ItemID.TerrasparkBoots),
                     new Item(ItemID.AngelWings)
-                ], false);
+                ], false, false);
         }
     }
 

@@ -2,5 +2,5 @@
 
 internal class InventoryResetSystem : ModSystem
 {
-    public override void OnWorldUnload() => Main.LocalPlayer.GetModPlayer<InventoryPlayer>().ExitWorld();
+    public override void OnWorldUnload() => Main.LocalPlayer.GetModPlayer<InventoryPlayer>().FullyResetInventory();
 }

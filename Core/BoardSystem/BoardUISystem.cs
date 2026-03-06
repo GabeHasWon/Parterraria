@@ -11,8 +11,10 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.States;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.UI;
 using Terraria.UI.Chat;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Parterraria.Core.BoardSystem;
 
@@ -151,7 +153,7 @@ internal class BoardUISystem : ModSystem
             );
 
             layers.Add(new LegacyGameInterfaceLayer("Parterraria: Minigame In-World UI", DrawMinigame, InterfaceScaleType.Game));
-            layers.Add(new LegacyGameInterfaceLayer("Parterraria: Minigame UI UI", DrawMinigameUI, InterfaceScaleType.UI));
+            layers.Add(new LegacyGameInterfaceLayer("Parterraria: Board/Minigame UI", DrawMiscUI, InterfaceScaleType.UI));
         }
     }
 
@@ -177,8 +179,6 @@ internal class BoardUISystem : ModSystem
                 if (plr.active && !plr.dead)
                     plr.GetModPlayer<PlayingBoardPlayer>().DrawBoardInfo();
             }
-
-            DrawBoardHUD();
         }
 
         return true;
@@ -186,7 +186,10 @@ internal class BoardUISystem : ModSystem
 
     private static void DrawBoardHUD()
     {
-        int yPos = 30;
+        int yPos = 325;
+
+        string partyPlayers = Language.GetTextValue("Mods.Parterraria.MiscUI.PartyPlayers");
+        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, partyPlayers, new Vector2(25, yPos - 50), Color.White, 0f, Vector2.Zero, new(0.5f));
 
         for (int i = 0; i < Main.CurrentFrameFlags.ActivePlayersCount; ++i)
         {
@@ -195,14 +198,14 @@ internal class BoardUISystem : ModSystem
             int type = ModContent.ItemType<AmethystCoin>();
             int core = ModContent.ItemType<CelestialCore>();
             var boardPlayer = player.GetModPlayer<PlayingBoardPlayer>();
-            string hasToGo = !boardPlayer.hasGoneOnCurrentTurn ? "Ready..." : "Gone";
+            bool goneOnCurrentTurn = WorldMinigameSystem.InMinigame ? boardPlayer.minigameReady : boardPlayer.hasGoneOnCurrentTurn;
+            string playerName = $"[c/{(goneOnCurrentTurn ? Color.Green : Color.White).Hex3()}:{player.name}]";
             BoardNode node = boardPlayer.connectedNode;
-            string text = $"{player.name}: {player.CountItem(type, 999)} [i:{type}] {player.CountItem(core, 99)} [i:{core}] - [nodeicon:{node.Name}] {node.DisplayName} - {hasToGo}";
+            string text = $"{playerName}: {player.CountItem(type, 999)} [i:{type}] {player.CountItem(core, 99)} [i:{core}] - [nodeicon:{node.Name}] {node.DisplayName}";
 
-            Vector2 size = ChatManager.GetStringSize(FontAssets.MouseText.Value, text, Vector2.One);
-            var headPosition = new Vector2(Main.ScreenSize.X / 2f - size.X / 2f - 64, yPos - 8);
+            var headPosition = new Vector2(30, yPos - 8);
             Main.PlayerRenderer.DrawPlayerHead(Main.Camera, player, headPosition, 1f, 1f, Color.White);
-            DrawCommon.CenteredString(FontAssets.MouseText.Value, new Vector2(Main.ScreenSize.X / 2f, yPos), text, Color.White);
+            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.MouseText.Value, text, new Vector2(64, yPos - 18), Color.White, 0f, Vector2.Zero, Vector2.One);
 
             if (new Rectangle((int)headPosition.X - 15, (int)headPosition.Y - 15, 30, 30).Contains(Main.MouseScreen.ToPoint()))
             {
@@ -223,8 +226,11 @@ internal class BoardUISystem : ModSystem
         return true;
     }
 
-    public static bool DrawMinigameUI()
+    public static bool DrawMiscUI()
     {
+        if (WorldBoardSystem.PlayingParty)
+            DrawBoardHUD();
+
         WorldMinigameSystem.DrawMinigameUI();
         return true;
     }

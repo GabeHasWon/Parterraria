@@ -89,7 +89,9 @@ internal partial class WorldBoardSystem : ModSystem
         Self.playingBoard = null;
 
         WorldMinigameSystem.Self.StopParty();
-        Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>().ExitParty();
+
+        foreach (Player player in Main.ActivePlayers)
+            player.GetModPlayer<PlayingBoardPlayer>().ExitParty();
 
         if (Main.netMode != NetmodeID.Server)
             BoardUISystem.CloseMiscUI();

@@ -51,10 +51,7 @@ internal class ProjectileRainGame : Minigame
     {
         if (!playing)
         {
-            plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
-                [
-                    new Item(ItemID.EoCShield),
-                ], false, false);
+            plr.GetModPlayer<InventoryPlayer>().SwitchInventory([], [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.EoCShield)], []);
         }
         else
             plr.QuickDismount();

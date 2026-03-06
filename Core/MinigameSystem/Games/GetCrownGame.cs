@@ -47,11 +47,8 @@ internal class GetCrownGame : Minigame
     {
         if (!playing)
         {
-            plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
-                [
-                    new Item(ItemID.DualHook),
-                    new Item(ItemID.CloudinaBalloon)
-                ], false, false);
+            plr.GetModPlayer<InventoryPlayer>().SwitchInventory([], [ ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.CloudinaBalloon)], 
+                [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.DualHook)]);
         }
         else
         {

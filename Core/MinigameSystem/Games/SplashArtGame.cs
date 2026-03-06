@@ -46,7 +46,7 @@ internal class SplashArtGame : Minigame
         if (!playing)
         {
             plr.GetModPlayer<InventoryPlayer>().SwitchInventory(
-                [], [CommonUtils.AirItem, CommonUtils.AirItem, CommonUtils.AirItem, new Item(ItemID.EoCShield), 
+                [], [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.EoCShield), 
                     new Item(ItemID.CloudinaBalloon), new Item(ItemID.LightningBoots)], []);
         }
     }

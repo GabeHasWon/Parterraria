@@ -1,6 +1,7 @@
 ﻿using Parterraria.Common;
 using Parterraria.Core.BoardSystem.BoardUI;
 using Parterraria.Core.Synchronization;
+using Parterraria.Core.Synchronization.NodeSyncing;
 using System;
 using System.Linq;
 using Terraria.GameContent;
@@ -77,7 +78,12 @@ internal class ToolUsage
                 NodeLinks.Link link = buildingNode.links.GetNearestLink(Main.MouseWorld, out bool noLinks);
 
                 if (!noLinks)
-                    buildingNode.links.RemoveLink(link);
+                {
+                    if (Main.netMode == NetmodeID.SinglePlayer)
+                        buildingNode.links.RemoveLink(link);
+                    else
+                        new UnlinkNodeModule(Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().editingBoard, link).Send();
+                }
 
                 buildingNode = null;
                 _placementStage = 0;
@@ -136,9 +142,14 @@ internal class ToolUsage
                     return;
                 }
 
-                buildingNode.links.AddLink(node);
-                buildingNode = null;
                 _placementStage = 0;
+
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                    new LinkNodeModule(Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().editingBoard, buildingNode.nodeId, node.nodeId).Send();
+                else
+                    buildingNode.links.AddLink(node);
+
+                buildingNode = null;
 
                 Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.ConnectedNodes.Connected"), CommonColors.Success);
             }
