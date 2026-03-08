@@ -1,5 +1,6 @@
 ﻿using Parterraria.Common;
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
+using Parterraria.Core.MinigameSystem;
 using Parterraria.Core.Synchronization;
 using ReLogic.Content;
 using System;
@@ -12,6 +13,9 @@ using Terraria.UI;
 
 namespace Parterraria.Core.BoardSystem.BoardUI;
 
+/// <summary>
+/// State used for the board tool.
+/// </summary>
 internal partial class ToolUIState(Player player) : UIState
 {
     private enum OpenPanelState : byte
@@ -61,8 +65,8 @@ internal partial class ToolUIState(Player player) : UIState
 
         Append(mainPanel);
 
-        UIText toolSelect = new(Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().Mode.ToString(), 1) 
-        { 
+        UIText toolSelect = new(Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().Mode.ToString(), 1)
+        {
             Top = StyleDimension.FromPixels(-20)
         };
         toolSelect.OnUpdate += (self) => (self as UIText).SetText(Main.LocalPlayer.GetModPlayer<BoardToolPlayer>().Mode.ToString());
@@ -82,7 +86,7 @@ internal partial class ToolUIState(Player player) : UIState
         AppendToolButton("Link", SetLinkMode, (_, ui) => SwitchTool(ToolMode.Link, ui as UIImageButton, "Link", "Unlink"), mainPanel, ref number);
         AppendToolButton("Play", StartParty, (_, ui) => EndParty(), mainPanel, ref number);
         AppendToolButton("Edit", EditBoard, (_, ui) => BoardUISystem.CloseMiscUI(), mainPanel, ref number);
-        
+
         AppendToolButton("Close", ExitMenu, null, mainPanel, ref number);
         AppendToolButton("Validate", ValidateBoard, null, mainPanel, ref number);
     }
@@ -97,7 +101,15 @@ internal partial class ToolUIState(Player player) : UIState
             return false;
         }
 
-        if (CheckInvalidBoard(key, out Board board, out List<int> invalidNodes))
+        Board board = WorldBoardSystem.Self.worldBoards[key];
+
+        if (!board.CanStart(out string denial))
+        {
+            Main.NewText(Language.GetTextValue(denial), CommonColors.Error);
+            return false;
+        }
+
+        if (CheckHangingNodes(key, out _, out List<int> invalidNodes))
         {
             string nodes = "";
 
@@ -106,15 +118,15 @@ internal partial class ToolUIState(Player player) : UIState
                 nodes += $"ID: {nodeId} ({board.nodesById[nodeId].DisplayName}), ";
             }
 
-            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.HangingNodes", nodes[..^2]), Color.Lerp(Color.Red, Color.White, 0.5f));
+            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.HangingNodes", nodes[..^2]), CommonColors.Error);
         }
         else
-            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.ValidBoard"));
+            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.ValidBoard"), CommonColors.Success);
 
         return true;
     }
 
-    internal static bool CheckInvalidBoard(string key, out Board board, out List<int> invalidNodes)
+    internal static bool CheckHangingNodes(string key, out Board board, out List<int> invalidNodes)
     {
         board = WorldBoardSystem.Self.worldBoards[key];
         invalidNodes = [];
@@ -258,7 +270,7 @@ internal partial class ToolUIState(Player player) : UIState
             return;
         }
 
-        if (!promptedInvalidBoard && CheckInvalidBoard(_boardKey, out _, out _))
+        if (!promptedInvalidBoard && CheckHangingNodes(_boardKey, out _, out _))
         {
             Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolUI.InvalidPlay"), CommonColors.Error);
             promptedInvalidBoard = true;
@@ -287,6 +299,10 @@ internal partial class ToolUIState(Player player) : UIState
     private void ExitMenu(UIMouseEvent evt, UIElement listeningElement)
     {
         BoardUISystem.CloseToolUI();
+
+        if (BoardUISystem.Self.miscUI.CurrentState is EditObjectUIState)
+            BoardUISystem.CloseMiscUI();
+
         ToolUsage.ResetTool();
         Main.isMouseLeftConsumedByUI = true;
 
@@ -356,5 +372,20 @@ internal partial class ToolUIState(Player player) : UIState
             button.SetImage(Texture(altTexture, true));
 
         button.Recalculate();
+    }
+
+    protected override void DrawSelf(SpriteBatch spriteBatch)
+    {
+        base.DrawSelf(spriteBatch);
+
+        if (_boardKey == string.Empty)
+            return;
+
+        Board board = WorldBoardSystem.Self.worldBoards[_boardKey];
+
+        DrawCommon.DrawPositionMarker(board.config.WinIdlePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.WinIdle"));
+        DrawCommon.DrawPositionMarker(board.config.FirstPlacePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.FirstPlace"), Color.Gold);
+        DrawCommon.DrawPositionMarker(board.config.SecondPlacePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.SecondPlace"), Color.Silver);
+        DrawCommon.DrawPositionMarker(board.config.ThirdPlacePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.ThirdPlace"), Color.SaddleBrown);
     }
 }

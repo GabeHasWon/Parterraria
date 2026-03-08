@@ -1,0 +1,44 @@
+BadEventNode: {
+	DisplayName: Bad Event
+	Tooltip: A random bad event occurs when landing on this node.
+}
+
+BadNode: {
+	DisplayName: Bad
+	Tooltip: Lose Amethyst Coins when landing on this node.
+}
+
+CoreNode: {
+	DisplayName: Core
+	Tooltip: Gain a Core, for a price, on this node.
+}
+
+EmptyNode: {
+	DisplayName: Plain
+	Tooltip: Does nothing.
+}
+
+EventNode: {
+	DisplayName: Random Event
+	Tooltip: A completely random event occurs when landing on this node.
+}
+
+GoodNode: {
+	DisplayName: Good
+	Tooltip: Gain Amethyst Coins when landing on this node.
+}
+
+ItemNode: {
+	DisplayName: Item
+	Tooltip: Gain a random item when landing on this node.
+}
+
+ShopNode: {
+	DisplayName: Shopping
+	Tooltip: Open a shop when passing by this node.
+}
+
+StartNode: {
+	DisplayName: Start
+	Tooltip: Start node.
+}

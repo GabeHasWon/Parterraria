@@ -1,4 +1,6 @@
 ﻿using Parterraria.Core.MinigameSystem;
+using Parterraria.Core.Synchronization.BoardItemSyncing;
+using System;
 using System.Collections.Generic;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
@@ -16,12 +18,15 @@ internal partial class WorldBoardSystem : ModSystem
 
     public static bool BuildingBoard => !PlayingParty && (Main.netMode == NetmodeID.Server || BoardUISystem.Self.toolUI.CurrentState is not null);
 
+    public static bool GameFinished => Self.turnsGone >= Self.playingBoard.GetData
+
     public Dictionary<string, Board> worldBoards = [];
 
     public Board playingBoard = null;
     public BoardNode hoverNode = null;
     public int boardHost = -1;
     public string playingBoardKey = null;
+    public int turnsGone = 0;
 
     public override void SaveWorldData(TagCompound tag)
     {
@@ -82,6 +87,7 @@ internal partial class WorldBoardSystem : ModSystem
         Self.playingBoardKey = boardKey;
         Self.playingBoard = GetBoard(boardKey);
         Self.playingBoard.Start();
+        Self.turnsGone = 0;
     }
 
     internal static void StopParty()
@@ -107,5 +113,34 @@ internal partial class WorldBoardSystem : ModSystem
 
         Board board = GetBoard(boardKey);
         return board.CanStart(out denialKey);
+    }
+
+    internal static void CompleteMinigame(Minigame finishedGame, MinigameRanking rankings)
+    {
+        Self.turnsGone++;
+        bool gameOver = Self.turnsGone >= Self.playingBoard.config.TurnMax;
+
+        for (int i = 0; i < Main.maxPlayers; ++i)
+        {
+            Player plr = Main.player[i];
+
+            if (plr.active)
+            {
+                if (plr.dead)
+                    plr.Spawn(PlayerSpawnContext.ReviveFromDeath);
+
+                plr.Center = gameOver ? Self.playingBoard.config.WinIdlePosition.ToWorldCoordinates(0, 0) : plr.GetModPlayer<PlayingBoardPlayer>().connectedNode.position;
+                plr.GetModPlayer<PlayingBoardPlayer>().hasGoneOnCurrentTurn = false;
+                finishedGame.ResetPlayer(plr);
+
+                plr.fallStart = (int)(plr.position.Y / 16f);
+                plr.fallStart2 = plr.fallStart;
+
+                if (Main.myPlayer == i)
+                    new ForceResetInformation((byte)i).Send();
+
+                finishedGame.Reward(rankings, plr);
+            }
+        }
     }
 }

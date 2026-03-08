@@ -1,0 +1,49 @@
+CraftLargeDiamondGame: {
+	Name: Diamond Dash
+	Description: Various diamonds will spawn around the arena. Mine them, craft a Large Diamond, and win!
+}
+
+GetCrownGame: {
+	Name: Crown Craze
+	Description: Somewhere, there is a crown on the ground. Pick it up and wear it to win!
+}
+
+CookingDashGame: {
+	Name: Bug Searching
+	Description: You forgot one piece of the Grub Soup! Find a Buggy by breaking ferns and make the soup to win!
+}
+
+ProjectileRainGame: {
+	Name: Risky Rain
+	Description: Projectiles rain from the ceiling. The player with the most health at the end wins!
+}
+
+SplashArtGame: {
+	Name: Splash Art
+	Description: Each player paints the wall behind them. The one with the most paint at the end wins!
+}
+
+BugChaseGame: {
+	Name: Fairy Flurry
+	Description: A Golden Faerie flits about the arena. Catch it to win!
+}
+
+PointRaceGame: {
+	Name: Expeditious Escapade
+	Description: Somewhere there is a finish point. Approach it to win!
+}
+
+GetHeightGame: {
+	Name: Peak Performance
+	Description: Race upwards to the highest peak to win!
+}
+
+MannequinGame: {
+	Name: Speedy Outfitters
+	Description: Put on one complete vanity set to win!
+}
+
+PhotoOpGame: {
+	Name: Celebrity Photoshoot
+	Description: Stay close to the famous Slime of Terraria to win!
+}

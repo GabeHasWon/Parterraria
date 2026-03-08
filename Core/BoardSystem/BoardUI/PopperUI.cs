@@ -9,7 +9,7 @@ namespace Parterraria.Core.BoardSystem.BoardUI;
 
 internal class PopperUI(PartyPopper popper) : UIState
 {
-    const string LocStart = "Mods.Parterraria.ToolInfo.";
+    const string LocStart = "Mods.Parterraria.ToolInfo.Popper.";
 
     private readonly PartyPopper _popper = popper;
 

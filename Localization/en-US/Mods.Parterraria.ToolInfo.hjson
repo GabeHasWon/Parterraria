@@ -5,6 +5,7 @@ Board: {
 	NoStart: Board has no start node!
 	InvalidBoard: Invalid board.
 	BossActive: A boss or event is active!
+	NoWin: Win placements aren't set! Make sure all of the win positions are set.
 	HangingNodes:
 		'''
 		Validation: Failed. The following node(s) do not have a next node (called 'hanging nodes'): {0}

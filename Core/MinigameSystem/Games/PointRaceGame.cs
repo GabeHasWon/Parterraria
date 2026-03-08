@@ -5,6 +5,7 @@ using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
 
@@ -62,7 +63,7 @@ internal class PointRaceGame : Minigame
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
 
-    public override MinigameRanking GetRanking() => MinigameRanking.ByOrderAbsolute([.. RankingByWhoAmI.Values]);
+    public override MinigameRanking GetRanking() => MinigameRanking.ByOrderAbsolute([.. RankingByWhoAmI.OrderBy(x => x.Value).Select(x => x.Key)]);
 
     public override void InternalUpdate()
     {
@@ -74,8 +75,19 @@ internal class PointRaceGame : Minigame
                 RankingByWhoAmI.Add(i, RankingByWhoAmI.Count);
         }
 
-        if (RankingByWhoAmI.Count > Main.CurrentFrameFlags.ActivePlayersCount - 1)
+        if (RankingByWhoAmI.Count > Main.CurrentFrameFlags.ActivePlayersCount - 2)
+        {
+            foreach (Player player in Main.ActivePlayers)
+            {
+                if (!RankingByWhoAmI.ContainsKey(player.whoAmI))
+                {
+                    RankingByWhoAmI.Add(player.whoAmI, RankingByWhoAmI.Count);
+                    break;
+                }
+            }
+
             Beaten = true;
+        }
     }
 
     protected override void InternalDraw(bool debug)

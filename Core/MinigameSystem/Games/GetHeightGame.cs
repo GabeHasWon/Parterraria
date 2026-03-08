@@ -60,7 +60,7 @@ internal class GetHeightGame : Minigame
         foreach (Player player in Main.ActivePlayers)
             heightPrio.Add(player.whoAmI, player.position.Y);
 
-        return MinigameRanking.ByOrderAbsolute([.. heightPrio.OrderByDescending(x => x.Value).Select(x => x.Key)]);
+        return MinigameRanking.ByOrderAbsolute([.. heightPrio.OrderBy(x => x.Value).Select(x => x.Key)]);
     }
 
     public override void OnStop()

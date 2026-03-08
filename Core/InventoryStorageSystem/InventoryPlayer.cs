@@ -14,6 +14,11 @@ internal class InventoryPlayer : ModPlayer
         internal StoredInventory Clone() => (StoredInventory)MemberwiseClone();
     }
 
+    internal class InventoryResetSystem : ModSystem
+    {
+        public override void OnWorldUnload() => Main.LocalPlayer.GetModPlayer<InventoryPlayer>().FullyResetInventory();
+    }
+
     private StoredInventory _inventory = null;
 
     public override void Load() => On_Player.SavePlayer += DontSaveStoredPlayer;
@@ -21,6 +26,13 @@ internal class InventoryPlayer : ModPlayer
     private static void DontSaveStoredPlayer(On_Player.orig_SavePlayer orig, Terraria.IO.PlayerFileData playerFile, bool skipMapSave)
     {
         InventoryPlayer invPlr = playerFile.Player.GetModPlayer<InventoryPlayer>();
+
+        if (invPlr._inventory is null)
+        {
+            orig(playerFile, skipMapSave);
+            return;
+        }
+
         var clone = invPlr._inventory.Clone();
         invPlr.FullyResetInventory();
 

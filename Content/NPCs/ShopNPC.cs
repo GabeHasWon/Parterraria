@@ -11,7 +11,12 @@ public class ShopNPC : ModNPC
 {
     private int PlayerAttached => (int)NPC.ai[0];
 
-    public override void SetStaticDefaults() => Main.npcFrameCount[Type] = Main.npcFrameCount[NPCID.Guide];
+    public override void SetStaticDefaults()
+    {
+        Main.npcFrameCount[Type] = Main.npcFrameCount[NPCID.Guide];
+
+        NPCID.Sets.NoTownNPCHappiness[Type] = true;
+    }
 
     public override void SetDefaults()
     {

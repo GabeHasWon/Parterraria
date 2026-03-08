@@ -43,7 +43,7 @@ internal class ModeUtils
 
 		if (Main.masterMode)
 		{
-			return master;
+			return Main.getGoodWorld ? legendary : master;
 		}
 		else if (Main.expertMode)
 		{

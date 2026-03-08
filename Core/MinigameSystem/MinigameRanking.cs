@@ -105,7 +105,11 @@ public class MinigameRanking
         foreach (var (who, rank) in Ranking)
         {
             var pos = Main.ScreenSize.ToVector2() / new Vector2(2f, 4f) + new Vector2(0, step++ * 40);
-            DrawCommon.CenteredString(FontAssets.DeathText.Value, pos, $"{Main.player[who].name}: {rank.RewardText} ({rank.Place})", color, new(scale));
+            DrawCommon.CenteredString(FontAssets.DeathText.Value, pos, $"{Main.player[who].name}: {rank.RewardText} "
+#if DEBUG
+                + $"({rank.Place})" // Show internal ranking name in debug only
+#endif
+                , color, new(scale));
 
             scale *= 0.75f;
 
@@ -118,6 +122,8 @@ public class MinigameRanking
     {
         Ranking[plr.whoAmI].OnReward(plr);
 
+#if DEBUG
         Main.NewText($"Rewarded ranking of {plr.name}, who came in {Ranking[plr.whoAmI].Place} placement.");
+#endif
     }
 }

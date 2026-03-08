@@ -1,5 +1,8 @@
 ﻿namespace Parterraria.Core.BoardSystem;
 
+/// <summary>
+/// Stores info on tool usage.
+/// </summary>
 internal partial class BoardToolPlayer : ModPlayer
 {
     public ToolMode Mode { get; set; } = ToolMode.None;

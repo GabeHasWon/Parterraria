@@ -129,14 +129,14 @@ public abstract class BoardNode
             DrawLinks(false);
 
             var font = FontAssets.DeathText.Value;
-            var namePos = position + new Vector2(-halfWidth + 6) - Main.screenPosition;
+            var pos = position + new Vector2(-halfWidth + 6) - Main.screenPosition;
             string text = GetType().Name;
             float size = font.MeasureString(text).X * 0.8f;
             var nameScale = Vector2.Min(new(halfWidth / size), Vector2.One);
 
-            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, namePos, Color.White, 0, Vector2.Zero, nameScale);
-            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, "ID: " + nodeId, namePos + new Vector2(0, 38), Color.White, 0, Vector2.Zero, nameScale * 0.7f);
-            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, "Connections:", namePos + new Vector2(0, 60), Color.White, 0, Vector2.Zero, nameScale * 0.7f);
+            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, pos, Color.White, 0, Vector2.Zero, nameScale);
+            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, $"{Localize("ID")} " + nodeId, pos + new Vector2(0, 38), Color.White, 0, Vector2.Zero, nameScale * 0.7f);
+            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, $"{Localize("Connections")}", pos + new Vector2(0, 60), Color.White, 0, Vector2.Zero, nameScale * 0.7f);
 
             string con = "";
 
@@ -145,12 +145,14 @@ public abstract class BoardNode
                 con += k.ToNode.nodeId;
             }
 
-            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, con, namePos + new Vector2(0, 86), Color.White, 0, Vector2.Zero, nameScale * 0.7f);
+            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, con, pos + new Vector2(0, 86), Color.White, 0, Vector2.Zero, nameScale * 0.7f);
 
             NodeDrawing.DrawLine(position - new Vector2(halfWidth), 0, halfWidth * 2);
             NodeDrawing.DrawLine(position - new Vector2(halfWidth), MathHelper.PiOver2, halfWidth * 2);
             NodeDrawing.DrawLine(position + new Vector2(halfWidth), -MathHelper.Pi, halfWidth * 2);
             NodeDrawing.DrawLine(position + new Vector2(halfWidth), -MathHelper.PiOver2, halfWidth * 2);
+
+            static string Localize(string postfix) => Language.GetTextValue("Mods.Parterraria.MiscUI.Nodes." + postfix);
         }
         else // Nicer visuals for playing
         {
@@ -159,7 +161,12 @@ public abstract class BoardNode
         }
     }
 
-    public virtual void FancyDraw() => NodeDrawing.DrawNodeSquare(position - Main.screenPosition, halfWidth, GetType().Name, Color.LightGray);
+    public virtual void FancyDraw()
+    {
+        PlayingBoardPlayer plr = Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>();
+        bool highlight = plr.promptingSplit && plr.splitNodes.Contains(this);
+        NodeDrawing.DrawNodeSquare(position - Main.screenPosition, halfWidth, GetType().Name, Color.LightGray, highlight);
+    }
 
     public virtual void DrawLinks(bool fancy)
     {

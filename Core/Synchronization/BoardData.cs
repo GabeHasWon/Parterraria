@@ -3,6 +3,9 @@ using System;
 
 namespace Parterraria.Core.Synchronization;
 
+/// <summary>
+/// Serializable struct for IO.
+/// </summary>
 [Serializable]
 public readonly struct BoardData(string key, BoardConfig config, BoardData.NodeData[] nodes)
 {

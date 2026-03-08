@@ -34,7 +34,7 @@ internal class PhotoOpGame : Minigame
 
     public override MinigameWinType WinType => MinigameWinType.First;
 
-    public override int MaxPlayTime => secondsBetweenPhotos * totalPhotos * 60;
+    public override int MaxPlayTime => secondsBetweenPhotos * totalPhotos * 60 + 10;
 
     private static Asset<Texture2D> Camera = null;
 

@@ -1,0 +1,20 @@
+PromptSplitPathUIState.Choose: Choose a path, any path
+Minigame: Minigame!
+MoveTimer: Move timer:
+Ready: READY
+NotReady: NOT READY
+Roll: Roll:
+PartyPlayers: Party Players:
+NextNode: Choose your next node!
+StartPosition: Start Position
+TimeLeft: Time Left
+
+Nodes: {
+	Connections: Connections:
+	ID: ID:
+}
+
+WinIdle: Win Idle
+FirstPlace: 1st
+SecondPlace: 2nd
+ThirdPlace: 3rd

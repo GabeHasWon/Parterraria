@@ -220,31 +220,12 @@ internal class WorldMinigameSystem : ModSystem
 
     private void CompleteMinigame()
     {
-        for (int i = 0; i < Main.maxPlayers; ++i)
-        {
-            Player plr = Main.player[i];
-
-            if (plr.active)
-            {
-                if (plr.dead)
-                    plr.Spawn(PlayerSpawnContext.ReviveFromDeath);
-
-                plr.Center = plr.GetModPlayer<PlayingBoardPlayer>().connectedNode.position;
-                plr.GetModPlayer<PlayingBoardPlayer>().hasGoneOnCurrentTurn = false;
-                playingMinigame.ResetPlayer(plr);
-
-                plr.fallStart = (int)(plr.position.Y / 16f);
-                plr.fallStart2 = plr.fallStart;
-
-                if (Main.myPlayer == i)
-                    new ForceResetInformation((byte)i).Send();
-
-                playingMinigame.Reward(rankings, plr);
-            }
-        }
-
         playingMinigame.OnStop();
+
+        WorldBoardSystem.CompleteMinigame(playingMinigame, rankings);
+
         playingMinigame = null;
+        rankings = null;
     }
 
     public override void ClearWorld()
@@ -267,7 +248,7 @@ internal class WorldMinigameSystem : ModSystem
         if (minigameSlot == -1)
             minigameSlot = Main.rand.Next(choices.Length);
 
-        playingMinigame = worldMinigames.First(x => x is PhotoOpGame).Clone(); //choices[minigameSlot].Clone(); //
+        playingMinigame = worldMinigames.First(x => x is MannequinGame).Clone(); //choices[minigameSlot].Clone(); //
         playingMinigame.OnSet();
         NotReady = true;
         selectingMinigame = false;
@@ -311,7 +292,7 @@ internal class WorldMinigameSystem : ModSystem
         for (int i = 0; i < count; ++i)
         {
             TagCompound game = tag.GetCompound("game" + i);
-            Minigame minigame = Minigame.LoadMinigame(game);
+            var minigame = Minigame.LoadMinigame(game);
 
             if (minigame is null)
                 continue;

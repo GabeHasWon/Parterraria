@@ -5,6 +5,7 @@ using Parterraria.Core.InventoryStorageSystem;
 using Parterraria.Core.Synchronization;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
@@ -18,7 +19,7 @@ public class Board
 
     public BoardConfig config = new();
 
-    public bool CanStart(out string denialKey)
+    public bool CanStart([NotNullWhen(false)] out string denialKey)
     {
         denialKey = null;
 
@@ -28,7 +29,7 @@ public class Board
             return false;
         }
 
-        if (!nodes.Any())
+        if (nodes.Count == 0)
         {
             denialKey = "Mods.Parterraria.ToolInfo.Board.BoardEmpty";
             return false;
@@ -37,6 +38,12 @@ public class Board
         if (!nodes.Any(x => x is StartNode))
         {
             denialKey = "Mods.Parterraria.ToolInfo.Board.NoStart";
+            return false;
+        }
+
+        if (config.WinIdlePosition == Point.Zero || config.FirstPlacePosition == Point.Zero || config.SecondPlacePosition == Point.Zero || config.ThirdPlacePosition == Point.Zero)
+        {
+            denialKey = "Mods.Parterraria.ToolInfo.Board.NoWin";
             return false;
         }
 
@@ -144,6 +151,11 @@ public class Board
         return board;
     }
 
+    /// <summary>
+    /// Converts this instance into a <see cref="BoardData"/> for synchronization.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
     internal BoardData GetData(string key)
     {
         var nodeData = new BoardData.NodeData[nodes.Count];

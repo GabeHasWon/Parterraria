@@ -41,7 +41,7 @@ class PartyPopper : ModItem
             return false;
         }
 
-        if (!promptedInvalidBoard && ToolUIState.CheckInvalidBoard(selectedBoard, out _, out _))
+        if (!promptedInvalidBoard && ToolUIState.CheckHangingNodes(selectedBoard, out _, out _))
         {
             Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolUI.InvalidPlay"), CommonColors.Error);
             promptedInvalidBoard = true;

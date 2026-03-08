@@ -6,12 +6,6 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Localization\en-US_Mods.Parterraria.Items.hjson" />
-    <None Remove="Localization\en-US_Mods.Parterraria.MiscUI.hjson" />
-    <None Remove="Localization\en-US_Mods.Parterraria.ToolInfo.hjson" />
-    <None Remove="Localization\en-US_Mods.Parterraria.ToolUI.hjson" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="NetEasy">
       <HintPath>lib\NetEasy_v0.1.8.dll</HintPath>
     </Reference>

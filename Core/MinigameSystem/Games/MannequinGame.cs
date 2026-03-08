@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.Xna.Framework.Input;
 using Parterraria.Common;
 using Parterraria.Core.InventoryStorageSystem;
 using System.Collections.Generic;
@@ -133,9 +134,11 @@ internal class MannequinGame : Minigame
             teDollInventory.SetValue(displayDolls[key], inv);
 
             if (Main.netMode == NetmodeID.Server)
-                NetMessage.SendData(MessageID.TileEntitySharing, -1, 1, null, displayDolls[key].ID);
+                SyncMannequin(displayDolls[key]);
         }
     }
+
+    private static void SyncMannequin(TEDisplayDoll te) => NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, te.ID, te.Position.X, te.Position.Y);
 
     public override void OnStop()
     {
@@ -147,7 +150,12 @@ internal class MannequinGame : Minigame
                 int y = j / 16;
 
                 if (TileEntity.ByPosition.TryGetValue(new Point16(x, y), out TileEntity te) && te is TEDisplayDoll mannequin)
+                {
                     teDollInventory.SetValue(mannequin, (Item[])[new(), new(), new(), new(), new(), new(), new(), new()]);
+
+                    if (Main.netMode == NetmodeID.Server)
+                        SyncMannequin(mannequin);
+                }
             }
         }
     }
@@ -160,7 +168,7 @@ internal class MannequinGame : Minigame
         {
             Player plr = Main.player[i];
 
-            if (Sets.Any(x => x.PlayerMatches(plr)))
+            if (plr.active && Sets.Any(x => x.PlayerMatches(plr)))
                 return MinigameRanking.ByFirst(plr.whoAmI);
         }
 

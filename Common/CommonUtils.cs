@@ -1,20 +1,9 @@
 ﻿using Terraria.DataStructures;
-using Terraria.ID;
 
 namespace Parterraria.Common;
 
 internal static class CommonUtils
 {
-    public static Item AirItem
-    {
-        get
-        {
-            var airItem = new Item(ItemID.None);
-            airItem.TurnToAir();
-            return airItem;
-        }
-    }
-
     public static void SafelyAddItemToInv<T>(Player player, int count) where T : ModItem => SafelyAddItemToInv(player, ModContent.ItemType<T>(), count);
 
     public static void SafelyAddItemToInv(Player player, int type, int count)

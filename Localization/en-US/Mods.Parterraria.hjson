@@ -1,0 +1,18 @@
+Projectiles: {
+	NormalDice_Dice.DisplayName: Dice
+	HighDice_Dice.DisplayName: High Dice
+	LowDice_Dice.DisplayName: Low Dice
+	BrokenDice_Dice.DisplayName: Broken Dice
+}
+
+NPCs: {
+	ShopNPC.DisplayName: Mysterious Vendor
+	GoldFaerie.DisplayName: Gold Faerie
+	SlimeOfTerraria.DisplayName: Slime Of Terraria
+}
+
+Microevents: {
+	GainMoneyEvent: Got {0} amethyst coins!
+	LoseMoneyEvent: Lost {0} amethyst coins...
+	GetItemEvent: Got item!
+}

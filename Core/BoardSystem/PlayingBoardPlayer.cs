@@ -1,4 +1,5 @@
-﻿using Parterraria.Common;
+﻿using MonoMod.Cil;
+using Parterraria.Common;
 using Parterraria.Content.Items.Board;
 using Parterraria.Core.BoardSystem.BoardUI;
 using Parterraria.Core.BoardSystem.Nodes;
@@ -358,12 +359,21 @@ internal class PlayingBoardPlayer : ModPlayer
             coin = $"[i:{ModContent.ItemType<CelestialCore>()}]: " + Player.CountItem(ModContent.ItemType<CelestialCore>());
             DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, coin, Color.White);
 
-            if (isMoving && !promptingSplit)
+            if (isMoving)
             {
                 pos = Player.Center - new Vector2(0, 48 - Player.gfxOffY) - Main.screenPosition;
-                float moveTime = Math.Max(MaxMoveTimer / 60f - moveTimer / 60f, 0);
-                string timeLeft = $"{Language.GetTextValue("Mods.Parterraria.MiscUI.MoveTimer")} " + moveTime.ToString("#0.#") + "s";
-                DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, timeLeft, Color.White);
+
+                if (!promptingSplit)
+                {
+                    float moveTime = Math.Max(MaxMoveTimer / 60f - moveTimer / 60f, 0);
+                    string timeLeft = $"{Language.GetTextValue("Mods.Parterraria.MiscUI.MoveTimer")} " + moveTime.ToString("#0.#") + "s";
+                    DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, timeLeft, Color.White);
+                }
+                else
+                {
+                    string timeLeft = Language.GetTextValue("Mods.Parterraria.MiscUI.NextNode");
+                    DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, timeLeft, Color.White);
+                }
             }
 
 #if DEBUG

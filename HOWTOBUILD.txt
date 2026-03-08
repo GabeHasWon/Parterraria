@@ -60,3 +60,6 @@ WRENCH (EDIT): Edits a selected minigame.
 LIST:
 Opens a list of minigames to select.
 These are listed by mod, name and internal name.
+
+- Fix Splash Art not working properly in mp
+- Fix Splash Art sample minigame area being short

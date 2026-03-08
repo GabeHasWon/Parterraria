@@ -19,6 +19,11 @@ public class BoardConfig
     public string[] DisallowedMinigames = [];
     public byte CoinDeltaFromNodes = 3;
     public byte CoinDeltaFromGames = 3;
+    public byte TurnMax = 15;
+    public Point WinIdlePosition = Point.Zero;
+    public Point ThirdPlacePosition = Point.Zero;
+    public Point SecondPlacePosition = Point.Zero;
+    public Point FirstPlacePosition = Point.Zero;
 
     public void Save(TagCompound tag)
     {
@@ -27,6 +32,10 @@ public class BoardConfig
         tag.Add(nameof(CoreCost), CoreCost);
         tag.Add(nameof(CoinDeltaFromNodes), CoinDeltaFromNodes);
         tag.Add(nameof(CoinDeltaFromGames), CoinDeltaFromGames);
+        tag.Add(nameof(WinIdlePosition), WinIdlePosition);
+        tag.Add(nameof(ThirdPlacePosition), ThirdPlacePosition);
+        tag.Add(nameof(SecondPlacePosition), SecondPlacePosition);
+        tag.Add(nameof(FirstPlacePosition), FirstPlacePosition);
     }
 
     public static BoardConfig Load(TagCompound tag)
@@ -37,6 +46,10 @@ public class BoardConfig
         config.CoreCost = (ushort)tag.GetShort(nameof(CoreCost));
         config.CoinDeltaFromNodes = tag.GetByte(nameof(CoinDeltaFromNodes));
         config.CoinDeltaFromGames = tag.GetByte(nameof(CoinDeltaFromGames));
+        config.WinIdlePosition = tag.Get<Point>(nameof(WinIdlePosition));
+        config.ThirdPlacePosition = tag.Get<Point>(nameof(ThirdPlacePosition));
+        config.SecondPlacePosition = tag.Get<Point>(nameof(SecondPlacePosition));
+        config.FirstPlacePosition = tag.Get<Point>(nameof(FirstPlacePosition));
         return config;
     }
 }

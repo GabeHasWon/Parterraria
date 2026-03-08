@@ -60,7 +60,7 @@ internal class SplashArtGame : Minigame
         bool max = HasMax(_countsByPaintId, out HashSet<int> players);
 
         if (max)
-            return MinigameRanking.ByFirst(players.First() - 1);
+            return MinigameRanking.ByFirst(players.Last() - 1);
         else
             return MinigameRanking.ByTie(players);
     }
@@ -154,7 +154,7 @@ internal class SplashArtGame : Minigame
         if (PlayTime % (2 * 60) == 0)
             RecountPaint();
 
-        var ordered = _countsByPaintId.OrderBy(x => x.Value);
+        var ordered = _countsByPaintId.OrderByDescending(x => x.Value);
         int num = 0;
 
         foreach (var pair in ordered)

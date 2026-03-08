@@ -1,20 +1,16 @@
-﻿using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Parterraria.Common;
-using Parterraria.Content.Items.Board;
+﻿using Parterraria.Content.Items.Board;
 using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem.BoardUI;
 using Parterraria.Core.MinigameSystem;
 using Parterraria.Core.MinigameSystem.MinigameUI;
 using System;
 using System.Collections.Generic;
-using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.States;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.UI;
 using Terraria.UI.Chat;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Parterraria.Core.BoardSystem;
 
@@ -186,7 +182,7 @@ internal class BoardUISystem : ModSystem
 
     private static void DrawBoardHUD()
     {
-        int yPos = 325;
+        int yPos = GetYForHUD();
 
         string partyPlayers = Language.GetTextValue("Mods.Parterraria.MiscUI.PartyPlayers");
         ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, partyPlayers, new Vector2(25, yPos - 50), Color.White, 0f, Vector2.Zero, new(0.5f));
@@ -218,6 +214,20 @@ internal class BoardUISystem : ModSystem
 
             yPos += 30;
         }
+    }
+
+    private static int GetYForHUD()
+    {
+        if (!Main.playerInventory)
+            return 120;
+
+        if (Main.LocalPlayer.tileEntityAnchor.InUse)
+            return 425;
+
+        if (Main.npcShop > 0 || Main.LocalPlayer.chest != -1)
+            return 485;
+
+        return 315;
     }
 
     public static bool DrawMinigame()

@@ -86,7 +86,7 @@ internal abstract class Minigame : ModType
     public virtual void OnStart() { }
 
     /// <summary>
-    /// Called when the minigame is exited.
+    /// Called when the minigame is exited. This is called on all clients and the server.
     /// </summary>
     public virtual void OnStop() { }
 
@@ -120,7 +120,7 @@ internal abstract class Minigame : ModType
 
         if (debug)
         {
-            DrawPositionMarker(playerStartLocation.ToWorldCoordinates(0, 0), "Start Position");
+            DrawCommon.DrawPositionMarker(playerStartLocation.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.StartPosition"));
 
             var points = GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
                 .Where(x => (typeof(Point).IsAssignableFrom(x.FieldType) || typeof(Vector2).IsAssignableFrom(x.FieldType)
@@ -140,20 +140,11 @@ internal abstract class Minigame : ModType
                     _ => throw null,
                 };
 
-                DrawPositionMarker(position, item.Name);
+                DrawCommon.DrawPositionMarker(position, item.Name);
             }
         }
 
         InternalDraw(debug);
-    }
-
-    private static void DrawPositionMarker(Vector2 worldPosition, string text)
-    {
-        var position = worldPosition - Main.screenPosition;
-        DrawCommon.CenteredString(FontAssets.ItemStack.Value, position - new Vector2(0, 4), text, Color.White);
-
-        var rect = new Rectangle((int)position.X, (int)position.Y, 16, 16);
-        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, Color.Green);
     }
 
     /// <summary>
@@ -167,7 +158,7 @@ internal abstract class Minigame : ModType
         if (DrawDefaultUI && MaxPlayTime > 0)
         {
             string time = MathF.Max((MaxPlayTime - PlayTime) / 60f, 0).ToString("#0.##");
-            DrawCenteredTextFromTop("Time Left: " + time + "s", 30);
+            DrawCenteredTextFromTop($"{Language.GetTextValue("Mods.Parterraria.MiscUI.TimeLeft")}: " + time + "s", 30);
         }
 
         InternalDrawUI();
