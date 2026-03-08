@@ -30,7 +30,7 @@ internal abstract class DiceItem : ModItem
     public override bool CanUseItem(Player player)
     {
         var play = player.GetModPlayer<PlayingBoardPlayer>();
-        return !play.isMoving && !play.hasGoneOnCurrentTurn && play.diceCount == 0 && !WorldMinigameSystem.InMinigame && !WorldMinigameSystem.selectingMinigame;
+        return !play.isMoving && !play.hasGoneOnCurrentTurn && play.diceCount == 0 && !WorldMinigameSystem.InMinigame && !WorldMinigameSystem.selectingMinigame && !WorldBoardSystem.GameFinished;
     }
 
     public override void ModifyShootStats(Player player, ref Vector2 p, ref Vector2 velocity, ref int t, ref int d, ref float k) => velocity.Y = -16;

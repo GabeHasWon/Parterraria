@@ -1,4 +1,5 @@
-﻿using Parterraria.Content.Items.Board;
+﻿using Parterraria.Common;
+using Parterraria.Content.Items.Board;
 using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem.BoardUI;
 using Parterraria.Core.MinigameSystem;
@@ -182,6 +183,12 @@ internal class BoardUISystem : ModSystem
 
     private static void DrawBoardHUD()
     {
+        if (WorldBoardSystem.GameFinished)
+        {
+            DrawPodium();
+            return;
+        }
+
         int yPos = GetYForHUD();
 
         string partyPlayers = Language.GetTextValue("Mods.Parterraria.MiscUI.PartyPlayers");
@@ -216,10 +223,43 @@ internal class BoardUISystem : ModSystem
         }
     }
 
+    private static void DrawPodium()
+    {
+        int timer = WorldBoardSystem.finishedTimer;
+        Vector2 topPosition = new(Main.screenWidth / 2f, 200);
+        WorldBoardSystem.WinPlacements place = WorldBoardSystem.placements;
+
+        if (WorldBoardSystem.CanDisplayPlacement(2) && place.Thirds.Count > 0)
+        {
+            Color col = Color.SaddleBrown * Math.Min((timer - WorldBoardSystem.ThirdPlaceWaitTime) / 60f, 1);
+            DrawCommon.CenteredString(FontAssets.DeathText.Value, topPosition + new Vector2(0, 160), PlacementText(2), col, new Vector2(0.6f));
+        }
+
+        if (WorldBoardSystem.CanDisplayPlacement(1) && place.Seconds.Count > 0)
+        {
+            Color col = Color.Silver * Math.Min((timer - WorldBoardSystem.SecondPlaceWaitTime) / 60f, 1);
+            DrawCommon.CenteredString(FontAssets.DeathText.Value, topPosition + new Vector2(0, 50), PlacementText(1), col, new Vector2(0.8f));
+        }
+
+        if (WorldBoardSystem.CanDisplayPlacement(0))
+        {
+            Color col = Color.Gold * Math.Min((timer - WorldBoardSystem.FirstPlaceWaitTime) / 60f, 1);
+            DrawCommon.CenteredString(FontAssets.DeathText.Value, topPosition, PlacementText(0), col);
+        }
+
+        if (timer >= WorldBoardSystem.FirstPlaceWaitTime + 200)
+        {
+            Color col = Color.Gray * Math.Min((timer - (WorldBoardSystem.FirstPlaceWaitTime + 200)) / 180f, 1) * 0.8f;
+            DrawCommon.CenteredString(FontAssets.DeathText.Value, topPosition - new Vector2(0, 44), Language.GetTextValue("Mods.Parterraria.MiscUI.HostExit"), col, new Vector2(0.4f));
+        }
+
+        string PlacementText(int placement) => Language.GetText("Mods.Parterraria.MiscUI.Placements." + placement) + ": " + place.GetPodiumNames((byte)placement);
+    }
+
     private static int GetYForHUD()
     {
         if (!Main.playerInventory)
-            return 120;
+            return Main.LocalPlayer.buffType[0] != 0 ? 166 : 126;
 
         if (Main.LocalPlayer.tileEntityAnchor.InUse)
             return 425;

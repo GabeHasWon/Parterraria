@@ -1,7 +1,5 @@
-﻿using MonoMod.Cil;
-using Parterraria.Common;
+﻿using Parterraria.Common;
 using Parterraria.Content.Items.Board;
-using Parterraria.Core.BoardSystem.BoardUI;
 using Parterraria.Core.BoardSystem.Nodes;
 using Parterraria.Core.InventoryStorageSystem;
 using Parterraria.Core.MinigameSystem;
@@ -14,6 +12,7 @@ using System.Linq;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.Localization;
+using static Parterraria.Core.MinigameSystem.MinigameReward;
 
 namespace Parterraria.Core.BoardSystem;
 
@@ -113,7 +112,7 @@ internal class PlayingBoardPlayer : ModPlayer
     {
         Vector2 vel = orig(Position, Velocity, Width, Height, fallThrough, fall2, gravDir);
 
-        if (CheckNodes is not null && WorldBoardSystem.PlayingParty && !WorldMinigameSystem.InMinigame)
+        if (CheckNodes is not null && WorldBoardSystem.PlayingParty && !WorldMinigameSystem.InMinigame && !WorldBoardSystem.GameFinished)
         {
             var boardPlayer = CheckNodes.GetModPlayer<PlayingBoardPlayer>();
 
@@ -348,8 +347,28 @@ internal class PlayingBoardPlayer : ModPlayer
     {
         if (!WorldMinigameSystem.InMinigame)
         {
+            if (WorldBoardSystem.GameFinished && WorldBoardSystem.HasPlacement && !WorldBoardSystem.placements.NotOnPodium(Player.whoAmI))
+            {
+                int placement = WorldBoardSystem.placements.GetPodium(Player.whoAmI);
+
+                if (!WorldBoardSystem.CanDisplayPlacement(placement))
+                    return;
+
+                Color color = CommonColors.GetPlacementColor(placement);
+                var podiumPos = Player.Center - new Vector2(0, 40 - Player.gfxOffY) - Main.screenPosition;
+                float scale = placement switch
+                {
+                    0 => 0.7f,
+                    1 => 0.5f,
+                    _ => 0.3f,
+                };
+
+                DrawCommon.CenteredString(FontAssets.DeathText.Value, podiumPos.Floor(), Language.GetTextValue("Mods.Parterraria.MiscUI.Placements." + placement), color, new(scale));
+                return;
+            }
+
             var pos = Player.Center - new Vector2(0, 120 - Player.gfxOffY) - Main.screenPosition;
-            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, $"{Language.GetTextValue("Mods.Parterraria.MiscUI.Roll")} " + storedRoll, Color.White);
+            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, $"{Language.GetTextValue("Mods.Parterraria.MiscUI.Roll")} {storedRoll}", Color.White);
 
             pos = Player.Center - new Vector2(0, 96 - Player.gfxOffY) - Main.screenPosition;
             string coin = $"[i:{ModContent.ItemType<AmethystCoin>()}]: " + Player.CountItem(ModContent.ItemType<AmethystCoin>());

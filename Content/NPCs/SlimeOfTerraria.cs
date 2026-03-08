@@ -23,6 +23,8 @@ internal class SlimeOfTerraria : ModNPC
         NPC.Size = new Vector2(40, 30);
         NPC.Opacity = 0.9f;
         NPC.lifeMax = 50000;
+        NPC.damage = 0;
+        NPC.friendly = true;
     }
 
     public override void AI()

@@ -1,9 +1,7 @@
 ﻿using Parterraria.Common;
 using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem;
-using Parterraria.Core.MinigameSystem.Games;
 using Parterraria.Core.MinigameSystem.MinigameUI;
-using Parterraria.Core.Synchronization.BoardItemSyncing;
 using Parterraria.Core.Synchronization.MinigameSyncing;
 using System;
 using System.Collections.Generic;
@@ -19,6 +17,10 @@ namespace Parterraria.Core.MinigameSystem;
 internal class WorldMinigameSystem : ModSystem
 {
     public static WorldMinigameSystem Self => ModContent.GetInstance<WorldMinigameSystem>();
+
+    /// <summary>
+    /// If 
+    /// </summary>
     public static bool InMinigame => Self.playingMinigame is not null;
     public static bool NotReady { get; private set; } = false;
 
@@ -160,6 +162,12 @@ internal class WorldMinigameSystem : ModSystem
             }
         }
 
+        if (WorldBoardSystem.PlayingParty && WorldBoardSystem.GameFinished)
+        {
+            WorldBoardSystem.CompleteGameFunctionality();
+            return;
+        }
+
         if (!WorldBoardSystem.PlayingParty || InMinigame || worldMinigames.Count == 0 || Main.netMode == NetmodeID.MultiplayerClient || selectingMinigame || !Main.dedServ && Main.npcShop > 0)
         {
             if (selectingMinigame && Main.netMode == NetmodeID.Server)
@@ -215,6 +223,7 @@ internal class WorldMinigameSystem : ModSystem
     {
         playingMinigame = null;
         selectingMinigame = false;
+        rankings = null;
         NotReady = true;
     }
 
@@ -248,7 +257,7 @@ internal class WorldMinigameSystem : ModSystem
         if (minigameSlot == -1)
             minigameSlot = Main.rand.Next(choices.Length);
 
-        playingMinigame = worldMinigames.First(x => x is MannequinGame).Clone(); //choices[minigameSlot].Clone(); //
+        playingMinigame = choices[minigameSlot].Clone(); //worldMinigames.First(x => x is MannequinGame).Clone(); //
         playingMinigame.OnSet();
         NotReady = true;
         selectingMinigame = false;

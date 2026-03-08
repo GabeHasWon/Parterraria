@@ -1,4 +1,9 @@
-﻿using Terraria.ID;
+﻿using MonoMod.RuntimeDetour;
+using System;
+using System.Linq;
+using System.Reflection;
+using Terraria.ID;
+using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.InventoryStorageSystem;
 
@@ -12,6 +17,8 @@ internal class InventoryPlayer : ModPlayer
         public Item[] miscAccessories = miscAccessories;
 
         internal StoredInventory Clone() => (StoredInventory)MemberwiseClone();
+
+        public override string ToString() => $"inv:{inv.Count(x => !x.IsAir)} armor:{armorAndAcc.Count(x => !x.IsAir)} misc: {miscAccessories.Count(x => !x.IsAir)}\nstored:{oldInv}";
     }
 
     internal class InventoryResetSystem : ModSystem
@@ -21,24 +28,27 @@ internal class InventoryPlayer : ModPlayer
 
     private StoredInventory _inventory = null;
 
-    public override void Load() => On_Player.SavePlayer += DontSaveStoredPlayer;
-
-    private static void DontSaveStoredPlayer(On_Player.orig_SavePlayer orig, Terraria.IO.PlayerFileData playerFile, bool skipMapSave)
+    public override void Load()
     {
-        InventoryPlayer invPlr = playerFile.Player.GetModPlayer<InventoryPlayer>();
+        Type playerIO = typeof(ModLoader).Assembly.GetType("Terraria.ModLoader.IO.PlayerIO");
+        MonoModHooks.Add(playerIO.GetMethod("SaveData", BindingFlags.NonPublic | BindingFlags.Static), DetourSaveData);
+    }
+
+    // Stops players from being saved with their alt inventories
+    public static TagCompound DetourSaveData(Func<Player, TagCompound> orig, Player player)
+    {
+        InventoryPlayer invPlr = player.GetModPlayer<InventoryPlayer>();
 
         if (invPlr._inventory is null)
-        {
-            orig(playerFile, skipMapSave);
-            return;
-        }
+            return orig(player);
 
         var clone = invPlr._inventory.Clone();
         invPlr.FullyResetInventory();
 
-        orig(playerFile, skipMapSave);
+        TagCompound tag = orig(player);
 
-        RecursivelyResetInventory(playerFile.Player, clone);
+        RecursivelyResetInventory(player, clone);
+        return tag;
     }
 
     private static void RecursivelyResetInventory(Player player, StoredInventory clone)

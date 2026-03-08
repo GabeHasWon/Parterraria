@@ -15,6 +15,11 @@ Nodes: {
 }
 
 WinIdle: Win Idle
-FirstPlace: 1st
-SecondPlace: 2nd
-ThirdPlace: 3rd
+
+Placements: {
+	0: 1st
+	1: 2nd
+	2: 3rd
+}
+
+HostExit: (Have the host stop the party to exit)

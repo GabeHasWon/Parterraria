@@ -36,6 +36,7 @@ public class BoardConfig
         tag.Add(nameof(ThirdPlacePosition), ThirdPlacePosition);
         tag.Add(nameof(SecondPlacePosition), SecondPlacePosition);
         tag.Add(nameof(FirstPlacePosition), FirstPlacePosition);
+        tag.Add(nameof(TurnMax), TurnMax);
     }
 
     public static BoardConfig Load(TagCompound tag)
@@ -50,6 +51,7 @@ public class BoardConfig
         config.ThirdPlacePosition = tag.Get<Point>(nameof(ThirdPlacePosition));
         config.SecondPlacePosition = tag.Get<Point>(nameof(SecondPlacePosition));
         config.FirstPlacePosition = tag.Get<Point>(nameof(FirstPlacePosition));
+        config.TurnMax = tag.GetByte(nameof(TurnMax));
         return config;
     }
 }

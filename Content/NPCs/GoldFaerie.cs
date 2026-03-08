@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using NPCUtils;
 using Parterraria.Core.MinigameSystem;
+using System;
 using Terraria.GameContent;
 using Terraria.ID;
 
@@ -57,6 +58,8 @@ internal class GoldFaerie : ModNPC
 
             NPC.velocity *= 0.99f;
         }
+
+        NPC.direction = NPC.spriteDirection = Math.Sign(NPC.velocity.X);
     }
 
     public override void FindFrame(int frameHeight) => NPC.frame.Y = (int)((NPC.frameCounter += 0.4f) % 2) * frameHeight;
