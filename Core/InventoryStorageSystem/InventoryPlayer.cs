@@ -1,5 +1,4 @@
-﻿using MonoMod.RuntimeDetour;
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 using Terraria.ID;

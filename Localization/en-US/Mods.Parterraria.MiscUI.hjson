@@ -23,3 +23,5 @@ Placements: {
 }
 
 HostExit: (Have the host stop the party to exit)
+Practice: (Practice Mode)
+Turn: "Current Turn: {0}"

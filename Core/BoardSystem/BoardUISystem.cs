@@ -189,10 +189,12 @@ internal class BoardUISystem : ModSystem
             return;
         }
 
-        int yPos = GetYForHUD();
+        int yPos = GetYForHUD() + 36;
 
         string partyPlayers = Language.GetTextValue("Mods.Parterraria.MiscUI.PartyPlayers");
         ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, partyPlayers, new Vector2(25, yPos - 50), Color.White, 0f, Vector2.Zero, new(0.5f));
+        string turnCountText = Language.GetTextValue("Mods.Parterraria.MiscUI.Turn", 1 + WorldBoardSystem.Self.turnsGone);
+        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, turnCountText, new Vector2(25, yPos - 76), new Color(200, 200, 200), 0f, Vector2.Zero, new(0.4f));
 
         for (int i = 0; i < Main.CurrentFrameFlags.ActivePlayersCount; ++i)
         {
@@ -232,7 +234,7 @@ internal class BoardUISystem : ModSystem
         if (WorldBoardSystem.CanDisplayPlacement(2) && place.Thirds.Count > 0)
         {
             Color col = Color.SaddleBrown * Math.Min((timer - WorldBoardSystem.ThirdPlaceWaitTime) / 60f, 1);
-            DrawCommon.CenteredString(FontAssets.DeathText.Value, topPosition + new Vector2(0, 160), PlacementText(2), col, new Vector2(0.6f));
+            DrawCommon.CenteredString(FontAssets.DeathText.Value, topPosition + new Vector2(0, 100), PlacementText(2), col, new Vector2(0.6f));
         }
 
         if (WorldBoardSystem.CanDisplayPlacement(1) && place.Seconds.Count > 0)

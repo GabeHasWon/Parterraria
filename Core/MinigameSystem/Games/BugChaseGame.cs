@@ -1,4 +1,5 @@
-﻿using Parterraria.Content.NPCs;
+﻿using Parterraria.Common;
+using Parterraria.Content.NPCs;
 using Parterraria.Core.BoardSystem;
 using Parterraria.Core.InventoryStorageSystem;
 using Terraria.ID;
@@ -38,10 +39,8 @@ internal class BugChaseGame : Minigame
                 [
                     new Item(ItemID.BugNet),
                     new Item(ItemID.DontHurtComboBook),
-                    new Item(ItemID.LunarHook),
-                    new Item(ItemID.TerrasparkBoots),
-                    new Item(ItemID.AngelWings)
-                ], false, false);
+                ], [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.TerrasparkBoots), new Item(ItemID.AngelWings)],
+                [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.LunarHook)]);
         }
     }
 

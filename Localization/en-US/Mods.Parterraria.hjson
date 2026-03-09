@@ -16,3 +16,5 @@ Microevents: {
 	LoseMoneyEvent: Lost {0} amethyst coins...
 	GetItemEvent: Got item!
 }
+
+Amethyst: amethyst

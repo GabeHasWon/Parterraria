@@ -90,6 +90,12 @@ internal class GetCrownGame : Minigame
         {
             Player plr = Main.player[i];
 
+            if (plr.HasItem(ItemID.PlatinumCrown))
+            {
+                plr.armor[0] = new Item(ItemID.PlatinumCrown);
+                plr.ConsumeItem(ItemID.PlatinumCrown);
+            }
+
             if (PlayerHasCrown(plr))
             {
                 Beaten = true;

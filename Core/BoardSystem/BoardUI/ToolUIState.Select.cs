@@ -84,7 +84,7 @@ internal partial class ToolUIState : UIState
         }
     }
 
-    private void UpdateRemoveText()
+    private static void UpdateRemoveText()
     {
         confirmTimer--;
 
@@ -115,6 +115,13 @@ internal partial class ToolUIState : UIState
             Main.NewText(Language.GetText("Mods.Parterraria.ToolUI.BoardSelected").Format(board), CommonColors.Info);
             _boardKey = board;
             _player.GetModPlayer<BoardToolPlayer>().editingBoard = board;
+
+            if (BoardUISystem.Self.miscUI.CurrentState is EditObjectUIState) // Toggle edit UI to use the new config properly
+            {
+                BoardUISystem.CloseMiscUI();
+                BoardUISystem.SetMiscUI(new EditObjectUIState(WorldBoardSystem.Self.worldBoards[_boardKey].config, 
+                    (obj) => WorldBoardSystem.Self.worldBoards[_boardKey].config = (BoardConfig)obj));
+            }
         };
 
         var delete = new UIButton<string>("[c/FF0000:x]")

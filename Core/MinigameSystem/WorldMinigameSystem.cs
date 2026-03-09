@@ -19,7 +19,7 @@ internal class WorldMinigameSystem : ModSystem
     public static WorldMinigameSystem Self => ModContent.GetInstance<WorldMinigameSystem>();
 
     /// <summary>
-    /// If 
+    /// If a minigame is currently active.
     /// </summary>
     public static bool InMinigame => Self.playingMinigame is not null;
     public static bool NotReady { get; private set; } = false;
@@ -51,7 +51,7 @@ internal class WorldMinigameSystem : ModSystem
 
         var game = Minigame.MinigamesByModAndName[name].Clone();
         game.area = rectangle;
-        game.playerStartLocation = playerSpawnLocation ?? rectangle.Center;
+        game.playerStartLocation = playerSpawnLocation ?? rectangle.Center.ToVector2().ToTileCoordinates();
         game.OnPlace();
 
         if (data is not null)
@@ -102,6 +102,14 @@ internal class WorldMinigameSystem : ModSystem
 
             var descPos = Main.ScreenSize.ToVector2() / new Vector2(2f, 4f) + new Vector2(0, 40);
             DrawCommon.CenteredString(FontAssets.DeathText.Value, descPos, Self.playingMinigame.Description.Value, alpha, new Vector2(0.5f));
+        }
+        else if (_minigamePreviewTimer > 260 && NotReady)
+        {
+            var p = new Vector2(Main.screenWidth / 2f, 60);
+            Color color = Color.White * MathF.Min((_minigamePreviewTimer - 260) / 120f, 1);
+            DrawCommon.CenteredString(FontAssets.DeathText.Value, p, Self.playingMinigame.DisplayName.Value, color);
+            DrawCommon.CenteredString(FontAssets.DeathText.Value, p + new Vector2(0, 40), Self.playingMinigame.Description.Value, color, new Vector2(0.5f));
+            DrawCommon.CenteredString(FontAssets.DeathText.Value, p + new Vector2(0, 80), Language.GetTextValue("Mods.Parterraria.MiscUI.Practice"), color, new Vector2(0.4f));
         }
     }
 
@@ -168,7 +176,8 @@ internal class WorldMinigameSystem : ModSystem
             return;
         }
 
-        if (!WorldBoardSystem.PlayingParty || InMinigame || worldMinigames.Count == 0 || Main.netMode == NetmodeID.MultiplayerClient || selectingMinigame || !Main.dedServ && Main.npcShop > 0)
+        if (!WorldBoardSystem.PlayingParty || InMinigame || worldMinigames.Count == 0 || Main.netMode == NetmodeID.MultiplayerClient || selectingMinigame || 
+            !Main.dedServ && Main.npcShop > 0)
         {
             if (selectingMinigame && Main.netMode == NetmodeID.Server)
                 RollMinigameOnServer();

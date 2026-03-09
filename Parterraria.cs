@@ -1,6 +1,5 @@
 global using Terraria.ModLoader;
 global using Terraria;
-global using Terraria.Graphics;
 global using ReLogic.Graphics;
 global using Microsoft.Xna.Framework;
 global using Microsoft.Xna.Framework.Graphics;
@@ -29,20 +28,18 @@ public class Parterraria : Mod
 
     public class AmethystCurrency(int coinItemID, long currencyCap) : CustomCurrencySingleCoin(coinItemID, currencyCap)
     {
-        public Color ExampleCustomCurrencyTextColor = Color.Purple;
-
         public override void GetPriceText(string[] lines, ref int currentLine, long price)
         {
-            Color color = ExampleCustomCurrencyTextColor * (Main.mouseTextColor / 255f);
-            lines[currentLine++] = string.Format("[c/{0:X2}{1:X2}{2:X2}:{3} {4} {5}]", new object[]
-                {
+            Color color = Color.Purple * (Main.mouseTextColor / 255f);
+            lines[currentLine++] = string.Format("[c/{0:X2}{1:X2}{2:X2}:{3} {4} {5}]",
+                [
                     color.R,
                     color.G,
                     color.B,
                     Language.GetTextValue("LegacyTooltip.50"),
                     price,
-                    "amethyst"
-                });
+                    Language.GetTextValue("Mods.Parterraria.Amethyst")
+                ]);
         }
     }
 }

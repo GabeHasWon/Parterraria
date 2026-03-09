@@ -407,7 +407,13 @@ internal class PlayingBoardPlayer : ModPlayer
         }
         else if (WorldMinigameSystem.NotReady)
         {
-            var pos = Player.Center - new Vector2(0, 48 - Player.gfxOffY) - Main.screenPosition;
+            var pos = Player.Center - new Vector2(0, 36 - Player.gfxOffY) - Main.screenPosition;
+
+            if (Player.chatOverhead.timeLeft > 0)
+            {
+                pos.Y -= 26;
+            }
+
             string text = minigameReady ? Language.GetTextValue("Mods.Parterraria.MiscUI.Ready") : Language.GetTextValue("Mods.Parterraria.MiscUI.NotReady");
             DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos.Floor(), text, minigameReady ? Color.Green : Color.Orange);
         }

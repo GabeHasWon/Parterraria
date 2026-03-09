@@ -2,6 +2,7 @@
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
 using System.Collections.Generic;
+using System.IO;
 using Terraria.DataStructures;
 using Terraria.ID;
 
@@ -14,6 +15,8 @@ internal class CraftLargeDiamondGame : Minigame
 
     [HideFromEdit]
     private readonly HashSet<Point16> _diamondLocations = [];
+
+    private int _diamondSecondInterval = 2;
 
     public override bool ValidateRectangle(ref Rectangle rectangle)
     {
@@ -138,7 +141,7 @@ internal class CraftLargeDiamondGame : Minigame
             }    
         }
 
-        if (PlayTime > 10 * 60 && PlayTime % (3 * 60) == 0 && Main.netMode != NetmodeID.MultiplayerClient)
+        if (PlayTime > 10 * 60 && PlayTime % (_diamondSecondInterval * 60) == 0 && Main.netMode != NetmodeID.MultiplayerClient)
         {
             bool fail = false;
             Point16 pos = DeterminePlacementOfNewDiamond(ref fail);
@@ -147,4 +150,7 @@ internal class CraftLargeDiamondGame : Minigame
                 PlaceDiamond(pos);
         }
     }
+
+    public override void WriteNetData(BinaryWriter writer) => writer.Write((byte)_diamondSecondInterval);
+    public override void ReadNetData(BinaryReader reader) => _diamondSecondInterval = reader.ReadByte();
 }

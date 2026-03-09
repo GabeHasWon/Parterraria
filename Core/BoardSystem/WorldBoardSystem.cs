@@ -59,7 +59,10 @@ internal partial class WorldBoardSystem : ModSystem
             return 3;
         }
 
-        public readonly bool NotOnPodium(int player) => Winners.Contains(player) && Seconds.Contains(player) && Thirds.Contains(player);
+        /// <summary>
+        /// Returns true if the player is not in at least first, second or third, or tied for any of the positions.
+        /// </summary>
+        public readonly bool NotOnPodium(int player) => !Winners.Contains(player) && !Seconds.Contains(player) && !Thirds.Contains(player);
     }
 
     public readonly struct PlayerWins(int who, int cores, int coins) : IComparable
@@ -106,7 +109,7 @@ internal partial class WorldBoardSystem : ModSystem
     /// <summary>
     /// If the current board is finished. Will throw if accessed outside of a party; that is, if <see cref="playingBoard"/> is null.
     /// </summary>
-    public static bool GameFinished => Self.turnsGone >= Self.playingBoard.config.TurnMax;
+    public static bool GameFinished => Self.playingBoard is not null && Self.turnsGone >= Self.playingBoard.config.TurnMax;
 
     public static bool HasPlacement => GameFinished && finishedTimer > 10;
 

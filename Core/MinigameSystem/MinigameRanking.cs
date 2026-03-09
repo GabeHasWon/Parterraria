@@ -93,7 +93,7 @@ public class MinigameRanking
         0 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.First"), MinigameReward.Placement.First),
         1 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Second"), MinigameReward.Placement.Second),
         2 => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Third"), MinigameReward.Placement.Third),
-        _ => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Failed"), MinigameReward.Placement.Fourth),
+        _ => new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Fourth),
     };
 
     internal void Draw(float alphaFade)

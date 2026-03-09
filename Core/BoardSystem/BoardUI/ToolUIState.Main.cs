@@ -251,8 +251,17 @@ internal partial class ToolUIState(Player player) : UIState
             return;
         }
 
-        BoardUISystem.SetMiscUI(new EditObjectUIState(WorldBoardSystem.Self.worldBoards[_boardKey].config, (obj) => WorldBoardSystem.Self.worldBoards[_boardKey].config = (BoardConfig)obj));
+        SetEditUI();
     }
+
+    private void SetEditUI() => BoardUISystem.SetMiscUI(new EditObjectUIState(WorldBoardSystem.Self.worldBoards[_boardKey].config,
+        (obj) =>
+        {
+            WorldBoardSystem.Self.worldBoards[_boardKey].config = (BoardConfig)obj;
+
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+                new UpdateBoardConfig(WorldBoardSystem.Self.worldBoards[_boardKey].config, _boardKey, Main.myPlayer).Send();
+        }));
 
     private static void EndParty()
     {
@@ -384,8 +393,8 @@ internal partial class ToolUIState(Player player) : UIState
         Board board = WorldBoardSystem.Self.worldBoards[_boardKey];
 
         DrawCommon.DrawPositionMarker(board.config.WinIdlePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.WinIdle"));
-        DrawCommon.DrawPositionMarker(board.config.FirstPlacePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.FirstPlace"), Color.Gold);
-        DrawCommon.DrawPositionMarker(board.config.SecondPlacePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.SecondPlace"), Color.Silver);
-        DrawCommon.DrawPositionMarker(board.config.ThirdPlacePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.ThirdPlace"), Color.SaddleBrown);
+        DrawCommon.DrawPositionMarker(board.config.FirstPlacePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.Placements.0"), Color.Gold);
+        DrawCommon.DrawPositionMarker(board.config.SecondPlacePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.Placements.1"), Color.Silver);
+        DrawCommon.DrawPositionMarker(board.config.ThirdPlacePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.Placements.2"), Color.SaddleBrown);
     }
 }
