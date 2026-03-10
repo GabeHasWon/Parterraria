@@ -189,6 +189,12 @@ internal class BoardUISystem : ModSystem
             return;
         }
 
+        if (Main.npcShop > 0 && Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>().hasGoneOnCurrentTurn)
+        {
+            string shop = Language.GetTextValue("Mods.Parterraria.MiscUI.CloseShop");
+            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, shop, new Vector2(190, 436), Color.White, 0f, Vector2.Zero, new(0.35f));
+        }
+
         int yPos = GetYForHUD() + 36;
 
         string partyPlayers = Language.GetTextValue("Mods.Parterraria.MiscUI.PartyPlayers");

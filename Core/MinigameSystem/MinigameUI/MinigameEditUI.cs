@@ -167,7 +167,6 @@ internal partial class MinigameEditUI(Player player) : UIState
 
     public static string GetToolModeName(MinigameToolPlayer.ToolMode mode) => mode switch
     {
-        MinigameToolPlayer.ToolMode.None => "None",
         MinigameToolPlayer.ToolMode.Place => "Place",
         MinigameToolPlayer.ToolMode.Edit => "Edit",
         _ => "Erase"

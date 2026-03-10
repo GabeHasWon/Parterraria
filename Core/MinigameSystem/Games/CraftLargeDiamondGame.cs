@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.MinigameSystem.Games;
 
@@ -16,7 +17,7 @@ internal class CraftLargeDiamondGame : Minigame
     [HideFromEdit]
     private readonly HashSet<Point16> _diamondLocations = [];
 
-    private int _diamondSecondInterval = 2;
+    private int _diamondTicksInterval = 150;
 
     public override bool ValidateRectangle(ref Rectangle rectangle)
     {
@@ -141,7 +142,7 @@ internal class CraftLargeDiamondGame : Minigame
             }    
         }
 
-        if (PlayTime > 10 * 60 && PlayTime % (_diamondSecondInterval * 60) == 0 && Main.netMode != NetmodeID.MultiplayerClient)
+        if (PlayTime > 10 * 60 && PlayTime % _diamondTicksInterval == 0 && Main.netMode != NetmodeID.MultiplayerClient)
         {
             bool fail = false;
             Point16 pos = DeterminePlacementOfNewDiamond(ref fail);
@@ -151,6 +152,8 @@ internal class CraftLargeDiamondGame : Minigame
         }
     }
 
-    public override void WriteNetData(BinaryWriter writer) => writer.Write((byte)_diamondSecondInterval);
-    public override void ReadNetData(BinaryReader reader) => _diamondSecondInterval = reader.ReadByte();
+    protected override void InternalSave(TagCompound tag) => tag.Add("ticks", _diamondTicksInterval);
+    public override void LoadData(TagCompound tag) => _diamondTicksInterval = tag.GetInt("ticks");
+    public override void WriteNetData(BinaryWriter writer) => writer.Write((byte)_diamondTicksInterval);
+    public override void ReadNetData(BinaryReader reader) => _diamondTicksInterval = reader.ReadByte();
 }

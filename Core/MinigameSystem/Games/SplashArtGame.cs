@@ -162,6 +162,9 @@ internal class SplashArtGame : Minigame
             Player player = Main.player[pair.Key - 1];
             DrawCenteredTextFromTop($"{player.name}: #" + (num + 1), 60 + num * 30);
             num++;
+
+            if (num >= Main.CurrentFrameFlags.ActivePlayersCount)
+                return;
         }
     }
 }

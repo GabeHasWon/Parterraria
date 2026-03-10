@@ -1,6 +1,7 @@
 ﻿using Parterraria.Common;
 using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem;
+using Parterraria.Core.MinigameSystem.Games;
 using Parterraria.Core.MinigameSystem.MinigameUI;
 using Parterraria.Core.Synchronization.MinigameSyncing;
 using System;
@@ -266,7 +267,7 @@ internal class WorldMinigameSystem : ModSystem
         if (minigameSlot == -1)
             minigameSlot = Main.rand.Next(choices.Length);
 
-        playingMinigame = choices[minigameSlot].Clone(); //worldMinigames.First(x => x is MannequinGame).Clone(); //
+        playingMinigame = worldMinigames.First(x => x is CraftLargeDiamondGame).Clone(); //choices[minigameSlot].Clone(); //
         playingMinigame.OnSet();
         NotReady = true;
         selectingMinigame = false;

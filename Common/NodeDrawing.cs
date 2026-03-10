@@ -1,11 +1,14 @@
 ﻿using Parterraria.Core.BoardSystem;
+using ReLogic.Content;
 using System;
 using Terraria.GameContent;
 
 namespace Parterraria.Common;
 
-internal class NodeDrawing
+internal static class NodeDrawing
 {
+    public static Asset<Texture2D> FancyLine = null;
+
     public static void DrawNodeSquare(Vector2 position, float halfWidth, string nodeName, Color? color = null, bool highlight = false)
     {
         Texture2D texture = BoardNode.Tex(nodeName).Value;
@@ -46,9 +49,9 @@ internal class NodeDrawing
         }
         else
         {
-            var pixel = ModContent.Request<Texture2D>("Parterraria/Assets/Textures/Nodes/Line").Value;
+            FancyLine ??= ModContent.Request<Texture2D>("Parterraria/Assets/Textures/Nodes/Line");
             var col = color ?? Color.White;
-            Main.spriteBatch.Draw(pixel, drawPos, null, col * 0.2f, rot - MathHelper.PiOver2, Vector2.Zero, new Vector2(2, dist / pixel.Height), SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(FancyLine.Value, drawPos, null, col * 0.4f, rot - MathHelper.PiOver2, Vector2.Zero, new Vector2(2, dist / FancyLine.Height()), SpriteEffects.None, 0);
         }
     }
 

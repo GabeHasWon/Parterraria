@@ -3,7 +3,6 @@ using Parterraria.Core.BoardSystem;
 using System.Linq;
 using Parterraria.Content.Items.Board.Create;
 using Terraria.Localization;
-using Mono.Cecil.Cil;
 
 namespace Parterraria.Core.MinigameSystem;
 
@@ -11,7 +10,6 @@ internal class MinigameToolPlayer : ModPlayer
 {
     public enum ToolMode : byte
     {
-        None,
         Place,
         Edit,
         Erase,
@@ -31,7 +29,7 @@ internal class MinigameToolPlayer : ModPlayer
         if (Player.HeldItem.ModItem is not MinigameTool)
         {
             ClearTool();
-            toolMode = ToolMode.None;
+            toolMode = ToolMode.Place;
             return;
         }
 

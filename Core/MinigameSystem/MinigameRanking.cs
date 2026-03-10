@@ -118,12 +118,5 @@ public class MinigameRanking
         }
     }
 
-    internal void Reward(Player plr)
-    {
-        Ranking[plr.whoAmI].OnReward(plr);
-
-#if DEBUG
-        Main.NewText($"Rewarded ranking of {plr.name}, who came in {Ranking[plr.whoAmI].Place} placement.");
-#endif
-    }
+    internal void Reward(Player plr) => Ranking[plr.whoAmI].OnReward(plr);
 }

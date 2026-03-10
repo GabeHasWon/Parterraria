@@ -30,7 +30,7 @@ BugChaseGame: {
 
 PointRaceGame: {
 	Name: Expeditious Escapade
-	Description: Somewhere there is a finish point. Approach it to win!
+	Description: Somewhere there is a finish point. Get there first!
 }
 
 GetHeightGame: {

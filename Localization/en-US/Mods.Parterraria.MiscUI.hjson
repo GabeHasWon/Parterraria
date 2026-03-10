@@ -24,4 +24,5 @@ Placements: {
 
 HostExit: (Have the host stop the party to exit)
 Practice: (Practice Mode)
-Turn: "Current Turn: {0}"
+Turn: Current Turn: {0}
+CloseShop: Close the shop to play the minigame!
