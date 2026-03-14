@@ -1,4 +1,6 @@
-﻿namespace Parterraria.Core.BoardSystem;
+﻿using Terraria.ID;
+
+namespace Parterraria.Core.BoardSystem;
 
 /// <summary>
 /// Stores info on tool usage.
@@ -24,5 +26,5 @@ internal partial class BoardToolPlayer : ModPlayer
         }
     }
 
-    public override bool CanUseItem(Item item) => !_mouseConsumed || item.mountType >= 0;
+    public override bool CanUseItem(Item item) => !_mouseConsumed || item.mountType >= MountID.Rudolph;
 }

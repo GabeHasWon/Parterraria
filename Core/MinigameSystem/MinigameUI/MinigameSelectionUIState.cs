@@ -1,5 +1,4 @@
-﻿using Parterraria.Core.MinigameSystem.Games;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
@@ -12,9 +11,11 @@ internal class MinigameSelectionUIState(MinigameSelectionUIState.SetMinigameDele
 {
     public delegate void SetMinigameDelegate(string value);
 
+    private readonly SetMinigameDelegate _setMinigame = setMinigame;
+
+    internal int selectedMinigame = 0;
+
     private string[] _minigames = minigames;
-    private int _selectedMinigame = 0;
-    private SetMinigameDelegate _setMinigame = setMinigame;
     private float _timerSpeed = timerSpeed;
     private float _minigameTime = 0;
 
@@ -35,15 +36,15 @@ internal class MinigameSelectionUIState(MinigameSelectionUIState.SetMinigameDele
 
         if (_minigameTime > 1)
         {
-            _selectedMinigame++;
+            selectedMinigame++;
             _minigameTime = 0;
         }
 
-        if (_selectedMinigame >= 4)
-            _selectedMinigame = 0;
+        if (selectedMinigame >= 4)
+            selectedMinigame = 0;
 
         if ((Main.netMode != NetmodeID.SinglePlayer || Main.instance.IsActive) && _timerSpeed < 0.005f)
-            _setMinigame(_minigames[_selectedMinigame]);
+            _setMinigame(_minigames[selectedMinigame]);
     }
 
     public override void OnInitialize()
@@ -93,7 +94,7 @@ internal class MinigameSelectionUIState(MinigameSelectionUIState.SetMinigameDele
                 VAlign = 0.1f + 0.25f * i,
                 HAlign = 0.5f
             };
-            text.OnUpdate += (_) => text.SetText($"[c/{(slot == _selectedMinigame ? "444444" : "FFFFFF")}:{minigamesDisplay[slot]}]");
+            text.OnUpdate += (_) => text.SetText($"[c/{(slot == selectedMinigame ? "444444" : "FFFFFF")}:{minigamesDisplay[slot]}]");
             panel.Append(text);
         }
     }

@@ -155,7 +155,7 @@ internal abstract class Minigame : ModType
 
     public void DrawUI()
     {
-        if (DrawDefaultUI && MaxPlayTime > 0)
+        if (DrawDefaultUI && MaxPlayTime > 0 && !WorldMinigameSystem.NotReady)
         {
             string time = MathF.Max((MaxPlayTime - PlayTime) / 60f, 0).ToString("#0.##");
             DrawCenteredTextFromTop($"{Language.GetTextValue("Mods.Parterraria.MiscUI.TimeLeft")}: " + time + "s", 30);

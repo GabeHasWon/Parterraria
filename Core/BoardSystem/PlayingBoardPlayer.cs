@@ -246,8 +246,6 @@ internal class PlayingBoardPlayer : ModPlayer
         else
             storedRoll += roll;
 
-        Main.NewText("stoerd:" + storedRoll);
-
         if (--diceCount == 0)
             CheckNextRoll();
     }

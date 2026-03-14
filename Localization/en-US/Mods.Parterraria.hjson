@@ -18,3 +18,14 @@ Microevents: {
 }
 
 Amethyst: amethyst
+
+Configs: {
+	ParterrariaServerConfig: {
+		DisplayName: Parterraria (Server)
+
+		AlwaysAdventureOnServer: {
+			Label: Always Adventure On Server
+			Tooltip: If true, players will always be on "adventure" mode on servers. That is, players cannot place tiles, mine anything (though they can cut tiles like vines), or use explosives.
+		}
+	}
+}
