@@ -83,9 +83,7 @@ internal class ProjectileRainGame : Minigame
             int y = (int)MathHelper.Lerp(Left.Y, Right.Y, factor);
 
             while (!WorldGen.SolidOrSlopedTile(x, y))
-            {
                 y--;
-            }
 
             y += 2;
 

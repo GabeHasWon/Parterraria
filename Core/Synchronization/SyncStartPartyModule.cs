@@ -23,6 +23,7 @@ public class SyncStartPartyModule(int fromWho, string boardKey) : Module
         {
             BoardUISystem.CloseToolUI();
             BoardUISystem.CheckCloseMiscUI<EditObjectUIState>();
+            Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>().StartParty();
         }
     }
 }

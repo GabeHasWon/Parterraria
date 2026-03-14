@@ -17,6 +17,7 @@ public class SyncPlayerNodeInfoModule(byte who, short current, short next) : Mod
         Player player = Main.player[who];
         PlayingBoardPlayer board = player.GetModPlayer<PlayingBoardPlayer>();
         board.connectedNode = WorldBoardSystem.Self.playingBoard.nodesById[current];
+        board.isMoving = true;
 
         if (next >= 0)
             board.nextNode = WorldBoardSystem.Self.playingBoard.nodesById[next];

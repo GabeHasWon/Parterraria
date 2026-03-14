@@ -15,7 +15,7 @@ public class UpdateBoardConfig(BoardConfig config, string boardKey, int fromPlay
     protected override void Receive()
     {
         if (Main.netMode == NetmodeID.Server)
-            Send(-1, fromPlayer);
+            Send(-1, fromPlayer, false);
 
         if (!WorldBoardSystem.Self.worldBoards.TryGetValue(boardKey, out Board board))
             throw new ArgumentException("Board " + boardKey + " not found?");

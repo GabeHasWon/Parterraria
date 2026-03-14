@@ -12,7 +12,6 @@ using System.Linq;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.Localization;
-using static Parterraria.Core.MinigameSystem.MinigameReward;
 
 namespace Parterraria.Core.BoardSystem;
 
@@ -247,6 +246,8 @@ internal class PlayingBoardPlayer : ModPlayer
         else
             storedRoll += roll;
 
+        Main.NewText("stoerd:" + storedRoll);
+
         if (--diceCount == 0)
             CheckNextRoll();
     }
@@ -289,7 +290,6 @@ internal class PlayingBoardPlayer : ModPlayer
             }
 
             nextNode = node;
-            isMoving = true;
         }
         else
         {
@@ -310,8 +310,9 @@ internal class PlayingBoardPlayer : ModPlayer
             }
 
             nextNode = node;
-            isMoving = true;
         }
+
+        isMoving = true;
 
         if (Main.netMode == NetmodeID.MultiplayerClient && Player.whoAmI == Main.myPlayer)
             new SyncPlayerNodeInfoModule((byte)Player.whoAmI, (short)connectedNode.nodeId, nextNode is null ? (short)-2 : (short)nextNode.nodeId).Send(-1, -1, false);
@@ -326,6 +327,10 @@ internal class PlayingBoardPlayer : ModPlayer
         hasGoneOnCurrentTurn = true;
         promptingSplit = false;
         splitNodes.Clear();
+
+#if DEBUG
+        Main.NewText("[DEBUG] Done rolling!");
+#endif
     }
 
     internal void ExitParty()
@@ -340,7 +345,7 @@ internal class PlayingBoardPlayer : ModPlayer
         storedRoll = 0;
         splitNodes.Clear();
 
-        Player.GetModPlayer<InventoryPlayer>().ReplaceInventory();
+        Player.GetModPlayer<InventoryPlayer>().FullyResetInventory();
     }
 
     internal void DrawBoardInfo()
@@ -423,5 +428,9 @@ internal class PlayingBoardPlayer : ModPlayer
     {
         connectedNode.LandOn(WorldBoardSystem.Self.playingBoard, Player);
         storedRoll = 0;
+        diceCount = 0;
+        minigameReady = false;
+        moveTimer = 0;
+        isMoving = false;
     }
 }

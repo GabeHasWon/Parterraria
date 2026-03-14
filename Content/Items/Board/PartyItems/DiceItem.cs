@@ -95,7 +95,7 @@ internal abstract class DiceItem : ModItem
                     if (Main.netMode == NetmodeID.SinglePlayer)
                         plr.GetModPlayer<PlayingBoardPlayer>().RolledDice((int)Roll);
                     else if (Main.myPlayer == Projectile.owner)
-                        new SyncRolledDice(Projectile.owner, (int)Roll).Send();
+                        new SyncRolledDice(Projectile.owner, (int)Roll).Send(-1, -1, false);
                 }
             }
 

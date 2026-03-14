@@ -16,7 +16,7 @@ public class SyncRolledDice(int fromWho, int roll) : Module
         Main.player[_fromWho].GetModPlayer<PlayingBoardPlayer>().RolledDice(_roll);
 
         if (Main.netMode == NetmodeID.Server)
-            Send(-1, _fromWho, false);
+            Send(-1, -1, false);
     }
 }
  

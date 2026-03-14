@@ -1,5 +1,6 @@
 ﻿using Parterraria.Common;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria.GameContent;
 using Terraria.Localization;
 
@@ -28,17 +29,40 @@ public class MinigameRanking
     }
 
     /// <summary>
-    /// Used for minigames where living players come in first, everyone else comes in last (or, technically, comes in <see cref="MinigameReward.Placement.Otherwise"/>).
+    /// Used for minigames where living players come in first, everyone else comes in last (or, technically, comes in <see cref="MinigameReward.Placement.Otherwise"/>).<br/>
+    /// <paramref name="binary"/> would mean players either get First or Last, exclusively. 
+    /// Otherwise, sort by health lost - most health lost loses, dead people counting as an unconditional loss.
     /// </summary>
-    public static MinigameRanking ByLiving()
+    public static MinigameRanking ByLiving(bool binary = false)
     {
         var rank = new MinigameRanking();
 
-        foreach (var player in Main.ActivePlayers)
+        if (binary)
         {
-            MinigameReward reward = player.dead ? new(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise)
-                : new(Language.GetTextValue("Mods.Parterraria.Rankings.First"), MinigameReward.Placement.First);
-            rank.Ranking.Add(player.whoAmI, reward);
+            foreach (var player in Main.ActivePlayers)
+            {
+                MinigameReward reward = player.dead ? new(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise)
+                    : new(Language.GetTextValue("Mods.Parterraria.Rankings.First"), MinigameReward.Placement.First);
+                rank.Ranking.Add(player.whoAmI, reward);
+            }
+        }
+        else
+        {
+            List<Player> players = [];
+
+            foreach (var player in Main.ActivePlayers)
+            {
+                if (player.dead)
+                    rank.Ranking.Add(player.whoAmI, new(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise));
+                else
+                    players.Add(player);
+            }
+
+            players = [.. players.OrderBy(x => x.statLifeMax2 - x.statLife)];
+            int place = 0;
+
+            foreach (Player player in players)
+                rank.Ranking.Add(player.whoAmI, DetermineStandardOrderedPlacement(place++));
         }
 
         return rank;
@@ -81,9 +105,7 @@ public class MinigameRanking
         var rank = new MinigameRanking();
 
         foreach ((int who, int placement) in playerWhoAmIInOrderOfPlacement)
-        {
             rank.Ranking.Add(who, DetermineStandardOrderedPlacement(placement));
-        }
 
         return rank;
     }

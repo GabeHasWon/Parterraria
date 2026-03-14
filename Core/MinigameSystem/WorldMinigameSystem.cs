@@ -267,7 +267,7 @@ internal class WorldMinigameSystem : ModSystem
         if (minigameSlot == -1)
             minigameSlot = Main.rand.Next(choices.Length);
 
-        playingMinigame = worldMinigames.First(x => x is CraftLargeDiamondGame).Clone(); //choices[minigameSlot].Clone(); //
+        playingMinigame = choices[minigameSlot].Clone(); //
         playingMinigame.OnSet();
         NotReady = true;
         selectingMinigame = false;

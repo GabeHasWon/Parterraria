@@ -32,13 +32,9 @@ class MinigameTool : ModItem
             Main.LocalPlayer.GetModPlayer<MinigameToolPlayer>().toolMode = MinigameToolPlayer.ToolMode.Place;
 
             if (BoardUISystem.Self.toolUI.CurrentState is not MinigameEditUI)
-            {
                 BoardUISystem.OpenToolUI(true);
-            }
             else
-            {
                 BoardUISystem.CloseToolUI();
-            }
 
             return false;
         }

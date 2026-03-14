@@ -1,6 +1,6 @@
 CraftLargeDiamondGame: {
 	Name: Diamond Dash
-	Description: Various diamonds will spawn around the arena. Mine them, craft a Large Diamond, and win!
+	Description: Various diamonds will spawn around the arena. Mine them, craft a Large Diamond at an Anvil, and win!
 }
 
 GetCrownGame: {
