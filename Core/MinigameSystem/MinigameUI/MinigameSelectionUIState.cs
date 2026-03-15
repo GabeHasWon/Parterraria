@@ -7,17 +7,29 @@ using Terraria.UI;
 
 namespace Parterraria.Core.MinigameSystem.MinigameUI;
 
-internal class MinigameSelectionUIState(MinigameSelectionUIState.SetMinigameDelegate setMinigame, float timerSpeed = -1, string[] minigames = null) : UIState
+internal class MinigameSelectionUIState : UIState
 {
     public delegate void SetMinigameDelegate(string value);
 
-    private readonly SetMinigameDelegate _setMinigame = setMinigame;
+    private readonly SetMinigameDelegate _setMinigame;
 
     internal int selectedMinigame = 0;
 
-    private string[] _minigames = minigames;
-    private float _timerSpeed = timerSpeed;
+    private string[] _minigames;
+    private float _timerSpeed;
     private float _minigameTime = 0;
+
+    public MinigameSelectionUIState(SetMinigameDelegate setMinigame, float timerSpeed = -1, string[] minigames = null)
+    {
+        _setMinigame = setMinigame;
+        _minigames = minigames;
+        _timerSpeed = timerSpeed;
+
+        if (_timerSpeed == -1)
+            _timerSpeed = Main.rand.NextFloat(2f, 2.5f);
+        else
+            _minigameTime += 0.5f;
+    }
 
     public override void Update(GameTime gameTime)
     {

@@ -37,7 +37,14 @@ internal class MannequinGame : Minigame
         new Set(ItemID.LeprechaunHat, ItemID.LeprechaunShirt, ItemID.LeprechaunPants), new Set(ItemID.PumpkinMask, ItemID.PumpkinShirt, ItemID.PumpkinPants),
         new Set(ItemID.WolfMask, ItemID.WolfShirt, ItemID.WolfPants), new Set(ItemID.CreeperMask, ItemID.CreeperShirt, ItemID.CreeperPants),
         new Set(ItemID.FoxMask, ItemID.FoxShirt, ItemID.FoxPants), new Set(ItemID.NurseHat, ItemID.NurseShirt, ItemID.NursePants),
-        new Set(ItemID.UnicornMask, ItemID.UnicornShirt, ItemID.UnicornPants)];
+        new Set(ItemID.UnicornMask, ItemID.UnicornShirt, ItemID.UnicornPants), new Set(ItemID.ClownHat, ItemID.ClownShirt, ItemID.ClownPants),
+        new Set(ItemID.ArchaeologistsHat, ItemID.ArchaeologistsJacket, ItemID.ArchaeologistsPants), new Set(ItemID.SantaHat, ItemID.SantaShirt, ItemID.SantaPants),
+        new Set(ItemID.MummyMask, ItemID.MummyShirt, ItemID.MummyPants), new Set(ItemID.PlumbersHat, ItemID.PlumbersShirt, ItemID.PlumbersPants),
+        new Set(ItemID.PirateHat, ItemID.PirateShirt, ItemID.PiratePants), new Set(ItemID.SteampunkHat, ItemID.SteampunkShirt, ItemID.SteampunkPants),
+        new Set(ItemID.HerosHat, ItemID.HerosShirt, ItemID.HerosPants), new Set(ItemID.RedsHelmet, ItemID.RedsBreastplate, ItemID.RedsLeggings),
+        new Set(ItemID.FamiliarWig, ItemID.FamiliarShirt, ItemID.FamiliarPants), new Set(ItemID.CowboyHat, ItemID.CowboyJacket, ItemID.CowboyPants),
+        new Set(ItemID.LeprechaunHat, ItemID.LeprechaunShirt, ItemID.LeprechaunPants), new Set(ItemID.ScarecrowHat, ItemID.ScarecrowShirt, ItemID.ScarecrowPants),
+        new Set(ItemID.TreeMask, ItemID.TreeShirt, ItemID.TreeTrunks), new Set(ItemID.LeinforsHat, ItemID.LeinforsShirt, ItemID.LeinforsPants)];
 
     public override MinigameWinType WinType => MinigameWinType.First;
     public override int MaxPlayTime => 0;

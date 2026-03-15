@@ -29,7 +29,7 @@ internal abstract class Minigame : ModType
     public LocalizedText DisplayName => Language.GetText(LocalizationPath + ".Name");
     public LocalizedText Description => Language.GetText(LocalizationPath + ".Description");
 
-    public bool Beaten { get; protected set; }
+    public bool Beaten { get; internal set; }
     public int PlayTime { get; protected set; }
     public virtual int MaxPlayTime { get; }
 
@@ -53,12 +53,16 @@ internal abstract class Minigame : ModType
         Language.GetOrRegister(LocalizationPath + ".Description", () => GetType().Name);
     }
 
+    /// <summary>
+    /// Updates the minigame. Runs on all clients + server.
+    /// </summary>
     public void Update()
     {
         PlayTime++;
         InternalUpdate();
     }
 
+    ///<inheritdoc cref="Update"/>
     public abstract void InternalUpdate();
     public abstract MinigameRanking GetRanking();
     public virtual Minigame Clone() => MemberwiseClone() as Minigame;

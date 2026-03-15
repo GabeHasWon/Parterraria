@@ -22,7 +22,7 @@ public class SyncMinigameRollUIModule(float timerSpeed, string[] minigames) : Mo
             WorldMinigameSystem.selectingMinigame = true;
 
             // For some reason, the selected minigame is always off by 1 when sent by the server. Here's a hardcode fix!
-            BoardUISystem.SetMiscUI(new MinigameSelectionUIState(ModContent.GetInstance<WorldMinigameSystem>().StartMinigame, _timerSpeed, _minigames) { selectedMinigame = 1 });
+            BoardUISystem.SetMiscUI(new MinigameSelectionUIState(ModContent.GetInstance<WorldMinigameSystem>().StartMinigame, _timerSpeed, _minigames));
         }
     }
 }

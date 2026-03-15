@@ -41,7 +41,9 @@ internal class CookingDashGame : Minigame
                     new Item(ItemID.Sluggy),
                     new Item(ItemID.DontHurtCrittersBook)
                 ], false);
-
+        }
+        else
+        {
             plr.GetModPlayer<AdventurePlayer>().AddPick(TileID.JunglePlants);
             plr.GetModPlayer<AdventurePlayer>().AddPick(TileID.JunglePlants2);
             plr.GetModPlayer<AdventurePlayer>().AddPick(TileID.PlantDetritus);

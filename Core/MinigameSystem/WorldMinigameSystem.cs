@@ -178,7 +178,7 @@ internal class WorldMinigameSystem : ModSystem
         }
 
         if (!WorldBoardSystem.PlayingParty || InMinigame || worldMinigames.Count == 0 || Main.netMode == NetmodeID.MultiplayerClient || selectingMinigame || 
-            !Main.dedServ && Main.npcShop > 0)
+            !Main.dedServ && AnyInShop())
         {
             if (selectingMinigame && Main.netMode == NetmodeID.Server)
                 RollMinigameOnServer();
@@ -211,6 +211,14 @@ internal class WorldMinigameSystem : ModSystem
         selectingMinigame = true;
     }
 
+    private bool AnyInShop()
+    {
+        if (Main.netMode == NetmodeID.SinglePlayer)
+            return Main.npcShop > 0;
+
+        return true;
+    }
+
     public void RollMinigameOnServer()
     {
         _minigameTime += _timerSpeed;
@@ -240,6 +248,7 @@ internal class WorldMinigameSystem : ModSystem
     private void CompleteMinigame()
     {
         playingMinigame.OnStop();
+        playingMinigame.Beaten = false;
 
         WorldBoardSystem.CompleteMinigame(playingMinigame, rankings);
 
@@ -267,7 +276,7 @@ internal class WorldMinigameSystem : ModSystem
         if (minigameSlot == -1)
             minigameSlot = Main.rand.Next(choices.Length);
 
-        playingMinigame = choices[minigameSlot].Clone(); //
+        playingMinigame = choices[minigameSlot].Clone(); //worldMinigames.First(x => x is PhotoOpGame).Clone();// 
         playingMinigame.OnSet();
         NotReady = true;
         selectingMinigame = false;

@@ -67,6 +67,8 @@ internal class PhotoOpGame : Minigame
 
     public override void SetupPlayer(Player plr, bool playing)
     {
+        plr.QuickDismount();
+
         if (!playing)
             plr.GetModPlayer<InventoryPlayer>().SwitchInventory([], [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.EoCShield), new Item(ItemID.HermesBoots)], []);
     }
@@ -86,6 +88,9 @@ internal class PhotoOpGame : Minigame
 
     public override MinigameRanking GetRanking()
     {
+        if (PlayerScoreByWhoAmI.Count == 0)
+            return MinigameRanking.CompleteTie();
+
         var sorted = PlayerScoreByWhoAmI.OrderBy(x => x.Value).Select(x => x.Key);
         return MinigameRanking.ByOrderAbsolute([.. sorted]);
     }
@@ -95,7 +100,7 @@ internal class PhotoOpGame : Minigame
         if (PlayTime % (secondsBetweenPhotos * 60) == 0)
             UpdatePlayerScores();
 
-        if (PlayTime >= MaxPlayTime)
+        if (PlayTime > secondsBetweenPhotos * totalPhotos * 60 && !Beaten)
             Beaten = true;
     }
 
@@ -115,6 +120,9 @@ internal class PhotoOpGame : Minigame
             PlayerScoreByWhoAmI[player.whoAmI] += dist;
             players.Add(player.whoAmI, dist);
         }
+
+        if (players.Count == 0)
+            return;
 
         var sort = players.OrderBy(x => x.Value);
         int placement = 0;

@@ -41,11 +41,11 @@ internal class SlimeOfTerraria : ModNPC
         {
             NPC.velocity.X *= 0.8f;
 
-            if (Timer >= 90)
+            if (Timer >= 80)
             {
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    NPC.velocity.Y = -7.5f;
+                    NPC.velocity.Y = -9f;
                     NPC.velocity.X = Main.rand.NextFloat(-4, 4);
                     NPC.netUpdate = true;
                 }

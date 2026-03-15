@@ -325,10 +325,6 @@ internal class PlayingBoardPlayer : ModPlayer
         hasGoneOnCurrentTurn = true;
         promptingSplit = false;
         splitNodes.Clear();
-
-#if DEBUG
-        Main.NewText("[DEBUG] Done rolling!");
-#endif
     }
 
     internal void ExitParty()
@@ -366,6 +362,9 @@ internal class PlayingBoardPlayer : ModPlayer
                     _ => 0.3f,
                 };
 
+                if (Player.chatOverhead.timeLeft > 0)
+                    podiumPos.Y -= 28;
+
                 DrawCommon.CenteredString(FontAssets.DeathText.Value, podiumPos.Floor(), Language.GetTextValue("Mods.Parterraria.MiscUI.Placements." + placement), color, new(scale));
                 return;
             }
@@ -398,27 +397,31 @@ internal class PlayingBoardPlayer : ModPlayer
                 }
             }
 
-#if DEBUG
-            pos = Player.Center - new Vector2(0, 144 - Player.gfxOffY) - Main.screenPosition;
-            BoardNode curNode = Player.GetModPlayer<PlayingBoardPlayer>().connectedNode;
-            BoardNode nexNode = Player.GetModPlayer<PlayingBoardPlayer>().nextNode;
-            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, curNode is null ? "NO C NODE" : "C: " + curNode.nodeId.ToString(), Color.White);
+//#if DEBUG
+//            pos = Player.Center - new Vector2(0, 144 - Player.gfxOffY) - Main.screenPosition;
+//            BoardNode curNode = Player.GetModPlayer<PlayingBoardPlayer>().connectedNode;
+//            BoardNode nexNode = Player.GetModPlayer<PlayingBoardPlayer>().nextNode;
+//            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, curNode is null ? "NO C NODE" : "C: " + curNode.nodeId.ToString(), Color.White);
 
-            pos = Player.Center - new Vector2(0, 168 - Player.gfxOffY) - Main.screenPosition;
-            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, nexNode is null ? "NO N NODE" : "N: " + nexNode.nodeId.ToString(), Color.White);
-#endif
+//            pos = Player.Center - new Vector2(0, 168 - Player.gfxOffY) - Main.screenPosition;
+//            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos, nexNode is null ? "NO N NODE" : "N: " + nexNode.nodeId.ToString(), Color.White);
+//#endif
         }
         else if (WorldMinigameSystem.NotReady)
         {
             var pos = Player.Center - new Vector2(0, 36 - Player.gfxOffY) - Main.screenPosition;
 
             if (Player.chatOverhead.timeLeft > 0)
-            {
                 pos.Y -= 26;
-            }
 
             string text = minigameReady ? Language.GetTextValue("Mods.Parterraria.MiscUI.Ready") : Language.GetTextValue("Mods.Parterraria.MiscUI.NotReady");
             DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos.Floor(), text, minigameReady ? Color.Green : Color.Orange);
+
+            if (Main.myPlayer != Player.whoAmI)
+                return;
+
+            text = Language.GetTextValue("Mods.Parterraria.MiscUI.RightClickToReady");
+            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos.Floor() - Vector2.UnitY * 28, text, Color.White);
         }
     }
 

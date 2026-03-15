@@ -65,6 +65,8 @@ internal abstract class DiceItem : ModItem
             Projectile.tileCollide = false;
         }
 
+        public override bool? CanDamage() => false;
+
         public override void AI()
         {
             Player plr = Main.player[Projectile.owner];

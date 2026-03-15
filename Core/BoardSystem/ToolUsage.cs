@@ -197,17 +197,22 @@ internal class ToolUsage
         if (buildingNode is not null)
         {
             if (_placementStage == 0)
-                buildingNode.position = Main.MouseWorld;
+                buildingNode.position = RoundToTile(Main.MouseWorld);
             else if (!Main.mouseMiddle)
             {
-                buildingNode.halfWidth = Math.Max(Math.Abs(buildingNode.position.X - Main.MouseWorld.X), Math.Abs(buildingNode.position.Y - Main.MouseWorld.Y));
+                buildingNode.halfWidth = (int)(Math.Max(Math.Abs(buildingNode.position.X - Main.MouseWorld.X), Math.Abs(buildingNode.position.Y - Main.MouseWorld.Y)) / 16f) * 16;
+                Main.NewText(buildingNode.halfWidth);
 
-                if (buildingNode.halfWidth < 40)
-                    buildingNode.halfWidth = 40;
+                if (buildingNode.halfWidth < 48)
+                    buildingNode.halfWidth = 48;
             }
 
             if (Main.mouseMiddle)
-                buildingNode.position = Main.MouseWorld - new Vector2(buildingNode.halfWidth);
+            {
+                Vector2 pos = RoundToTile(Main.MouseWorld - new Vector2(buildingNode.halfWidth));
+
+                buildingNode.position = pos;
+            }
 
             if (Main.mouseRight)
             {
@@ -217,6 +222,15 @@ internal class ToolUsage
         }
 
         ToolUIState.HoveringList = false;
+    }
+
+    private static Vector2 RoundToTile(Vector2 pos)
+    {
+        pos /= 16f;
+        pos.X = MathF.Round(pos.X);
+        pos.Y = MathF.Round(pos.Y);
+        pos = pos.ToWorldCoordinates(0, 2);
+        return pos;
     }
 
     internal static void DrawBuilding()

@@ -192,7 +192,8 @@ internal class BoardUISystem : ModSystem
         if (Main.npcShop > 0 && Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>().hasGoneOnCurrentTurn)
         {
             string shop = Language.GetTextValue("Mods.Parterraria.MiscUI.CloseShop");
-            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, shop, new Vector2(190, 436), Color.White, 0f, Vector2.Zero, new(0.35f));
+            Color col = Color.Lerp(Color.White, Color.DeepPink, MathF.Sin(Main.GameUpdateCount * 0.07f) * 0.5f + 0.5f);
+            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, shop, new Vector2(190, 436), col, 0f, Vector2.Zero, new(0.35f));
         }
 
         int yPos = GetYForHUD() + 36;
@@ -200,7 +201,8 @@ internal class BoardUISystem : ModSystem
         string partyPlayers = Language.GetTextValue("Mods.Parterraria.MiscUI.PartyPlayers");
         ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, partyPlayers, new Vector2(25, yPos - 50), Color.White, 0f, Vector2.Zero, new(0.5f));
         string turnCountText = Language.GetTextValue("Mods.Parterraria.MiscUI.Turn", 1 + WorldBoardSystem.Self.turnsGone);
-        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, turnCountText, new Vector2(25, yPos - 76), new Color(200, 200, 200), 0f, Vector2.Zero, new(0.4f));
+        var turnColor = new Color(200, 200, 200);
+        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, turnCountText, new Vector2(25, yPos - 76), turnColor, 0f, Vector2.Zero, new(0.4f));
 
         for (int i = 0; i < Main.CurrentFrameFlags.ActivePlayersCount; ++i)
         {

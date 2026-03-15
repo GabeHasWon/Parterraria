@@ -69,6 +69,22 @@ public class MinigameRanking
     }
 
     /// <summary>
+    /// A complete tie. Everyone is visually a "tie", but counts as <see cref="MinigameReward.Placement.Third"/> for rewards.
+    /// </summary>
+    public static MinigameRanking CompleteTie()
+    {
+        var rank = new MinigameRanking();
+
+        foreach (var player in Main.ActivePlayers)
+        {
+            MinigameReward reward = new(Language.GetTextValue("Mods.Parterraria.Rankings.Tie"), MinigameReward.Placement.Third);
+            rank.Ranking.Add(player.whoAmI, reward);
+        }
+
+        return rank;
+    }
+
+    /// <summary>
     /// Used for minigames where one or more players complete the win condition, or otherwise tie.
     /// </summary>
     /// <param name="players">The winners of the game.</param>
@@ -128,9 +144,9 @@ public class MinigameRanking
         {
             var pos = Main.ScreenSize.ToVector2() / new Vector2(2f, 4f) + new Vector2(0, step++ * 40);
             DrawCommon.CenteredString(FontAssets.DeathText.Value, pos, $"{Main.player[who].name}: {rank.RewardText} "
-#if DEBUG
-                + $"({rank.Place})" // Show internal ranking name in debug only
-#endif
+//#if DEBUG
+//                + $"({rank.Place})" // Show internal ranking name in debug only
+//#endif
                 , color, new(scale));
 
             scale *= 0.75f;
