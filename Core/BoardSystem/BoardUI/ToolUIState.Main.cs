@@ -1,6 +1,5 @@
 ﻿using Parterraria.Common;
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
-using Parterraria.Core.MinigameSystem;
 using Parterraria.Core.Synchronization;
 using ReLogic.Content;
 using System;
@@ -251,17 +250,31 @@ internal partial class ToolUIState(Player player) : UIState
             return;
         }
 
+        if (WorldBoardSystem.PlayingParty)
+        {
+            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.AlreadyPlaying"), CommonColors.Error);
+            return;
+        }
+
         SetEditUI();
     }
 
-    private void SetEditUI() => BoardUISystem.SetMiscUI(new EditObjectUIState(WorldBoardSystem.Self.worldBoards[_boardKey].config,
-        (obj) =>
-        {
-            WorldBoardSystem.Self.worldBoards[_boardKey].config = (BoardConfig)obj;
+    private void SetEditUI() => BoardUISystem.SetMiscUI(new EditObjectUIState(WorldBoardSystem.Self.worldBoards[_boardKey].config, 
+        (obj, hasChanged) => SaveEditsOnBoard(_boardKey, obj, hasChanged)));
 
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-                new UpdateBoardConfig(WorldBoardSystem.Self.worldBoards[_boardKey].config, _boardKey, Main.myPlayer).Send();
-        }));
+    public static void SaveEditsOnBoard(string key, object obj, bool hasChanged)
+    {
+        if (!hasChanged)
+            return;
+
+        WorldBoardSystem.Self.worldBoards[key].config = (BoardConfig)obj;
+
+        if (Main.netMode == NetmodeID.MultiplayerClient)
+            new UpdateBoardConfig(WorldBoardSystem.Self.worldBoards[key].config, key, Main.myPlayer).Send();
+
+        string date = DateTime.Now.ToString("H:mm:ss");
+        Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Board.SavedEdits" + (Main.netMode == NetmodeID.MultiplayerClient ? "MP" : ""), date), CommonColors.Success);
+    }
 
     private static void EndParty()
     {

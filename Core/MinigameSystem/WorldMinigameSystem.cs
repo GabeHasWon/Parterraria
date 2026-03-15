@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.Localization;
@@ -26,6 +27,7 @@ internal class WorldMinigameSystem : ModSystem
     public static bool NotReady { get; private set; } = false;
 
     internal static readonly List<Minigame> worldMinigames = [];
+    internal static readonly Dictionary<int, Minigame> worldMinigamesByNetId = [];
 
     internal static bool selectingMinigame = false;
     internal static MinigameRanking rankings = null;
@@ -40,33 +42,63 @@ internal class WorldMinigameSystem : ModSystem
 
     public Minigame playingMinigame = null;
 
-    public static bool TryAddMinigame(string name, Rectangle rectangle, Point? playerSpawnLocation = null, byte[] data = null)
+    /// <summary>
+    /// Tries to add a minigame. If it succeeds, adds the minigame and syncs it.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="rectangle"></param>
+    /// <param name="playerSpawnLocation"></param>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public static bool TryAddMinigame(string name, Rectangle rectangle, Point? playerSpawnLocation = null, byte[] data = null, bool sync = false)
     {
         Minigame.MinigamesByModAndName[name].ValidateRectangle(ref rectangle);
 
         if (worldMinigames.Any(x => x.area.Intersects(rectangle)))
         {
-            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Minigame.Intersecting"));
+            Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Minigame.Intersecting"), CommonColors.Error);
             return false;
         }
 
-        var game = Minigame.MinigamesByModAndName[name].Clone();
-        game.area = rectangle;
-        game.playerStartLocation = playerSpawnLocation ?? rectangle.Center.ToVector2().ToTileCoordinates();
-        game.OnPlace();
-
-        if (data is not null)
+        if (sync && Main.netMode == NetmodeID.MultiplayerClient)
+            new SyncMinigameModule(name, rectangle, rectangle.Center.ToVector2().ToTileCoordinates(), data).Send(-1, -1, false);
+        else
         {
-            using var stream = data.ToMemoryStream();
-            using var reader = new BinaryReader(stream);
-            game.ReadNetData(reader);
+            var game = Minigame.MinigamesByModAndName[name].Clone();
+            game.area = rectangle;
+            game.playerStartLocation = playerSpawnLocation ?? rectangle.Center.ToVector2().ToTileCoordinates();
+            game.OnPlace();
+
+            if (data is not null)
+            {
+                using var stream = data.ToMemoryStream();
+                using var reader = new BinaryReader(stream);
+                game.ReadNetData(reader);
+            }
+
+            int id = 0;
+
+            foreach (Minigame miniGame in worldMinigames)
+            {
+                if (miniGame.netId == id)
+                    id++;
+            }
+
+            game.netId = id;
+
+            worldMinigames.Add(game);
+            worldMinigamesByNetId.Add(id, game);
         }
 
-        worldMinigames.Add(game);
         return true;
     }
 
-    internal static void RemoveMinigame(Minigame minigame) => worldMinigames.Remove(minigame);
+    internal static void RemoveMinigame(Minigame minigame)
+    {
+        int netId = minigame.netId;
+        worldMinigames.Remove(minigame);
+        worldMinigamesByNetId.Remove(netId);
+    }
 
     internal static void DrawMinigameUI()
     {

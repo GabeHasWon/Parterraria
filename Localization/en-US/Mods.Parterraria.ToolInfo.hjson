@@ -12,6 +12,9 @@ Board: {
 		This may mean you experience softlocks or other issues when playing.
 		'''
 	ValidBoard: Validation: Success! Board has no hanging nodes.
+	AlreadyPlaying: Can't edit a board during play!
+	SavedEdits: "{0}: Edits saved."
+	SavedEditsMP: "{0}: Edits saved and synchronized."
 }
 
 CantConnectNode: {
@@ -25,6 +28,8 @@ ConnectedNodes.Connected: Successfully connected nodes.
 Minigame: {
 	Success: Placed minigame.
 	Intersecting: Area intersects other minigame.
+	Updated: "{0}: Updated minigame."
+	UpdatedAndSynced: "{0}: Updated minigame and synced."
 }
 
 Popper: {

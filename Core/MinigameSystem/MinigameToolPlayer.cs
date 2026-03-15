@@ -1,7 +1,11 @@
-﻿using Parterraria.Core.BoardSystem.BoardUI.EditUI;
-using Parterraria.Core.BoardSystem;
-using System.Linq;
+﻿using Parterraria.Common;
 using Parterraria.Content.Items.Board.Create;
+using Parterraria.Core.BoardSystem;
+using Parterraria.Core.BoardSystem.BoardUI.EditUI;
+using Parterraria.Core.Synchronization.MinigameSyncing;
+using System;
+using System.Linq;
+using Terraria.ID;
 using Terraria.Localization;
 
 namespace Parterraria.Core.MinigameSystem;
@@ -29,9 +33,11 @@ internal class MinigameToolPlayer : ModPlayer
         if (Player.HeldItem.ModItem is not MinigameTool)
         {
             ClearTool();
-            toolMode = ToolMode.Place;
             return;
         }
+
+        if (Main.myPlayer != Player.whoAmI)
+            return;
 
         if (_minigameArea.HasValue)
         {
@@ -66,19 +72,41 @@ internal class MinigameToolPlayer : ModPlayer
                 }
                 else
                 {
-                    WorldMinigameSystem.TryAddMinigame(SelectedMinigame.FullName, _minigameArea.Value);
+                    WorldMinigameSystem.TryAddMinigame(SelectedMinigame.FullName, _minigameArea.Value, null, null, true);
                     _minigameArea = null;
                 }
             }
             else if (toolMode == ToolMode.Edit)
             {
-                if (_selectedWorldMinigame is not null)
+                Minigame newMinigame = WorldMinigameSystem.worldMinigames.FirstOrDefault(x => x.area.Contains(Main.MouseWorld.ToPoint()));
+
+                if (newMinigame is not null && _selectedWorldMinigame is not null && newMinigame.netId == _selectedWorldMinigame.netId)
                     return;
 
-                _selectedWorldMinigame = WorldMinigameSystem.worldMinigames.FirstOrDefault(x => x.area.Contains(Main.MouseWorld.ToPoint()));
+                _selectedWorldMinigame = newMinigame;
 
                 if (_selectedWorldMinigame is not null)
-                    BoardUISystem.SetMiscUI(new EditObjectUIState(_selectedWorldMinigame, (obj) => _selectedWorldMinigame = (Minigame)obj));
+                {
+                    BoardUISystem.SetMiscUI(new EditObjectUIState(_selectedWorldMinigame, (obj, changed) =>
+                    {
+                        if (!changed)
+                            return;
+
+                        _selectedWorldMinigame = (Minigame)obj;
+
+                        if (Main.netMode == NetmodeID.MultiplayerClient)
+                            new UpdateMinigameModule((byte)Main.myPlayer, (short)_selectedWorldMinigame.netId, _selectedWorldMinigame.GetNetBytes()).Send();
+
+                        string postfix = Main.netMode == NetmodeID.MultiplayerClient ? "AndSynced" : "";
+                        string date = DateTime.Now.ToString("H:mm:ss");
+                        Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Minigame.Updated" + postfix, date), CommonColors.Success);
+                    }));
+                }
+                else
+                {
+                    BoardUISystem.CloseMiscUI();
+                    _selectedWorldMinigame = null;
+                }
             }
             else if (toolMode == ToolMode.Erase)
             {
@@ -91,7 +119,10 @@ internal class MinigameToolPlayer : ModPlayer
                 }
                 else
                 {
-                    WorldMinigameSystem.RemoveMinigame(_selectedWorldMinigame);
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                        WorldMinigameSystem.RemoveMinigame(_selectedWorldMinigame);
+                    else
+                        new RemoveMinigameModule((short)_selectedWorldMinigame.netId).Send(-1, -1, false);
                 }
             }
         }

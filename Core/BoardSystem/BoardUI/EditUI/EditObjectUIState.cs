@@ -6,16 +6,18 @@ using Terraria.UI;
 
 namespace Parterraria.Core.BoardSystem.BoardUI.EditUI;
 
-internal class EditObjectUIState(object objectToEdit, Action<object> setObjectFunc) : UIState
+internal class EditObjectUIState(object objectToEdit, Action<object, bool> setObjectFunc) : UIState
 {
-    private readonly Action<object> _setObjectFunc = setObjectFunc;
+    private readonly Action<object, bool> _setObjectFunc = setObjectFunc;
 
     private object _objectToEdit = objectToEdit;
+    private int _saveTimer = -1;
 
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
-        _setObjectFunc(_objectToEdit);
+        _setObjectFunc(_objectToEdit, _saveTimer == 0);
+        _saveTimer--;
     }
 
     public override void OnInitialize()
@@ -76,5 +78,14 @@ internal class EditObjectUIState(object objectToEdit, Action<object> setObjectFu
         }
     }
 
-    private void UpdateValue(MemberEditUI edit, FieldInfo info, ref object obj) => info.SetValue(obj, edit.GetValue);
+    private void UpdateValue(MemberEditUI edit, FieldInfo info, ref object obj)
+    {
+        info.SetValue(obj, edit.GetValue);
+
+        if (edit.HasBeenEdited)
+        {
+            _saveTimer = 60;
+            edit.HasBeenEdited = false;
+        }
+    }
 }

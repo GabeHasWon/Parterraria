@@ -1,6 +1,6 @@
 ﻿namespace Parterraria.Common;
 
-internal class CommonColors
+internal static class CommonColors
 {
     public static readonly Color Error = new(255, 180, 180);
     public static readonly Color Success = new(180, 255, 180);

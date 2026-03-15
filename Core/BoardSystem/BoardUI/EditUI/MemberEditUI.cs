@@ -15,6 +15,8 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
 
     public object GetValue => _info.GetValue(_reference);
 
+    public bool HasBeenEdited = false;
+
     readonly object _reference = reference;
     readonly FieldInfo _info = info;
 
@@ -54,6 +56,8 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
         }
     }
 
+    public override void OnDeactivate() => base.OnDeactivate();
+
     private void SetText(UIText text)
     {
         object value = _info.GetValue(_reference);
@@ -78,9 +82,11 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
         {
             Main.LocalPlayer.GetModPlayer<EditToolPlayer>().placeDelay = 5;
             Main.LocalPlayer.GetModPlayer<EditToolPlayer>().placingType = new Point();
-            Main.LocalPlayer.GetModPlayer<EditToolPlayer>().placeResult = (object value) =>
+            Main.LocalPlayer.GetModPlayer<EditToolPlayer>().placeResult = value =>
             {
                 var point = (Point)value;
+
+                HasBeenEdited = true;
 
                 if (_info.FieldType == typeof(Point))
                     _info.SetValue(_reference, point);
@@ -140,6 +146,8 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
                 default:
                     throw null;
             }
+
+            HasBeenEdited = true;
         }
     }
 }

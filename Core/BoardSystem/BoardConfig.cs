@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Parterraria.Core.BoardSystem.BoardUI.EditUI;
+using System;
 using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.BoardSystem;
@@ -13,7 +14,9 @@ public class BoardConfig
         CoreCount,
     }
 
+    [HideFromEdit]
     public WinType Win = WinType.TurnCount;
+
     public ushort MaxMoveTimerInSeconds = 10;
     public ushort CoreCost = 20;
     public string[] DisallowedMinigames = [];

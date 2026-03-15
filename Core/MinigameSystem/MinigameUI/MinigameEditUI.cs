@@ -71,7 +71,7 @@ internal partial class MinigameEditUI(Player player) : UIState
         mainPanel.Append(boardSelect);
 
         int number = 0;
-        AppendToolButton("Place", SetMode, SwitchMode, mainPanel, ref number);
+        UpdateToolButtonImage(AppendToolButton("Place", SetMode, SwitchMode, mainPanel, ref number));
         AppendToolButton("Close", ExitMenu, null, mainPanel, ref number);
         AppendToolButton("List", ToggleList, null, mainPanel, ref number);
     }
@@ -183,6 +183,11 @@ internal partial class MinigameEditUI(Player player) : UIState
 
         Main.isMouseLeftConsumedByUI = true;
 
+        UpdateToolButtonImage(listeningElement);
+    }
+
+    private static void UpdateToolButtonImage(UIElement listeningElement)
+    {
         (listeningElement as UIImageButton).SetImage(Texture(GetToolModeName(Main.LocalPlayer.GetModPlayer<MinigameToolPlayer>().toolMode)));
         listeningElement.Width = StyleDimension.FromPixels(32);
         listeningElement.Height = StyleDimension.FromPixels(32);
@@ -197,7 +202,7 @@ internal partial class MinigameEditUI(Player player) : UIState
         _player.mouseInterface = true;
     }
 
-    private static void AppendToolButton(string name, MouseEvent onClick, MouseEvent rightClick, UIPanel panel, ref int number)
+    private static UIImageButton AppendToolButton(string name, MouseEvent onClick, MouseEvent rightClick, UIPanel panel, ref int number)
     {
         var tex = Texture(name);
 
@@ -219,6 +224,7 @@ internal partial class MinigameEditUI(Player player) : UIState
         panel.Append(button);
 
         number++;
+        return button;
     }
 
     private static void StopUseOnHover(UIElement affectedElement)

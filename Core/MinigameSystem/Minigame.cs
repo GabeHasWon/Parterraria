@@ -12,7 +12,7 @@ using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.MinigameSystem;
 
-internal abstract class Minigame : ModType
+public abstract class Minigame : ModType
 {
     public enum MinigameWinType : byte
     {
@@ -21,8 +21,8 @@ internal abstract class Minigame : ModType
         Last,
     }
 
-    public static Dictionary<string, Minigame> MinigamesByModAndName = [];
-    public static Dictionary<int, Minigame> MinigamesById = [];
+    internal static Dictionary<string, Minigame> MinigamesByModAndName = [];
+    internal static Dictionary<int, Minigame> MinigamesById = [];
 
     public abstract MinigameWinType WinType { get; }
     public virtual string LocalizationPath => "Mods." + Mod.Name + ".Party.Minigames." + GetType().Name;
@@ -34,6 +34,12 @@ internal abstract class Minigame : ModType
     public virtual int MaxPlayTime { get; }
 
     protected virtual bool DrawDefaultUI => true;
+
+    /// <summary>
+    /// Internal ID used for IO/netsync.
+    /// </summary>
+    //[HideFromEdit]
+    internal int netId = 0;
 
     /// <summary>
     /// The area, in tile coordinates, of this minigame. This should only be set on placement.
@@ -81,7 +87,7 @@ internal abstract class Minigame : ModType
     /// Called when the minigame is set, per player.
     /// </summary>
     /// <param name="plr">Relevant player.</param>
-    /// <param name="playing">Whether this is running during <see cref="Minigame.OnSet"/> or during <see cref="OnStart"/>.</param>
+    /// <param name="playing">Whether this is running during <see cref="OnSet"/> or during <see cref="OnStart"/>.</param>
     public virtual void SetupPlayer(Player plr, bool playing) { }
 
     /// <summary>
@@ -102,6 +108,19 @@ internal abstract class Minigame : ModType
 
     public virtual void WriteNetData(BinaryWriter writer)
     {
+    }
+
+    /// <summary>
+    /// Returns the result of <see cref="WriteNetData(BinaryWriter)"/> as a byte array.
+    /// </summary>
+    public byte[] GetNetBytes()
+    {
+        using MemoryStream mem = new();
+        using BinaryWriter writer = new(mem);
+        WriteNetData(writer);
+        writer.Flush();
+        mem.Position = 0;
+        return mem.ReadBytes(mem.Length);
     }
 
     public virtual void ReadNetData(BinaryReader reader)
@@ -181,6 +200,7 @@ internal abstract class Minigame : ModType
         tag.Add("type", FullName);
         tag.Add(nameof(area), area);
         tag.Add(nameof(playerStartLocation), playerStartLocation);
+        tag.Add(nameof(netId), netId);
         InternalSave(tag);
     }
 
@@ -195,6 +215,7 @@ internal abstract class Minigame : ModType
             Minigame game = storedGame.Clone();
             game.area = tag.Get<Rectangle>(nameof(area));
             game.playerStartLocation = tag.Get<Point>(nameof(playerStartLocation));
+            game.netId = tag.GetInt(nameof(netId));
             game.LoadData(tag);
             return game;
         }

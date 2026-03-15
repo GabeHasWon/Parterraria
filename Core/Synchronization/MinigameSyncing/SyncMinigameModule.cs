@@ -2,9 +2,8 @@
 using Parterraria.Core.MinigameSystem;
 using System;
 using Terraria.ID;
-using Terraria.ModLoader.IO;
 
-namespace Parterraria.Core.Synchronization;
+namespace Parterraria.Core.Synchronization.MinigameSyncing;
 
 [Serializable]
 public class SyncMinigameModule(string type, Rectangle area, Point playerSpawnLocation, byte[] data) : Module
@@ -17,8 +16,8 @@ public class SyncMinigameModule(string type, Rectangle area, Point playerSpawnLo
     protected override void Receive()
     {
         if (Main.netMode == NetmodeID.Server)
-            return;
-        else
-            WorldMinigameSystem.TryAddMinigame(_type, _area, _playerSpawnLocation, _data);
+            Send(-1, -1, false);
+        
+        WorldMinigameSystem.TryAddMinigame(_type, _area, _playerSpawnLocation, _data);
     }
 }
