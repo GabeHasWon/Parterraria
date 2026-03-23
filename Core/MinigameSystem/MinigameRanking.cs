@@ -103,14 +103,15 @@ public class MinigameRanking
         return rank;
     }
 
-    public static MinigameRanking ByOrderAbsolute(int[] playerWhoAmIInOrderOfPlacement)
+    public static MinigameRanking ByOrderAbsolute(int[] playerWhoAmIInOrderOfPlacement, HashSet<int> forcedLast = null)
     {
         var rank = new MinigameRanking();
 
         for (int i = 0; i < playerWhoAmIInOrderOfPlacement.Length; i++)
         {
             int who = playerWhoAmIInOrderOfPlacement[i];
-            rank.Ranking.Add(who, DetermineStandardOrderedPlacement(i));
+            rank.Ranking.Add(who, forcedLast?.Contains(who) is true ? new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise) 
+                : DetermineStandardOrderedPlacement(i));
         }
 
         return rank;

@@ -38,7 +38,7 @@ public abstract class Minigame : ModType
     /// <summary>
     /// Internal ID used for IO/netsync.
     /// </summary>
-    //[HideFromEdit]
+    [HideFromEdit]
     internal int netId = 0;
 
     /// <summary>

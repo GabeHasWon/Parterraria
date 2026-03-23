@@ -200,7 +200,7 @@ internal class BoardUISystem : ModSystem
 
         string partyPlayers = Language.GetTextValue("Mods.Parterraria.MiscUI.PartyPlayers");
         ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, partyPlayers, new Vector2(25, yPos - 50), Color.White, 0f, Vector2.Zero, new(0.5f));
-        string turnCountText = Language.GetTextValue("Mods.Parterraria.MiscUI.Turn", 1 + WorldBoardSystem.Self.turnsGone);
+        string turnCountText = Language.GetTextValue("Mods.Parterraria.MiscUI.Turn", 1 + WorldBoardSystem.Self.turnsGone + " / " + WorldBoardSystem.Self.playingBoard.config.TurnMax);
         var turnColor = new Color(200, 200, 200);
         ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, turnCountText, new Vector2(25, yPos - 76), turnColor, 0f, Vector2.Zero, new(0.4f));
 

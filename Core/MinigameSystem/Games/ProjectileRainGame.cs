@@ -3,6 +3,7 @@ using Parterraria.Core.BoardSystem;
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
 using PathOfTerraria.Common.NPCs;
+using System;
 using System.IO;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
@@ -99,6 +100,8 @@ internal class ProjectileRainGame : Minigame
         tag.Add("maxTime", MinigameTimeInSeconds);
         tag.Add("left", Left);
         tag.Add("right", Right);
+        tag.Add("projId", ProjId);
+        tag.Add("perSecond", ProjectilesPerSecond);
     }
 
     public override void LoadData(TagCompound tag)
@@ -106,11 +109,14 @@ internal class ProjectileRainGame : Minigame
         MinigameTimeInSeconds = tag.GetInt("maxTime");
         Left = tag.Get<Point>("left");
         Right = tag.Get<Point>("right");
+        ProjId = tag.GetInt("projId");
+        ProjectilesPerSecond = tag.GetFloat("perSecond");
     }
 
     public override void ReadNetData(BinaryReader reader)
     {
         MinigameTimeInSeconds = reader.ReadInt16();
+        ProjectilesPerSecond = (float)reader.ReadHalf();
         ProjId = reader.ReadInt16();
         Left = new Point(reader.ReadInt32(), reader.ReadInt32());
         Right = new Point(reader.ReadInt32(), reader.ReadInt32());
@@ -119,6 +125,7 @@ internal class ProjectileRainGame : Minigame
     public override void WriteNetData(BinaryWriter writer)
     {
         writer.Write((short)MinigameTimeInSeconds);
+        writer.Write((Half)ProjectilesPerSecond);
         writer.Write((short)ProjId);
         writer.Write(Left.X);
         writer.Write(Left.Y);

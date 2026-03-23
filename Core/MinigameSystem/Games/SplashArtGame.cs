@@ -2,6 +2,7 @@
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -148,6 +149,8 @@ internal class SplashArtGame : Minigame
 
     protected override void InternalSave(TagCompound tag) => tag.Add("maxTime", MinigameTimeInSeconds);
     public override void LoadData(TagCompound tag) => MinigameTimeInSeconds = tag.GetInt("maxTime");
+    public override void WriteNetData(BinaryWriter writer) => writer.Write((byte)MinigameTimeInSeconds);
+    public override void ReadNetData(BinaryReader reader) => MinigameTimeInSeconds = reader.ReadByte();
 
     protected override void InternalDrawUI()
     {

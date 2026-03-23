@@ -63,14 +63,6 @@ internal class GetCrownGame : Minigame
     {
     }
 
-    public override void WriteNetData(BinaryWriter writer)
-    {
-        writer.Write(_crownSpawnLocation.X);
-        writer.Write(_crownSpawnLocation.Y);
-    }
-
-    public override void ReadNetData(BinaryReader reader) => _crownSpawnLocation = new(reader.ReadInt32(), reader.ReadInt32());
-
     public override MinigameRanking GetRanking()
     {
         for (int i = 0; i < Main.maxPlayers; ++i)
@@ -108,4 +100,12 @@ internal class GetCrownGame : Minigame
         (plr.armor[0].type == ItemID.PlatinumCrown && !plr.armor[0].IsAir || plr.armor[10].type == ItemID.PlatinumCrown && !plr.armor[10].IsAir);
     protected override void InternalSave(TagCompound tag) => tag.Add(nameof(_crownSpawnLocation), _crownSpawnLocation);
     public override void LoadData(TagCompound tag) => _crownSpawnLocation = tag.Get<Point>(nameof(_crownSpawnLocation));
+
+    public override void WriteNetData(BinaryWriter writer)
+    {
+        writer.Write(_crownSpawnLocation.X);
+        writer.Write(_crownSpawnLocation.Y);
+    }
+
+    public override void ReadNetData(BinaryReader reader) => _crownSpawnLocation = new(reader.ReadInt32(), reader.ReadInt32());
 }

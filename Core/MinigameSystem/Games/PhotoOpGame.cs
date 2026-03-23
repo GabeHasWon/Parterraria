@@ -5,9 +5,12 @@ using Parterraria.Core.BoardSystem;
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
 using ReLogic.Content;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Terraria.ID;
+using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.MinigameSystem.Games;
 
@@ -82,6 +85,8 @@ internal class PhotoOpGame : Minigame
             var pos = new Vector2(area.Center.X, area.Top + 20);
             NPC.NewNPC(src, (int)pos.X, (int)pos.Y, ModContent.NPCType<SlimeOfTerraria>());
         }
+
+        PlayerScoreByWhoAmI.Clear();
     }
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
@@ -91,8 +96,19 @@ internal class PhotoOpGame : Minigame
         if (PlayerScoreByWhoAmI.Count == 0)
             return MinigameRanking.CompleteTie();
 
+        HashSet<int> forcedLast = [];
+
+        foreach (Player player in Main.ActivePlayers)
+        {
+            if (!PlayerScoreByWhoAmI.ContainsKey(player.whoAmI))
+            {
+                PlayerScoreByWhoAmI.Add(player.whoAmI, int.MaxValue);
+                forcedLast.Add(player.whoAmI);
+            }
+        }
+
         var sorted = PlayerScoreByWhoAmI.OrderBy(x => x.Value).Select(x => x.Key);
-        return MinigameRanking.ByOrderAbsolute([.. sorted]);
+        return MinigameRanking.ByOrderAbsolute([.. sorted], forcedLast);
     }
 
     public override void InternalUpdate()
@@ -166,5 +182,29 @@ internal class PhotoOpGame : Minigame
             Main.spriteBatch.Draw(Camera.Value, Main.npc[slime].Center - Main.screenPosition, null, Color.White, 0f, Camera.Size() / 2f, 1f, SpriteEffects.None, 0);
         else if (PlayTime > secondsBetweenPhotos * 60 && mod < 20)
             Main.spriteBatch.Draw(Camera.Value, Main.npc[slime].Center - Main.screenPosition, null, Color.White * (1 - mod / 20f), 0f, Camera.Size() / 2f, 1f, SpriteEffects.None, 0);
+    }
+
+    public override void WriteNetData(BinaryWriter writer)
+    {
+        writer.Write((byte)secondsBetweenPhotos);
+        writer.Write((byte)totalPhotos);
+    }
+
+    public override void ReadNetData(BinaryReader reader)
+    {
+        secondsBetweenPhotos = Math.Clamp((int)reader.ReadByte(), 0, 255);
+        totalPhotos = Math.Clamp((int)reader.ReadByte(), 0, 255);
+    }
+
+    protected override void InternalSave(TagCompound tag)
+    {
+        tag.Add("secondsBetween", secondsBetweenPhotos);
+        tag.Add("total", totalPhotos);
+    }
+
+    public override void LoadData(TagCompound tag)
+    {
+        secondsBetweenPhotos = tag.GetInt("secondsBetween");
+        totalPhotos = tag.GetInt("total");
     }
 }

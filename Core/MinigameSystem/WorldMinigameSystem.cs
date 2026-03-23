@@ -195,7 +195,7 @@ internal class WorldMinigameSystem : ModSystem
                     rankings = playingMinigame.GetRanking();
 
                     if (Main.netMode == NetmodeID.Server)
-                        new SyncMinigameRankingModule(rankings).Send();
+                        new SyncMinigameRankingModule(rankings).Send(-1, -1, false);
                 }
 
                 if (_minigameOverTimer++ > 240)

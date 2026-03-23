@@ -97,9 +97,27 @@ internal class PointRaceGame : Minigame
         Main.spriteBatch.Draw(Flag.Value, position, null, Color.White * (0.7f + alpha), 0f, Flag.Size() / 2f, 1f, SpriteEffects.None, 0);
     }
 
-    protected override void InternalSave(TagCompound tag) => tag.Add("end", endPosition);
-    public override void LoadData(TagCompound tag) => endPosition = tag.Get<Vector2>("end");
+    protected override void InternalSave(TagCompound tag)
+    {
+        tag.Add("end", endPosition);
+        tag.Add("distance", distanceToWin);
+    }
 
-    public override void ReadNetData(BinaryReader reader) => endPosition = reader.ReadVector2();
-    public override void WriteNetData(BinaryWriter writer) => writer.WriteVector2(endPosition);
+    public override void LoadData(TagCompound tag)
+    {
+        endPosition = tag.Get<Vector2>("end");
+        distanceToWin = tag.GetFloat("distance");
+    }
+
+    public override void ReadNetData(BinaryReader reader)
+    {
+        endPosition = reader.ReadVector2();
+        distanceToWin = reader.ReadSingle();
+    }
+
+    public override void WriteNetData(BinaryWriter writer)
+    {
+        writer.WriteVector2(endPosition);
+        writer.Write(distanceToWin);
+    }
 }
