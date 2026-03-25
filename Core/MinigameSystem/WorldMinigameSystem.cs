@@ -3,6 +3,7 @@ using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem;
 using Parterraria.Core.MinigameSystem.Games;
 using Parterraria.Core.MinigameSystem.MinigameUI;
+using Parterraria.Core.Synchronization;
 using Parterraria.Core.Synchronization.MinigameSyncing;
 using System;
 using System.Collections.Generic;
@@ -209,8 +210,7 @@ internal class WorldMinigameSystem : ModSystem
             return;
         }
 
-        if (!WorldBoardSystem.PlayingParty || InMinigame || worldMinigames.Count == 0 || Main.netMode == NetmodeID.MultiplayerClient || selectingMinigame || 
-            !Main.dedServ && AnyInShop())
+        if (!WorldBoardSystem.PlayingParty || InMinigame || worldMinigames.Count == 0 || Main.netMode == NetmodeID.MultiplayerClient || selectingMinigame || AnyInShop())
         {
             if (selectingMinigame && Main.netMode == NetmodeID.Server)
                 RollMinigameOnServer();
@@ -237,18 +237,26 @@ internal class WorldMinigameSystem : ModSystem
         {
             _minigames = MinigameSelectionUIState.DetermineMinigames();
             _timerSpeed = Main.rand.NextFloat(2f, 2.5f);
-            new SyncMinigameRollUIModule(_timerSpeed, _minigames).Send(-1, -1, false);
+            new SyncMinigameRollUIModule(_selectedMinigame, _minigames).Send(-1, -1, false);
         }
 
         selectingMinigame = true;
     }
 
-    private bool AnyInShop()
+    private static bool AnyInShop()
     {
         if (Main.netMode == NetmodeID.SinglePlayer)
             return Main.npcShop > 0;
+        else
+        {
+            foreach (Player player in Main.ActivePlayers)
+            {
+                if (SyncInShopModule.InShop(player.whoAmI))
+                    return true;
+            }
 
-        return true;
+            return false;
+        }
     }
 
     public void RollMinigameOnServer()

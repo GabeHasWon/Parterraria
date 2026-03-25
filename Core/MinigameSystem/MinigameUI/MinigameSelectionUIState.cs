@@ -16,47 +16,39 @@ internal class MinigameSelectionUIState : UIState
     internal int selectedMinigame = 0;
 
     private string[] _minigames;
-    private float _timerSpeed;
-    private float _minigameTime = 0;
+    private int _selectedGame;
+    private float _minigameTime;
 
-    public MinigameSelectionUIState(SetMinigameDelegate setMinigame, float timerSpeed = -1, string[] minigames = null)
+    public MinigameSelectionUIState(SetMinigameDelegate setMinigame, int selectedGame = -1, string[] minigames = null)
     {
         _setMinigame = setMinigame;
         _minigames = minigames;
-        _timerSpeed = timerSpeed;
+        _selectedGame = selectedGame;
+        _minigameTime = 0;
 
-        if (_timerSpeed == -1)
-            _timerSpeed = Main.rand.NextFloat(2f, 2.5f);
-        else
-            _minigameTime += 0.5f;
+        if (_selectedGame == -1)
+            RandomizeSelectedGame();
     }
+
+    private void RandomizeSelectedGame() => _selectedGame = Main.rand.Next(34, 34 + 4 * 3);
 
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
 
-        if (_timerSpeed == -1)
-            _timerSpeed = Main.rand.NextFloat(2f, 2.5f);
+        if (_selectedGame == -1)
+            RandomizeSelectedGame();
 
         UpdateTimers();
     }
 
     private void UpdateTimers()
     {
-        _minigameTime += _timerSpeed;
-        _timerSpeed *= 0.98f;
+        _minigameTime = MathHelper.Lerp(_minigameTime, _selectedGame + 0.5f, 0.012f);
+        selectedMinigame = (int)(_minigameTime % 4);
 
-        if (_minigameTime > 1)
-        {
-            selectedMinigame++;
-            _minigameTime = 0;
-        }
-
-        if (selectedMinigame >= 4)
-            selectedMinigame = 0;
-
-        if ((Main.netMode != NetmodeID.SinglePlayer || Main.instance.IsActive) && _timerSpeed < 0.005f)
-            _setMinigame(_minigames[selectedMinigame]);
+        if ((Main.netMode != NetmodeID.SinglePlayer || Main.instance.IsActive) && _minigameTime >= _selectedGame)
+            _setMinigame(_minigames[(selectedMinigame - 1) % 4]);
     }
 
     public override void OnInitialize()

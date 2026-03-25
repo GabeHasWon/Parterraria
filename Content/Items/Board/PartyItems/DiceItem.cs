@@ -135,6 +135,9 @@ internal abstract class DiceItem : ModItem
             }
         }
 
+        /// <summary>
+        /// Maps the pip count (roll) to frame. For example, given the pip counts [1, 3, 5, 7, 9, 11] you'd need to map 5 to 2 (as it's the second frame/option).
+        /// </summary>
         protected abstract int PipCountToFrame(int pipCount);
 
         public override bool PreDraw(ref Color lightColor)

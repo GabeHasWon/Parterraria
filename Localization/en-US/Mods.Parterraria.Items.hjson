@@ -112,3 +112,13 @@ PartyPopper: {
 		'Useful for scaring your friends!'
 		'''
 }
+
+NegativeDice: {
+	DisplayName: Negative Dice
+	Tooltip:
+		'''
+		Rolls negative 1 to 6
+		{$DisappearsWhenNotPartying}
+		'Concerning.'
+		'''
+}

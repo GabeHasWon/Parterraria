@@ -3,10 +3,11 @@ Projectiles: {
 	HighDice_Dice.DisplayName: High Dice
 	LowDice_Dice.DisplayName: Low Dice
 	BrokenDice_Dice.DisplayName: Broken Dice
+	NegativeDice_Dice.DisplayName: Broken Dice
 }
 
 NPCs: {
-	ShopNPC.DisplayName: Mysterious Vendor
+	ShopNPC.DisplayName: Party Shop
 	GoldFaerie.DisplayName: Gold Faerie
 	SlimeOfTerraria.DisplayName: Slime Of Terraria
 }

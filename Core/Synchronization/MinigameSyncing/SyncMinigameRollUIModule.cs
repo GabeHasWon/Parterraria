@@ -8,9 +8,9 @@ using Terraria.ID;
 namespace Parterraria.Core.Synchronization.MinigameSyncing;
 
 [Serializable]
-public class SyncMinigameRollUIModule(float timerSpeed, string[] minigames) : Module
+public class SyncMinigameRollUIModule(int selectedMinigame, string[] minigames) : Module
 {
-    private readonly float _timerSpeed = timerSpeed;
+    private readonly int _selectedMinigame = selectedMinigame;
     private readonly string[] _minigames = minigames;
 
     protected override void Receive()
@@ -20,9 +20,7 @@ public class SyncMinigameRollUIModule(float timerSpeed, string[] minigames) : Mo
         else
         {
             WorldMinigameSystem.selectingMinigame = true;
-
-            // For some reason, the selected minigame is always off by 1 when sent by the server. Here's a hardcode fix!
-            BoardUISystem.SetMiscUI(new MinigameSelectionUIState(ModContent.GetInstance<WorldMinigameSystem>().StartMinigame, _timerSpeed, _minigames));
+            BoardUISystem.SetMiscUI(new MinigameSelectionUIState(ModContent.GetInstance<WorldMinigameSystem>().StartMinigame, _selectedMinigame, _minigames));
         }
     }
 }
