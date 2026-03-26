@@ -1,4 +1,5 @@
 ﻿using Parterraria.Core.BoardSystem;
+using System;
 using System.Collections.Generic;
 using Terraria.ID;
 
@@ -15,6 +16,18 @@ internal class AdventurePlayer : ModPlayer
     {
         On_Player.PickTile += StopAdventureMining;
         On_Player.PlaceThing += StopAdventurePlacement;
+    }
+
+    public void AddPick(params Span<int> ids)
+    {
+        foreach (int id in ids)
+            _allowedPicks.Add(id);
+    }
+
+    public void RemovePick(params Span<int> ids)
+    {
+        foreach (int id in ids)
+            _allowedPicks.Remove(id);
     }
 
     public void AddPick(int id) => _allowedPicks.Add(id);

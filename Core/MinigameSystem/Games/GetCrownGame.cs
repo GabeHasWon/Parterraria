@@ -48,13 +48,10 @@ internal class GetCrownGame : Minigame
         if (!playing)
         {
             plr.GetModPlayer<InventoryPlayer>().SwitchInventory([], [ ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.CloudinaBalloon)], 
-                [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.DualHook)]);
+                [new Item(ItemID.HermesBoots), ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.DualHook)]);
         }
         else
-        {
-            plr.Center = playerStartLocation.ToWorldCoordinates();
-            plr.QuickDismount();
-        }
+            plr.SafeTeleport(playerStartLocation.ToWorldCoordinates());
     }
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();

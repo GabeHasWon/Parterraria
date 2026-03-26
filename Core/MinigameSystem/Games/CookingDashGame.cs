@@ -43,14 +43,14 @@ internal class CookingDashGame : Minigame
                 ], false);
         }
         else
-        {
-            plr.GetModPlayer<AdventurePlayer>().AddPick(TileID.JunglePlants);
-            plr.GetModPlayer<AdventurePlayer>().AddPick(TileID.JunglePlants2);
-            plr.GetModPlayer<AdventurePlayer>().AddPick(TileID.PlantDetritus);
-        }
+            plr.GetModPlayer<AdventurePlayer>().AddPick(TileID.JunglePlants, TileID.JunglePlants2, TileID.PlantDetritus);
     }
 
-    public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
+    public override void ResetPlayer(Player plr)
+    {
+        plr.GetModPlayer<AdventurePlayer>().RemovePick(TileID.JunglePlants, TileID.JunglePlants2, TileID.PlantDetritus);
+        plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
+    }
 
     public override MinigameRanking GetRanking()
     {

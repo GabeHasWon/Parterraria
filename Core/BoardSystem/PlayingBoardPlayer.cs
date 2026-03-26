@@ -300,8 +300,8 @@ internal class PlayingBoardPlayer : ModPlayer
                 node = nodes[0].links.GetLinkTo(connectedNode).Parent;
             else
             {
-                foreach (var link in connectedNode.links)
-                    splitNodes.Add(link.ToNode);
+                foreach (var priorNode in nodes)
+                    splitNodes.Add(priorNode);
 
                 promptingSplit = true;
                 node = null;

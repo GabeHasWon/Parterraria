@@ -46,10 +46,7 @@ internal class GetHeightGame : Minigame
                 [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.LunarHook)]);
         }
         else
-        {
-            plr.Center = playerStartLocation.ToWorldCoordinates();
-            plr.RemoveAllGrapplingHooks();
-        }
+            plr.SafeTeleport(playerStartLocation.ToWorldCoordinates());
     }
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();

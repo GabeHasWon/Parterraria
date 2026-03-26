@@ -76,7 +76,10 @@ internal partial class WorldBoardSystem : ModSystem
             if (obj is not PlayerWins wins)
                 return -1;
 
-            return (wins.Cores + wins.Coins).CompareTo(Cores + Coins);
+            if (wins.Cores != Cores)
+                return wins.Cores.CompareTo(Cores);
+
+            return wins.Coins.CompareTo(Coins);
         }
 
         public override bool Equals([NotNullWhen(true)] object obj)
@@ -92,7 +95,7 @@ internal partial class WorldBoardSystem : ModSystem
 
     public const int ThirdPlaceWaitTime = 400;
     public const int SecondPlaceWaitTime = ThirdPlaceWaitTime + 200;
-    public const int FirstPlaceWaitTime = ThirdPlaceWaitTime + 300;
+    public const int FirstPlaceWaitTime = ThirdPlaceWaitTime + 400;
 
     public static WorldBoardSystem Self => ModContent.GetInstance<WorldBoardSystem>();
 

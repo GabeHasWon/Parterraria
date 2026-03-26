@@ -236,6 +236,7 @@ internal class WorldMinigameSystem : ModSystem
         else
         {
             _minigames = MinigameSelectionUIState.DetermineMinigames();
+            _minigameTime = 0;
             _selectedMinigame = MinigameSelectionUIState.RandomizeSelectedGame();
             new SyncMinigameRollUIModule(_selectedMinigame, _minigames).Send(-1, -1, false);
         }
@@ -284,6 +285,8 @@ internal class WorldMinigameSystem : ModSystem
 
         playingMinigame = null;
         rankings = null;
+
+        _minigameTime = 0;
     }
 
     public override void ClearWorld()

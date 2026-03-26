@@ -53,10 +53,7 @@ internal class PointRaceGame : Minigame
                 [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.HermesBoots), new Item(ItemID.ShinyRedBalloon)], []);
         }
         else
-        {
-            plr.Center = playerStartLocation.ToWorldCoordinates();
-            plr.QuickDismount();
-        }
+            plr.SafeTeleport(playerStartLocation.ToWorldCoordinates());
     }
 
     public override void OnStart() => RankingByWhoAmI.Clear();

@@ -31,6 +31,7 @@ internal class PartyMirror : ModItem, IBoardClearItem
     {
         player.GetModPlayer<PlayingBoardPlayer>().connectedNode = Main.rand.Next(WorldBoardSystem.Self.playingBoard.nodes);
         player.Center = player.GetModPlayer<PlayingBoardPlayer>().connectedNode.position;
+        player.fallStart = player.fallStart2 = (int)(player.Center.Y / 16f);
         position = player.Center;
 
         velocity.Y = -16;

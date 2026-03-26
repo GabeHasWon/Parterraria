@@ -1,13 +1,17 @@
-﻿using Parterraria.Common;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Parterraria.Common;
 using Parterraria.Content.Items.Board;
 using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem.BoardUI;
 using Parterraria.Core.MinigameSystem;
 using Parterraria.Core.MinigameSystem.MinigameUI;
+using Parterraria.Core.Synchronization;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.States;
+using Terraria.Graphics;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.UI;
@@ -108,6 +112,10 @@ internal class BoardUISystem : ModSystem
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
     {
         int resourceBarIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Resource Bars"));
+        int inventory = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Inventory"));
+
+        if (inventory != -1)
+            layers.Insert(inventory, new LegacyGameInterfaceLayer("Parterraria: Board HUD", DrawBoardHUD, InterfaceScaleType.UI));
 
         if (resourceBarIndex != -1)
         {
@@ -181,12 +189,15 @@ internal class BoardUISystem : ModSystem
         return true;
     }
 
-    private static void DrawBoardHUD()
+    private static bool DrawBoardHUD()
     {
+        if (!WorldBoardSystem.PlayingParty)
+            return true;
+
         if (WorldBoardSystem.GameFinished)
         {
             DrawPodium();
-            return;
+            return true;
         }
 
         if (Main.npcShop > 0 && Main.LocalPlayer.GetModPlayer<PlayingBoardPlayer>().hasGoneOnCurrentTurn)
@@ -216,8 +227,12 @@ internal class BoardUISystem : ModSystem
             BoardNode node = boardPlayer.connectedNode;
             string text = $"{playerName}: {player.CountItem(type, 999)} [i:{type}] {player.CountItem(core, 99)} [i:{core}] - [nodeicon:{node.Name}] {node.DisplayName}";
 
+            if (Main.netMode == NetmodeID.SinglePlayer ? Main.npcShop > 0 : SyncInShopModule.InShop(i))
+                text += $" [c/FFFFAA:{Language.GetTextValue("Mods.Parterraria.MiscUI.InShop")}]";
+
             var headPosition = new Vector2(30, yPos - 8);
             Main.PlayerRenderer.DrawPlayerHead(Main.Camera, player, headPosition, 1f, 1f, Color.White);
+
             ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.MouseText.Value, text, new Vector2(64, yPos - 18), Color.White, 0f, Vector2.Zero, Vector2.One);
 
             if (new Rectangle((int)headPosition.X - 15, (int)headPosition.Y - 15, 30, 30).Contains(Main.MouseScreen.ToPoint()))
@@ -231,7 +246,12 @@ internal class BoardUISystem : ModSystem
 
             yPos += 30;
         }
+
+        return true;
     }
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_transformationMatrix")]
+    public static extern ref Matrix GetTransform(SpriteViewMatrix self);
 
     private static void DrawPodium()
     {
@@ -288,9 +308,6 @@ internal class BoardUISystem : ModSystem
 
     public static bool DrawMiscUI()
     {
-        if (WorldBoardSystem.PlayingParty)
-            DrawBoardHUD();
-
         WorldMinigameSystem.DrawMinigameUI();
         return true;
     }
