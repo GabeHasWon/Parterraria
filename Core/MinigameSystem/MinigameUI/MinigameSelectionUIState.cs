@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
@@ -27,17 +28,17 @@ internal class MinigameSelectionUIState : UIState
         _minigameTime = 0;
 
         if (_selectedGame == -1)
-            RandomizeSelectedGame();
+            _selectedGame = RandomizeSelectedGame();
     }
 
-    private void RandomizeSelectedGame() => _selectedGame = Main.rand.Next(34, 34 + 4 * 3);
+    internal static int RandomizeSelectedGame() => Main.rand.Next(34, 34 + 4 * 3);
 
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
 
         if (_selectedGame == -1)
-            RandomizeSelectedGame();
+            _selectedGame = RandomizeSelectedGame();
 
         UpdateTimers();
     }
@@ -48,7 +49,7 @@ internal class MinigameSelectionUIState : UIState
         selectedMinigame = (int)(_minigameTime % 4);
 
         if ((Main.netMode != NetmodeID.SinglePlayer || Main.instance.IsActive) && _minigameTime >= _selectedGame)
-            _setMinigame(_minigames[(selectedMinigame - 1) % 4]);
+            _setMinigame(_minigames[Math.Abs(selectedMinigame - 1) % 4]);
     }
 
     public override void OnInitialize()

@@ -236,7 +236,7 @@ internal class WorldMinigameSystem : ModSystem
         else
         {
             _minigames = MinigameSelectionUIState.DetermineMinigames();
-            _timerSpeed = Main.rand.NextFloat(2f, 2.5f);
+            _selectedMinigame = MinigameSelectionUIState.RandomizeSelectedGame();
             new SyncMinigameRollUIModule(_selectedMinigame, _minigames).Send(-1, -1, false);
         }
 
@@ -261,20 +261,10 @@ internal class WorldMinigameSystem : ModSystem
 
     public void RollMinigameOnServer()
     {
-        _minigameTime += _timerSpeed;
-        _timerSpeed *= 0.98f;
+        _minigameTime = MathHelper.Lerp(_minigameTime, _selectedMinigame + 0.5f, 0.012f);
 
-        if (_minigameTime > 1)
-        {
-            _selectedMinigame++;
-            _minigameTime = 0;
-        }
-
-        if (_selectedMinigame >= 4)
-            _selectedMinigame = 0;
-
-        if ((Main.netMode != NetmodeID.SinglePlayer || Main.instance.IsActive) && _timerSpeed < 0.005f)
-            StartMinigame(_minigames[_selectedMinigame]);
+        if ((Main.netMode != NetmodeID.SinglePlayer || Main.instance.IsActive) && _minigameTime >= _selectedMinigame)
+            StartMinigame(_minigames[Math.Abs(_selectedMinigame - 1) % 4]);
     }
 
     internal void StopParty()
