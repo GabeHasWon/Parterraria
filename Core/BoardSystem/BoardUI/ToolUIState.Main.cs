@@ -260,7 +260,7 @@ internal partial class ToolUIState(Player player) : UIState
     }
 
     private void SetEditUI() => BoardUISystem.SetMiscUI(new EditObjectUIState(WorldBoardSystem.Self.worldBoards[_boardKey].config, 
-        (obj, hasChanged) => SaveEditsOnBoard(_boardKey, obj, hasChanged)));
+        (obj, hasChanged) => SaveEditsOnBoard(_boardKey, obj, hasChanged), BoardUISystem.BoardConfigFieldLocalizations));
 
     public static void SaveEditsOnBoard(string key, object obj, bool hasChanged)
     {

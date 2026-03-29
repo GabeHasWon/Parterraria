@@ -120,7 +120,7 @@ internal partial class ToolUIState : UIState
             {
                 BoardUISystem.CloseMiscUI();
                 BoardUISystem.SetMiscUI(new EditObjectUIState(WorldBoardSystem.Self.worldBoards[_boardKey].config, 
-                    (obj, changed) => SaveEditsOnBoard(_boardKey, obj, changed)));
+                    (obj, changed) => SaveEditsOnBoard(_boardKey, obj, changed), BoardUISystem.BoardConfigFieldLocalizations));
             }
         };
 

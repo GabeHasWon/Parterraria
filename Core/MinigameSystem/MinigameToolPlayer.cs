@@ -100,7 +100,7 @@ internal class MinigameToolPlayer : ModPlayer
                         string postfix = Main.netMode == NetmodeID.MultiplayerClient ? "AndSynced" : "";
                         string date = DateTime.Now.ToString("H:mm:ss");
                         Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Minigame.Updated" + postfix, date), CommonColors.Success);
-                    }));
+                    }, _selectedWorldMinigame.fieldLocalizations));
                 }
                 else
                 {

@@ -1,14 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Terraria.GameContent.UI.Elements;
+using Terraria.Localization;
 using Terraria.UI;
 
 namespace Parterraria.Core.BoardSystem.BoardUI.EditUI;
 
-internal class EditObjectUIState(object objectToEdit, Action<object, bool> setObjectFunc) : UIState
+#nullable enable
+
+/// <summary>
+/// Describes a field's localized name and description.
+/// </summary>
+public readonly record struct FieldLocalization(LocalizedText Name, LocalizedText Description);
+
+internal class EditObjectUIState(object objectToEdit, Action<object, bool> setObjectFunc, Dictionary<string, FieldLocalization>? localizations = null) : UIState
 {
+    public static readonly BindingFlags FieldReflectionFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+
     private readonly Action<object, bool> _setObjectFunc = setObjectFunc;
+    private readonly Dictionary<string, FieldLocalization>? _localizations = localizations;
 
     private object _objectToEdit = objectToEdit;
     private int _saveTimer = -1;
@@ -33,9 +45,7 @@ internal class EditObjectUIState(object objectToEdit, Action<object, bool> setOb
         panel.OnUpdate += self =>
         {
             if (self.GetDimensions().ToRectangle().Contains(Main.MouseScreen.ToPoint()))
-            {
                 Main.LocalPlayer.mouseInterface = true;
-            }
         };
 
         Append(panel);
@@ -60,7 +70,8 @@ internal class EditObjectUIState(object objectToEdit, Action<object, bool> setOb
         list.SetScrollbar(bar);
         panel.Append(bar);
 
-        foreach (var item in _objectToEdit.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+        FieldInfo[] fields = _objectToEdit.GetType().GetFields(FieldReflectionFlags);
+        foreach (var item in fields)
         {
             if (item.DeclaringType == typeof(object) || Attribute.IsDefined(item, typeof(HideFromEditAttribute)))
                 continue;
@@ -68,7 +79,7 @@ internal class EditObjectUIState(object objectToEdit, Action<object, bool> setOb
             if (!MemberEditUI.EditableTypes.Contains(item.FieldType) && !MemberEditUI.EditableTypes.Any(x => x.IsAssignableFrom(item.FieldType)))
                 continue;
 
-            MemberEditUI edit = new(_objectToEdit, item)
+            MemberEditUI edit = new(_objectToEdit, item, _localizations?.TryGetValue(item.Name, out FieldLocalization value) is true ? value : null)
             {
                 Width = StyleDimension.Fill,
                 Height = StyleDimension.FromPixels(60),

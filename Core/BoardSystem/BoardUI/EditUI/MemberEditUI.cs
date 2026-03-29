@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NewBeginnings.Common.UI;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Terraria.DataStructures;
@@ -8,14 +9,20 @@ using Terraria.UI;
 
 namespace Parterraria.Core.BoardSystem.BoardUI.EditUI;
 
-internal class MemberEditUI(object reference, FieldInfo info) : UIState
+internal class MemberEditUI(object reference, FieldInfo info, FieldLocalization? localization = null) : UIState
 {
-    public static List<Type> EditableTypes = [typeof(int), typeof(short), typeof(ushort), typeof(byte), typeof(bool), typeof(float), typeof(string), typeof(Vector2), 
+    public static List<Type> EditableTypes = [typeof(int), typeof(short), typeof(ushort), typeof(byte), typeof(bool), typeof(float), typeof(string), typeof(Vector2),
         typeof(Enum), typeof(Point)];
 
     public object GetValue => _info.GetValue(_reference);
 
+    private string DisplayName => Localization.HasValue ? Localization.Value.Name.Value : _info.Name;
+
+    public readonly FieldLocalization? Localization = localization;
+
     public bool HasBeenEdited = false;
+
+    private UIText _text = null;
 
     readonly object _reference = reference;
     readonly FieldInfo _info = info;
@@ -29,13 +36,17 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
         };
         Append(panel);
 
-        UIText text = new(_info.Name)
+        _text = new(DisplayName)
         {
             Width = StyleDimension.Fill,
+            Height = StyleDimension.Fill,
+            Top = StyleDimension.FromPixels(12),
             VAlign = 0.5f
         };
-        text.OnUpdate += (_) => SetText(text);
-        panel.Append(text);
+
+        _text.OnUpdate += (self) => SetText(_text);
+
+        panel.Append(_text);
 
         object value = _info.GetValue(_reference);
         switch (value)
@@ -44,7 +55,9 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
             case short:
             case byte:
             case ushort:
-                BuildInteger(panel);
+            case float:
+            case double:
+                BuildNumber(panel);
                 break;
 
             case Point or Vector2 or Point16:
@@ -63,9 +76,9 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
         object value = _info.GetValue(_reference);
         text.SetText(value switch
         {
-            int or short or byte or ushort or float => _info.Name + ": " + value,
-            Enum => _info.Name + ": " + value + $" ({Convert.ToInt32((Enum)value)})",
-            Point or Vector2 => _info.Name + $": {value}",
+            int or short or byte or ushort or float => DisplayName + ": " + value,
+            Enum => DisplayName + ": " + value + $" ({Convert.ToInt32((Enum)value)})",
+            Point or Vector2 => DisplayName + $": {value}",
             _ => "[Unknown data type, how'd you get here?]"
         });
     }
@@ -96,11 +109,11 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
                     _info.SetValue(_reference, point.ToWorldCoordinates());
             };
         };
-        
+
         panel.Append(incButton);
     }
 
-    private void BuildInteger(UIPanel panel)
+    private void BuildNumber(UIPanel panel)
     {
         var incButton = new UIButton<string>("-")
         {
@@ -118,6 +131,16 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
         };
         decButton.OnLeftClick += (_, _) => ModifyValue(true);
         panel.Append(decButton);
+
+        var input = new UIEditableText(InputType.Number, "#...", EnterEditable, 3)
+        {
+            Width = StyleDimension.FromPixels(60),
+            Height = StyleDimension.Fill,
+            HAlign = 1f,
+            Left = StyleDimension.FromPixels(-64)
+        };
+        input.OnUpdate += CheckSetObjectValue;
+        panel.Append(input);
 
         void ModifyValue(bool increase)
         {
@@ -149,5 +172,45 @@ internal class MemberEditUI(object reference, FieldInfo info) : UIState
 
             HasBeenEdited = true;
         }
+    }
+
+    private void CheckSetObjectValue(UIElement affectedElement)
+    {
+        UIEditableText self = affectedElement as UIEditableText;
+
+        if (self.currentValue != string.Empty && !self.CurrentlyTyping)
+            EnterEditable(self, ref self.currentValue);
+    }
+
+    public void EnterEditable(UIEditableText self, ref string value)
+    {
+        if (value == string.Empty)
+            return;
+
+        object editingValue = _info.GetValue(_reference);
+
+        object newValue = editingValue switch // Require boxing in order to properly type cast
+        {
+            int => (object)int.Parse(value),
+            short => (object)short.Parse(value),
+            ushort => (object)ushort.Parse(value),
+            byte => (object)byte.Parse(value),
+            float => (object)float.Parse(value),
+            double => (object)double.Parse(value),
+            _ => 0,
+        };
+
+        _info.SetValue(_reference, newValue);
+
+        value = "";
+    }
+
+    protected override void DrawChildren(SpriteBatch spriteBatch)
+    {
+        foreach (UIElement element in Elements)
+            element.Draw(spriteBatch);
+
+        if (_text.ContainsPoint(Main.MouseScreen) && Localization.HasValue)
+            UICommon.TooltipMouseText(Localization.Value.Description.Value);
     }
 }

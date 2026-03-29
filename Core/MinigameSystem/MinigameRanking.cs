@@ -6,9 +6,16 @@ using Terraria.Localization;
 
 namespace Parterraria.Core.MinigameSystem;
 
+#nullable enable
+
 public class MinigameRanking
 {
     public Dictionary<int, MinigameReward> Ranking = [];
+
+    /// <summary>
+    /// Ordered by first->last to display in order. Solves my need to manually order it.
+    /// </summary>
+    private IOrderedEnumerable<(int, MinigameReward)>? _displayRanking = null;
 
     /// <summary>
     /// Used for minigames where one player comes in first, everyone else comes in last (or, technically, comes in <see cref="MinigameReward.Placement.Otherwise"/>).
@@ -103,7 +110,7 @@ public class MinigameRanking
         return rank;
     }
 
-    public static MinigameRanking ByOrderAbsolute(int[] playerWhoAmIInOrderOfPlacement, HashSet<int> forcedLast = null)
+    public static MinigameRanking ByOrderAbsolute(int[] playerWhoAmIInOrderOfPlacement, HashSet<int>? forcedLast = null)
     {
         var rank = new MinigameRanking();
 
@@ -141,14 +148,12 @@ public class MinigameRanking
         float scale = 1f;
         var color = Color.White * alphaFade;
 
-        foreach (var (who, rank) in Ranking)
+        _displayRanking ??= Ranking.Select(x => (x.Key, x.Value)).OrderBy(x => x.Value.Place);
+
+        foreach (var (who, rank) in _displayRanking)
         {
             var pos = Main.ScreenSize.ToVector2() / new Vector2(2f, 4f) + new Vector2(0, step++ * 40);
-            DrawCommon.CenteredString(FontAssets.DeathText.Value, pos, $"{Main.player[who].name}: {rank.RewardText} "
-//#if DEBUG
-//                + $"({rank.Place})" // Show internal ranking name in debug only
-//#endif
-                , color, new(scale));
+            DrawCommon.CenteredString(FontAssets.DeathText.Value, pos, $"{Main.player[who].name}: {rank.RewardText} ", color, new(scale));
 
             scale *= 0.75f;
 

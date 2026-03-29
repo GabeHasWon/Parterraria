@@ -1,0 +1,51 @@
+Fields: {
+	MaxMoveTimerInSeconds: {
+		Name: Max Move Timer
+		Description: Amount of time a player has to move to their next node, in seconds.
+	}
+
+	CoreCost: {
+		Name: Core Cost
+		Description: How much a Celestial Core costs to buy.
+	}
+
+	DisallowedMinigames: {
+		Name: Disallowed Minigames (Unused)
+		Description: Not used.
+	}
+
+	CoinDeltaFromNodes: {
+		Name: Coins from Nodes
+		Description: Amount of coins gained or lost from nodes (including Event nodes).
+	}
+
+	CoinDeltaFromGames: {
+		Name: Coins from Games
+		Description: Amount of coins gained from winning games. This scales; this value exactly is used for First place only, and goes down from there.
+	}
+
+	TurnMax: {
+		Name: Max Turns
+		Description: How many turns there are in the game.
+	}
+
+	WinIdlePosition: {
+		Name: Win Idle Position
+		Description: This is where players will be placed when the game is over, before players have won.
+	}
+
+	ThirdPlacePosition: {
+		Name: Third Place Position
+		Description: This is where third place will be placed during the podium sequence.
+	}
+
+	SecondPlacePosition: {
+		Name: Second Place Position
+		Description: This is where second place will be placed during the podium sequence.
+	}
+
+	FirstPlacePosition: {
+		Name: First Place Position
+		Description: This is where first place will be placed during the podium sequence.
+	}
+}

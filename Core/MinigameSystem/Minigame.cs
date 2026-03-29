@@ -49,6 +49,12 @@ public abstract class Minigame : ModType
 
     public Point playerStartLocation = default;
 
+    /// <summary>
+    /// Maps field name to their localization.
+    /// </summary>
+    [HideFromEdit]
+    internal Dictionary<string, FieldLocalization> fieldLocalizations = [];
+
     protected sealed override void Register()
     {
         ModTypeLookup<Minigame>.Register(this);
@@ -57,6 +63,38 @@ public abstract class Minigame : ModType
 
         Language.GetOrRegister(LocalizationPath + ".Name", () => GetType().Name);
         Language.GetOrRegister(LocalizationPath + ".Description", () => GetType().Name);
+
+        FieldInfo[] fields = GetType().GetFields(EditObjectUIState.FieldReflectionFlags);
+
+        foreach (FieldInfo field in fields)
+        {
+            if (field.DeclaringType == typeof(object) || Attribute.IsDefined(field, typeof(HideFromEditAttribute)))
+                continue;
+
+            if (field.DeclaringType == typeof(Minigame)) // Force consistent localizations for minigame members
+            {
+                LocalizedText minigameFieldName = Language.GetOrRegister("Mods." + Mod.Name + ".Party.Minigames." + field.Name + ".Name", () => field.Name);
+                LocalizedText minigameFieldDesc = Language.GetOrRegister("Mods." + Mod.Name + ".Party.Minigames." + field.Name + ".Description", () => "");
+                fieldLocalizations.Add(field.Name, new FieldLocalization(minigameFieldName, minigameFieldDesc));
+                continue;
+            }
+
+            string key = LocalizationPath + ".Fields." + field.Name + ".Name";
+            string descKey = LocalizationPath + ".Fields." + field.Name + ".Description";
+
+            if (Attribute.GetCustomAttribute(field, typeof(MemberLocalizableAttribute)) is MemberLocalizableAttribute member)
+            {
+                if (member.ForceKey is { } newKey)
+                    key = newKey;
+
+                if (member.ForceDescription is { } newDescription)
+                    descKey = newDescription;
+            }
+
+            LocalizedText name = Language.GetOrRegister(key, () => field.Name);
+            LocalizedText description = descKey == string.Empty ? LocalizedText.Empty : Language.GetOrRegister(descKey, () => "");
+            fieldLocalizations.Add(field.Name, new FieldLocalization(name, description));
+        }
     }
 
     /// <summary>

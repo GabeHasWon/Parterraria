@@ -3,11 +3,13 @@ using Parterraria.Common;
 using Parterraria.Content.Items.Board;
 using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem.BoardUI;
+using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.MinigameSystem;
 using Parterraria.Core.MinigameSystem.MinigameUI;
 using Parterraria.Core.Synchronization;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.States;
@@ -22,6 +24,8 @@ namespace Parterraria.Core.BoardSystem;
 internal class BoardUISystem : ModSystem
 {
     public static BoardUISystem Self => ModContent.GetInstance<BoardUISystem>();
+
+    internal static Dictionary<string, FieldLocalization> BoardConfigFieldLocalizations = [];
 
     internal UserInterface toolUI = null;
     internal UserInterface miscUI = null;
@@ -40,6 +44,24 @@ internal class BoardUISystem : ModSystem
 
             miscUI = new UserInterface();
             miscUI.SetState(null);
+
+            BoardConfigFieldLocalizations.Clear();
+
+            FieldInfo[] fields = typeof(BoardConfig).GetFields(EditObjectUIState.FieldReflectionFlags);
+
+            foreach (FieldInfo field in fields)
+            {
+                if (field.DeclaringType == typeof(object) || Attribute.IsDefined(field, typeof(HideFromEditAttribute)))
+                    continue;
+
+                const string LocalizationPath = "Mods.Parterraria.Party";
+
+                string key = LocalizationPath + ".Fields." + field.Name + ".Name";
+                string descKey = LocalizationPath + ".Fields." + field.Name + ".Description";
+                LocalizedText name = Language.GetOrRegister(key, () => field.Name);
+                LocalizedText description = descKey == string.Empty ? LocalizedText.Empty : Language.GetOrRegister(descKey, () => "");
+                BoardConfigFieldLocalizations.Add(field.Name, new FieldLocalization(name, description));
+            }
         }
     }
 

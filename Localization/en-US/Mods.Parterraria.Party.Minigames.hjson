@@ -1,11 +1,33 @@
+MinigameLength: Minigame Length
+LengthDescription: Minigame length, in seconds.
+
+playerStartLocation: {
+	Name: Player Start Location
+	Description: Spawn point for players starting the minigame.
+}
+
 CraftLargeDiamondGame: {
 	Name: Diamond Dash
 	Description: Various diamonds will spawn around the arena. Mine them, craft a Large Diamond at an Anvil, and win!
+
+	Fields: {
+		_diamondTicksInterval: {
+			Name: Diamond Placement Speed
+			Description: If the minigame goes on for a while, diamonds will be randomly placed once every (this number) frames.
+		}
+	}
 }
 
 GetCrownGame: {
 	Name: Crown Craze
 	Description: Somewhere, there is a crown on the ground. Pick it up and wear it to win!
+
+	Fields: {
+		_crownSpawnLocation: {
+			Name: Crown Placement
+			Description: Where the crown will be spawned.
+		}
+	}
 }
 
 CookingDashGame: {
@@ -16,11 +38,45 @@ CookingDashGame: {
 ProjectileRainGame: {
 	Name: Risky Rain
 	Description: Projectiles rain from the ceiling. The player with the most health at the end wins!
+
+	Fields: {
+		MinigameTimeInSeconds: {
+			Name: "{$MinigameLength}"
+			Description: "{$LengthDescription}"
+		}
+
+		ProjectilesPerSecond: {
+			Name: Projectiles/Second
+			Description: How many projectiles are spawned per second along the line.
+		}
+
+		Left: {
+			Name: Point One
+			Description: First bound for projectile spawning. Projectiles are spawned on the first solid tile above a point randomly chosen between this and point two.
+		}
+
+		Right: {
+			Name: Point Two
+			Description: Second bound for projectile spawning. Projectiles are spawned on the first solid tile above a point randomly chosen between this and point one.
+		}
+
+		ProjId: {
+			Name: Projectile ID
+			Description: Projectile ID that this minigame spawns. Defaults to a Boulder.
+		}
+	}
 }
 
 SplashArtGame: {
 	Name: Splash Art
 	Description: Each player paints the wall behind them. The one with the most paint at the end wins!
+
+	Fields: {
+		MinigameTimeInSeconds: {
+			Name: "{$MinigameLength}"
+			Description: "{$LengthDescription}"
+		}
+	}
 }
 
 BugChaseGame: {
@@ -30,12 +86,31 @@ BugChaseGame: {
 
 PointRaceGame: {
 	Name: Expeditious Escapade
-	Description: Somewhere there is a finish point. Get there first!
+	Description: Race around the area to reach the checkered flag!
+
+	Fields: {
+		endPosition: {
+			Name: End Position
+			Description: Players near this point will complete the minigame.
+		}
+
+		distanceToWin: {
+			Name: Win Radius
+			Description: Radius of the win minigame, in pixels.
+		}
+	}
 }
 
 GetHeightGame: {
 	Name: Peak Performance
 	Description: Race upwards to the highest peak to win!
+
+	Fields: {
+		MinigameTimeInSeconds: {
+			Name: "{$MinigameLength}"
+			Description: "{$LengthDescription}"
+		}
+	}
 }
 
 MannequinGame: {
@@ -46,4 +121,16 @@ MannequinGame: {
 PhotoOpGame: {
 	Name: Celebrity Photoshoot
 	Description: Stay close to the famous Slime of Terraria to win!
+
+	Fields: {
+		secondsBetweenPhotos: {
+			Name: Seconds Between Photos
+			Description: Time between photos, in seconds.
+		}
+
+		totalPhotos: {
+			Name: Total Photos
+			Description: Total photos taken. This, combined with Seconds Between Photos, determines the length of the minigame.
+		}
+	}
 }
