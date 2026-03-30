@@ -141,6 +141,8 @@ internal class BoardUISystem : ModSystem
 
         if (resourceBarIndex != -1)
         {
+            layers.Insert(resourceBarIndex - 3, new LegacyGameInterfaceLayer("Parterraria: Minigame In-World UI", DrawMinigame, InterfaceScaleType.Game));
+
             layers.Insert(resourceBarIndex - 2, new LegacyGameInterfaceLayer(
                 "Parterraria: Board",
                 DrawBoard,
@@ -179,7 +181,6 @@ internal class BoardUISystem : ModSystem
                 InterfaceScaleType.UI)
             );
 
-            layers.Add(new LegacyGameInterfaceLayer("Parterraria: Minigame In-World UI", DrawMinigame, InterfaceScaleType.Game));
             layers.Add(new LegacyGameInterfaceLayer("Parterraria: Board/Minigame UI", DrawMiscUI, InterfaceScaleType.UI));
         }
     }
@@ -247,7 +248,10 @@ internal class BoardUISystem : ModSystem
             bool goneOnCurrentTurn = WorldMinigameSystem.InMinigame ? boardPlayer.minigameReady : boardPlayer.hasGoneOnCurrentTurn;
             string playerName = $"[c/{(goneOnCurrentTurn ? Color.Green : Color.White).Hex3()}:{player.name}]";
             BoardNode node = boardPlayer.connectedNode;
-            string text = $"{playerName}: {player.CountItem(type, 999)} [i:{type}] {player.CountItem(core, 99)} [i:{core}] - [nodeicon:{node.Name}] {node.DisplayName}";
+            string text = $"{playerName}";
+
+            if (!WorldMinigameSystem.InMinigame)
+                text += $": {player.CountItem(type, 999)} [i:{type}] {player.CountItem(core, 99)} [i:{core}] - [nodeicon:{node.Name}] {node.DisplayName}";
 
             if (Main.netMode == NetmodeID.SinglePlayer ? Main.npcShop > 0 : SyncInShopModule.InShop(i))
                 text += $" [c/FFFFAA:{Language.GetTextValue("Mods.Parterraria.MiscUI.InShop")}]";

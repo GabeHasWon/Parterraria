@@ -3,6 +3,7 @@ using Parterraria.Core.BoardSystem;
 using Parterraria.Core.InventoryStorageSystem;
 using System.IO;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.MinigameSystem.Games;
@@ -105,4 +106,5 @@ internal class GetCrownGame : Minigame
     }
 
     public override void ReadNetData(BinaryReader reader) => _crownSpawnLocation = new(reader.ReadInt32(), reader.ReadInt32());
+    protected override (object, LocalizedText)[] DebugDisplayPositions() => [(_crownSpawnLocation, Language.GetOrRegister(LocalizationPath + ".Positions.Crown"))];
 }

@@ -21,7 +21,7 @@ internal class SplashArtGame : Minigame
     private int _timer = 0;
 
     [HideFromEdit]
-    private Dictionary<int, int> _countsByPaintId = [];
+    private readonly Dictionary<int, int> _countsByPaintId = [];
 
     public override bool ValidateRectangle(ref Rectangle rectangle)
     {

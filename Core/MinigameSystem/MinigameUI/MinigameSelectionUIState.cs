@@ -108,11 +108,15 @@ internal class MinigameSelectionUIState : UIState
     {
         minigamesDisplay ??= new string[4];
         string[] minigames = new string[4];
+        HashSet<string> gameNames = [];
         HashSet<Minigame> games = [];
 
         foreach (var item in WorldMinigameSystem.worldMinigames)
         {
-            games.Add(item);
+            if (!gameNames.Contains(item.Name))
+                games.Add(item);
+
+            gameNames.Add(item.Name);
         }
 
         for (int i = 0; i < 4; ++i)

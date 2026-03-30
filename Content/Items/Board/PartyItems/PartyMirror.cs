@@ -1,4 +1,5 @@
-﻿using Parterraria.Core.BoardSystem;
+﻿using Parterraria.Common;
+using Parterraria.Core.BoardSystem;
 using Parterraria.Core.MinigameSystem;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -30,8 +31,7 @@ internal class PartyMirror : ModItem, IBoardClearItem
     public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int d, ref float k)
     {
         player.GetModPlayer<PlayingBoardPlayer>().connectedNode = Main.rand.Next(WorldBoardSystem.Self.playingBoard.nodes);
-        player.Center = player.GetModPlayer<PlayingBoardPlayer>().connectedNode.position;
-        player.fallStart = player.fallStart2 = (int)(player.Center.Y / 16f);
+        player.SafeTeleport(player.GetModPlayer<PlayingBoardPlayer>().connectedNode.position);
         position = player.Center;
 
         velocity.Y = -16;

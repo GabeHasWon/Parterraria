@@ -7,7 +7,12 @@ namespace Parterraria.Core.BoardSystem.Events;
 internal class LoseMoneyEvent : Microevent
 {
     public override Quality EventQuality => Quality.Bad;
+
+    /// <summary>
+    /// Loses equivalent to the board's config Coin from Nodes.
+    /// </summary>
     protected virtual int Loss => WorldBoardSystem.Self.playingBoard.config.CoinDeltaFromNodes;
+
     public override LocalizedText Text => Language.GetOrRegister("Mods.Parterraria.Microevents.LoseMoneyEvent", () => "").WithFormatArgs(Loss);
 
     protected override void InternalInvoke(Player player) => CommonUtils.ConsumeItemFromInventory<AmethystCoin>(player, Loss, true);

@@ -28,6 +28,8 @@ GetCrownGame: {
 			Description: Where the crown will be spawned.
 		}
 	}
+
+	Positions.Crown: "{$Fields._crownSpawnLocation.Name}"
 }
 
 CookingDashGame: {
@@ -65,6 +67,11 @@ ProjectileRainGame: {
 			Description: Projectile ID that this minigame spawns. Defaults to a Boulder.
 		}
 	}
+
+	Positions: {
+		Left: "{$Fields.Left.Name}"
+		Right: "{$Fields.Right.Name}"
+	}
 }
 
 SplashArtGame: {
@@ -99,6 +106,8 @@ PointRaceGame: {
 			Description: Radius of the win minigame, in pixels.
 		}
 	}
+
+	Positions.End: "{$Fields.endPosition.Name}"
 }
 
 GetHeightGame: {

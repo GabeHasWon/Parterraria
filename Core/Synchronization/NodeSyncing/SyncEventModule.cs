@@ -5,6 +5,11 @@ using Terraria.ID;
 
 namespace Parterraria.Core.Synchronization.BoardItemSyncing;
 
+/// <summary>
+/// Runs a <see cref="Microevent"/> on all clients + server.
+/// </summary>
+/// <param name="index"></param>
+/// <param name="fromWho"></param>
 [Serializable]
 public class SyncEventModule(int index, int fromWho) : Module
 {

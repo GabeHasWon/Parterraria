@@ -61,6 +61,8 @@ public abstract class Minigame : ModType
         MinigamesByModAndName.Add(Mod.Name + "/" + GetType().Name, this);
         MinigamesById.Add(MinigamesById.Count, this);
 
+        _ = DebugDisplayPositions();
+
         Language.GetOrRegister(LocalizationPath + ".Name", () => GetType().Name);
         Language.GetOrRegister(LocalizationPath + ".Description", () => GetType().Name);
 
@@ -182,18 +184,11 @@ public abstract class Minigame : ModType
         if (debug)
         {
             DrawCommon.DrawPositionMarker(playerStartLocation.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.StartPosition"));
+            (object position, LocalizedText name)[] positions = DebugDisplayPositions();
 
-            var points = GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
-                .Where(x => (typeof(Point).IsAssignableFrom(x.FieldType) || typeof(Vector2).IsAssignableFrom(x.FieldType)
-                    || typeof(Point16).IsAssignableFrom(x.FieldType)) && x.DeclaringType != typeof(Minigame));
-
-            FieldInfo[] points2 = [.. points];
-
-            foreach (var item in points)
+            foreach (var item in positions)
             {
-                object value = item.GetValue(this);
-
-                Vector2 position = value switch
+                Vector2 position = item.position switch
                 {
                     Point16 point16 => point16.ToWorldCoordinates(0, 0),
                     Vector2 vecPosition => vecPosition,
@@ -201,12 +196,14 @@ public abstract class Minigame : ModType
                     _ => throw null,
                 };
 
-                DrawCommon.DrawPositionMarker(position, item.Name);
+                DrawCommon.DrawPositionMarker(position, item.name.Value);
             }
         }
 
         InternalDraw(debug);
     }
+
+    protected virtual (object, LocalizedText)[] DebugDisplayPositions() => [];
 
     /// <summary>
     /// Draws the minigame.

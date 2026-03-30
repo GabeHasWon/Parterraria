@@ -15,7 +15,13 @@ NPCs: {
 Microevents: {
 	GainMoneyEvent: Got {0} amethyst coins!
 	LoseMoneyEvent: Lost {0} amethyst coins...
-	GetItemEvent: Got item!
+	GetItemEvent: Got item: {0}!
+
+	MoveEvent: {
+		Text: Moved {0} spaces {1}!
+		Back: backwards
+		Front: forwards
+	}
 }
 
 Amethyst: amethyst

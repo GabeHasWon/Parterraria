@@ -6,6 +6,7 @@ using PathOfTerraria.Common.NPCs;
 using System;
 using System.IO;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.MinigameSystem.Games;
@@ -132,4 +133,7 @@ internal class ProjectileRainGame : Minigame
         writer.Write(Right.X);
         writer.Write(Right.Y);
     }
+
+    protected override (object, LocalizedText)[] DebugDisplayPositions() => [(Left, Language.GetOrRegister(LocalizationPath + ".Positions.Left")),
+        (Right, Language.GetOrRegister(LocalizationPath + ".Positions.Right"))];
 }

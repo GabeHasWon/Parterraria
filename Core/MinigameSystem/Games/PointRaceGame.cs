@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.MinigameSystem.Games;
@@ -117,4 +118,6 @@ internal class PointRaceGame : Minigame
         writer.WriteVector2(endPosition);
         writer.Write(distanceToWin);
     }
+
+    protected override (object, LocalizedText)[] DebugDisplayPositions() => [(endPosition, Language.GetOrRegister(LocalizationPath + ".Positions.End"))];
 }
