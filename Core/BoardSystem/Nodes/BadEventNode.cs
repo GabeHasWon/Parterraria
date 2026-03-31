@@ -1,7 +1,10 @@
-﻿using Parterraria.Core.BoardSystem.Events;
-using Parterraria.Core.Synchronization.BoardItemSyncing;
+﻿using Parterraria.Common;
+using Parterraria.Core.BoardSystem.Events;
+using Parterraria.Core.Synchronization.NodeSyncing;
+using System.IO;
 using System.Linq;
 using Terraria.ID;
+using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.BoardSystem.Nodes;
 
@@ -13,11 +16,13 @@ public class BadEventNode() : EmptyNode
         var ev = events.ElementAt(Main.rand.Next(events.Count()));
 
         if (Main.netMode == NetmodeID.SinglePlayer)
-            ev.Invoke(player);
+            ev.Invoke(player, null);
         else if (player.whoAmI == Main.myPlayer)
         {
             int slot = Microevent.Microevents.IndexOf(ev);
-            new SyncEventModule(slot, player.whoAmI).Send(-1, -1, false);
+            byte[] data = NetUtils.WriteAsBytes(Microevent.Microevents[slot].NetSend);
+
+            new SyncMicroeventModule(slot, player.whoAmI, data).Send(-1, -1, false);
         }
     }
 }

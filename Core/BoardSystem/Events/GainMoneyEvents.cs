@@ -1,8 +1,11 @@
 ﻿using Parterraria.Common;
 using Parterraria.Content.Items.Board;
+using System.IO;
 using Terraria.Localization;
 
 namespace Parterraria.Core.BoardSystem.Events;
+
+#nullable enable
 
 internal class GainMoneyEvent : Microevent
 {
@@ -10,7 +13,7 @@ internal class GainMoneyEvent : Microevent
     protected virtual int Gain => WorldBoardSystem.Self.playingBoard.config.CoinDeltaFromNodes;
     public override LocalizedText Text => Language.GetOrRegister("Mods.Parterraria.Microevents.GainMoneyEvent", () => "").WithFormatArgs(Gain);
 
-    protected override void InternalInvoke(Player player) => CommonUtils.SafelyAddItemToInv<AmethystCoin>(player, Gain);
+    protected override void InternalInvoke(Player player, BinaryReader? reader) => CommonUtils.SafelyAddItemToInv<AmethystCoin>(player, Gain);
 }
 
 internal class DoubleGainMoneyEvent : GainMoneyEvent

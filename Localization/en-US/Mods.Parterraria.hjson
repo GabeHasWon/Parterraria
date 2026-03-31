@@ -18,7 +18,7 @@ Microevents: {
 	GetItemEvent: Got item: {0}!
 
 	MoveEvent: {
-		Text: Moved {0} spaces {1}!
+		Text: Moved {0} space(s) {1}!
 		Back: backwards
 		Front: forwards
 	}

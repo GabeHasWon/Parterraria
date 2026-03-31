@@ -201,7 +201,6 @@ internal class ToolUsage
             else if (!Main.mouseMiddle)
             {
                 buildingNode.halfWidth = (int)(Math.Max(Math.Abs(buildingNode.position.X - Main.MouseWorld.X), Math.Abs(buildingNode.position.Y - Main.MouseWorld.Y)) / 16f) * 16;
-                Main.NewText(buildingNode.halfWidth);
 
                 if (buildingNode.halfWidth < 48)
                     buildingNode.halfWidth = 48;

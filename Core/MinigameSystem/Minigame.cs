@@ -153,15 +153,7 @@ public abstract class Minigame : ModType
     /// <summary>
     /// Returns the result of <see cref="WriteNetData(BinaryWriter)"/> as a byte array.
     /// </summary>
-    public byte[] GetNetBytes()
-    {
-        using MemoryStream mem = new();
-        using BinaryWriter writer = new(mem);
-        WriteNetData(writer);
-        writer.Flush();
-        mem.Position = 0;
-        return mem.ReadBytes(mem.Length);
-    }
+    public byte[] GetNetBytes() => NetUtils.WriteAsBytes(WriteNetData);
 
     public virtual void ReadNetData(BinaryReader reader)
     {

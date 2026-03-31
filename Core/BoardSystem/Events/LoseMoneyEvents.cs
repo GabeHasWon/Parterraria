@@ -1,8 +1,11 @@
 ﻿using Parterraria.Common;
 using Parterraria.Content.Items.Board;
+using System.IO;
 using Terraria.Localization;
 
 namespace Parterraria.Core.BoardSystem.Events;
+
+#nullable enable
 
 internal class LoseMoneyEvent : Microevent
 {
@@ -15,7 +18,7 @@ internal class LoseMoneyEvent : Microevent
 
     public override LocalizedText Text => Language.GetOrRegister("Mods.Parterraria.Microevents.LoseMoneyEvent", () => "").WithFormatArgs(Loss);
 
-    protected override void InternalInvoke(Player player) => CommonUtils.ConsumeItemFromInventory<AmethystCoin>(player, Loss, true);
+    protected override void InternalInvoke(Player player, BinaryReader? reader) => CommonUtils.ConsumeItemFromInventory<AmethystCoin>(player, Loss, true);
 }
 
 internal class DoubleLoseMoneyEvent : LoseMoneyEvent
