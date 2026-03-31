@@ -9,6 +9,7 @@ namespace Parterraria.Core.BoardSystem.Events;
 
 #nullable enable
 
+// Not included in release, couldn't get functionality working.
 [Autoload(false)]
 internal class MoveEvent : Microevent
 {
@@ -58,8 +59,6 @@ internal class MoveEvent : Microevent
     {
         sbyte move = MoveRange();
         writer.Write(move);
-
-        Main.NewText(move);
 
         for (int i = 0; i < move; ++i)
             writer.Write((byte)Main.rand.Next(byte.MaxValue + 1));

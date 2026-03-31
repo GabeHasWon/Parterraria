@@ -9,4 +9,7 @@ internal class ParterrariaServerConfig : ModConfig
 
     [DefaultValue(false)]
     public bool AlwaysAdventureOnServer;
+
+    [DefaultValue(true)]
+    public bool DisablePartySpawns;
 }

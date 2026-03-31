@@ -1,3 +1,7 @@
+Please note: This may need improvement! Give me feedback on how to make this easier to understand.
+
+NOTE: This mod may mess up player saves. Make a player solely focused on playing this mod, or you may lose items, armor, accessories, and other items!
+
 --------------------------------------------
 BUILD TOOL:
 Crafted with 5 wood, 1 ruby @ anvil
@@ -60,6 +64,3 @@ WRENCH (EDIT): Edits a selected minigame.
 LIST:
 Opens a list of minigames to select.
 These are listed by mod, name and internal name.
-
-- Fix Splash Art not working properly in mp
-- Fix Splash Art sample minigame area being short

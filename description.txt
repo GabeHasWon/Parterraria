@@ -1,11 +1,13 @@
 ----- Parterraria! -----
+Initial Release Version
+
 by GabeHasWon
 commissioned & concepted by Megaswave
 
 Parterraria! is a mod that adds in the ability to play Mario Party-styled games within Terraria.
 You can build the boards, build the minigames, and play with any amount of friends!
 
-Collect Amethyst Coins and Celestial Cores, play hectic multiplayer games and roll to win in
+Collect Amethyst Coins and Celestial Cores, play hectic multiplayer games and roll to win in...
 Parterraria!
 
 ----
@@ -16,7 +18,7 @@ CUSTOMIZABLE BOARDS:
 	Configure the boards to modify how many coins you get, how expensive stuff is, how long the turns are, and more
 	Create as many boards as you can fit in a world, and play any at any time
 
-SYNCHRONOUS BOARDPLAY
+MULTIPLAYER BOARDPLAY
 	Roll and explore your boards with your friends at all once - no turns
 	Plan routes and paths to get the best luck you can
 

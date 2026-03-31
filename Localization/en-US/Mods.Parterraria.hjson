@@ -32,7 +32,12 @@ Configs: {
 
 		AlwaysAdventureOnServer: {
 			Label: Always Adventure On Server
-			Tooltip: If true, players will always be on "adventure" mode on servers. That is, players cannot place tiles, mine anything (though they can cut tiles like vines), or use explosives.
+			Tooltip: If true, players will always be on "adventure" mode on servers. That is, players cannot place tiles, mine anything, or use explosives - though they can cut tiles like vines or break pots.
+		}
+
+		DisablePartySpawns: {
+			Label: Disable Party Spawns
+			Tooltip: If true, natural NPC spawns will be disabled in a party.
 		}
 	}
 }
