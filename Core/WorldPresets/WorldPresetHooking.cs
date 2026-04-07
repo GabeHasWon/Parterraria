@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria.Audio;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameContent.UI.States;
@@ -38,7 +37,7 @@ internal class WorldPresetHooking : ILoadable
     {
         orig(self, outerContainer);
 
-        UITextPanel<LocalizedText> uITextPanel2 = new UITextPanel<LocalizedText>(Language.GetText("Mods.Parterraria.MiscUI.PresetWorlds.Title"), 0.7f, large: true)
+        UITextPanel<LocalizedText> uITextPanel2 = new(Language.GetText("Mods.Parterraria.MiscUI.PresetWorlds.Title"), 0.7f, large: true)
         {
             Width = StyleDimension.FromPixelsAndPercent(-10, 0.5f),
             Height = StyleDimension.FromPixels(50f),
@@ -54,7 +53,7 @@ internal class WorldPresetHooking : ILoadable
         outerContainer.Append(uITextPanel2);
     }
 
-    private void SetToPresetUI(UIWorldCreation self) => Main.MenuUI.SetState(new WorldPresetState(() => Main.MenuUI.SetState(self)));
+    private static void SetToPresetUI(UIWorldCreation self) => Main.MenuUI.SetState(new WorldPresetState(() => Main.MenuUI.SetState(self)));
 
     private void FadedMouseOver(UIMouseEvent evt, UIElement listeningElement)
     {
