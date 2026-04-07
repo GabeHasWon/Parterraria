@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Terraria.Audio;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameContent.UI.States;
@@ -10,9 +11,27 @@ namespace Parterraria.Core.WorldPresets;
 
 internal class WorldPresetHooking : ILoadable
 {
+    public static List<WorldPreset> Presets = [];
+
     public void Load(Mod mod)
     {
         On_UIWorldCreation.MakeBackAndCreatebuttons += MakePresetButton;
+
+        AddPreset(new WorldPreset("Parterraria!", "Mods.Parterraria.Presets.Parterraria!", 3, 11, "GabeHasWon", mod, () => RetrieveZip(mod, "Parterraria!")));
+    }
+
+    public static byte[] RetrieveZip(Mod mod, string name)
+    {
+        byte[] bytes = mod.GetFileBytes($"Core/WorldPresets/Presets/{name}.zip");
+        return bytes;
+    }
+
+    public static void AddPreset(WorldPreset preset)
+    {
+        Presets.Add(preset);
+
+        _ = Language.GetOrRegister(preset.LocalizationKey + ".Name");
+        _ = Language.GetOrRegister(preset.LocalizationKey + ".Description");
     }
 
     private void MakePresetButton(On_UIWorldCreation.orig_MakeBackAndCreatebuttons orig, UIWorldCreation self, UIElement outerContainer)
