@@ -120,6 +120,7 @@ internal class WorldPresetState(Action returnAction) : UIState
 
         while (File.Exists(path))
         {
+            id++;
             path = Path.Combine(Main.SavePath, "Worlds", preset.Id + " " + id);
         }
 
