@@ -1,4 +1,4 @@
 displayName = Parterraria
 author = GabeHasWon, Megaswave
-version = 0.1
+version = 0.1.0.1
 dllReferences = NetEasy_v0.1.8, NetSerializer, NPCUtils

@@ -1,7 +1,6 @@
 ﻿using Parterraria.Common;
 using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem;
-using Parterraria.Core.MinigameSystem.Games;
 using Parterraria.Core.MinigameSystem.MinigameUI;
 using Parterraria.Core.Synchronization;
 using Parterraria.Core.Synchronization.MinigameSyncing;
@@ -9,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.Localization;
@@ -297,7 +295,7 @@ internal class WorldMinigameSystem : ModSystem
 
     public void StartMinigame(string minigameName) => StartMinigame(minigameName, -1);
 
-    public void StartMinigame(string minigameName, int minigameSlot = -1)
+    public void StartMinigame(string minigameName, int minigameSlot = -1, Minigame.MinigamePlayType playType = Minigame.MinigamePlayType.None)
     {
         if (Main.netMode == NetmodeID.MultiplayerClient && minigameSlot == -1)
             return;
@@ -310,6 +308,10 @@ internal class WorldMinigameSystem : ModSystem
             minigameSlot = Main.rand.Next(choices.Length);
 
         playingMinigame = choices[minigameSlot].Clone(); //worldMinigames.First(x => x is PhotoOpGame).Clone();// 
+
+        if (playType == Minigame.MinigamePlayType.None)
+            playingMinigame.PlayType = playingMinigame.GetRandomPlayType();
+
         playingMinigame.OnSet();
         NotReady = true;
         selectingMinigame = false;
@@ -330,7 +332,9 @@ internal class WorldMinigameSystem : ModSystem
         if (Main.netMode != NetmodeID.Server)
             BoardUISystem.CloseMiscUI();
         else
-            new SyncMinigameStartModule(minigameName, minigameSlot).Send(-1, -1, false);
+        {
+            new SyncMinigameStartModule(minigameName, minigameSlot, playingMinigame.GetRandomPlayType()).Send(-1, -1, false);
+        }
     }
 
     public override void SaveWorldData(TagCompound tag)

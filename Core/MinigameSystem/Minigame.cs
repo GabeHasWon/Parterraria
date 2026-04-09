@@ -3,7 +3,6 @@ using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -21,10 +20,35 @@ public abstract class Minigame : ModType
         Last,
     }
 
+    [Flags]
+    public enum MinigamePlayType : byte
+    {
+        None = 0,
+        FreeForAll = 1 << 1,
+        Team = 1 << 2,
+        Duel = 1 << 3,
+
+        All = FreeForAll | Team | Duel
+    }
+
     internal static Dictionary<string, Minigame> MinigamesByModAndName = [];
     internal static Dictionary<int, Minigame> MinigamesById = [];
 
+    /// <summary>
+    /// How this minigame is won.
+    /// </summary>
     public abstract MinigameWinType WinType { get; }
+
+    /// <summary>
+    /// If this is a free-for-all, team, duel game, or any combination of these. Duo games will only be selected by duel nodes.
+    /// </summary>
+    public abstract MinigamePlayType AvailablePlayType { get; }
+
+    /// <summary>
+    /// If this game forces PvP on.
+    /// </summary>
+    public virtual bool PvPGame => false;
+
     public virtual string LocalizationPath => "Mods." + Mod.Name + ".Party.Minigames." + GetType().Name;
     public LocalizedText DisplayName => Language.GetText(LocalizationPath + ".Name");
     public LocalizedText Description => Language.GetText(LocalizationPath + ".Description");
@@ -32,6 +56,7 @@ public abstract class Minigame : ModType
     public bool Beaten { get; internal set; }
     public int PlayTime { get; protected set; }
     public virtual int MaxPlayTime { get; }
+    public MinigamePlayType PlayType { get; internal set; }
 
     protected virtual bool DrawDefaultUI => true;
 
@@ -162,6 +187,38 @@ public abstract class Minigame : ModType
     internal virtual void Reward(MinigameRanking rankings, Player plr) => rankings.Reward(plr);
 
     public abstract bool ValidateRectangle(ref Rectangle rectangle);
+
+    public MinigamePlayType GetRandomPlayType()
+    {
+        PriorityQueue<MinigamePlayType, float> options = new();
+
+        for (int i = 1; i <= System.Numerics.BitOperations.PopCount((uint)MinigamePlayType.All); ++i)
+        {
+            var flag = (MinigamePlayType)(1 << i);
+
+            if (AvailablePlayType.HasFlag(flag))
+                options.Enqueue(flag, Main.rand.Next());
+        }
+
+        return options.Dequeue();
+    }
+
+    protected static void RectangleMinimumTiles(ref Rectangle rectangle, int minWidth, int minHeight, out bool modified)
+    {
+        modified = false;
+
+        if (rectangle.Width < minWidth * 16)
+        {
+            rectangle.Width = minWidth * 16;
+            modified = true;
+        }
+
+        if (rectangle.Height < minHeight * 16)
+        {
+            rectangle.Height = minHeight * 16;
+            modified = true;
+        }
+    }
 
     public void Draw(bool debug)
     {
