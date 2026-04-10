@@ -16,6 +16,7 @@ internal class PointRaceGame : Minigame
 {
     private static Asset<Texture2D> Flag = null;
 
+    public override MinigamePlayType AvailablePlayType => MinigamePlayType.FreeForAll | MinigamePlayType.Team | MinigamePlayType.Duel;
     public override MinigameWinType WinType => MinigameWinType.InOrder;
     public override int MaxPlayTime => 0;
 

@@ -12,4 +12,7 @@ internal class ParterrariaServerConfig : ModConfig
 
     [DefaultValue(true)]
     public bool DisablePartySpawns;
+
+    //[DefaultValue(true)]
+    //public bool UnevenPartyDisablesTeams;
 }

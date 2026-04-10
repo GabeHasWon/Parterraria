@@ -46,6 +46,7 @@ internal class MannequinGame : Minigame
         new Set(ItemID.LeprechaunHat, ItemID.LeprechaunShirt, ItemID.LeprechaunPants), new Set(ItemID.ScarecrowHat, ItemID.ScarecrowShirt, ItemID.ScarecrowPants),
         new Set(ItemID.TreeMask, ItemID.TreeShirt, ItemID.TreeTrunks), new Set(ItemID.LeinforsHat, ItemID.LeinforsShirt, ItemID.LeinforsPants)];
 
+    public override MinigamePlayType AvailablePlayType => MinigamePlayType.FreeForAll;
     public override MinigameWinType WinType => MinigameWinType.First;
     public override int MaxPlayTime => 0;
 

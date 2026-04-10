@@ -39,5 +39,10 @@ Configs: {
 			Label: Disable Party Spawns
 			Tooltip: If true, natural NPC spawns will be disabled in a party.
 		}
+
+		UnevenPartyDisablesTeams: {
+			Label: Uneven Party Disables Teams
+			Tooltip: ""
+		}
 	}
 }

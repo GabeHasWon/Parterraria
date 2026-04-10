@@ -8,6 +8,7 @@ namespace Parterraria.Core.MinigameSystem.Games;
 
 internal class BugChaseGame : Minigame
 {
+    public override MinigamePlayType AvailablePlayType => MinigamePlayType.FreeForAll | MinigamePlayType.Duel;
     public override MinigameWinType WinType => MinigameWinType.Last;
 
     public override int MaxPlayTime => 0;

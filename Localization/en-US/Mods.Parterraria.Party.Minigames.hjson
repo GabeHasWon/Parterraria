@@ -143,3 +143,25 @@ PhotoOpGame: {
 		}
 	}
 }
+
+KingOfTheHillGame: {
+	Name: King of the Hill
+	Description: Dominate the winning position to gain as many points as possible!
+
+	Fields: {
+		MinigameTimeInSeconds: {
+			Name: "{$MinigameLength}"
+			Description: "{$LengthDescription}"
+		}
+
+		HoldPlace: {
+			Name: Goal Place
+			Description: The target for players to be in.
+		}
+
+		HoldDistance: {
+			Name: Goal Radius
+			Description: How large the target space is.
+		}
+	}
+}

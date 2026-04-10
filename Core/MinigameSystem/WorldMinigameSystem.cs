@@ -1,6 +1,7 @@
 ﻿using Parterraria.Common;
 using Parterraria.Content.Items.Board.Create;
 using Parterraria.Core.BoardSystem;
+using Parterraria.Core.MinigameSystem.Games;
 using Parterraria.Core.MinigameSystem.MinigameUI;
 using Parterraria.Core.Synchronization;
 using Parterraria.Core.Synchronization.MinigameSyncing;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Terraria.Enums;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.Localization;
@@ -38,6 +40,7 @@ internal class WorldMinigameSystem : ModSystem
     private float _timerSpeed = 0f;
     private string[] _minigames = [];
     private int _selectedMinigame = 0;
+    private bool[] _wasPvp = new bool[Main.maxPlayers];
 
     public Minigame playingMinigame = null;
 
@@ -284,6 +287,14 @@ internal class WorldMinigameSystem : ModSystem
         playingMinigame = null;
         rankings = null;
 
+        foreach (Player player in Main.ActivePlayers)
+        {
+            player.hostile = _wasPvp[player.whoAmI];
+
+            if (player.whoAmI == Main.myPlayer)
+                NetMessage.SendData(MessageID.TogglePVP, -1, -1, null, Main.myPlayer);
+        }
+
         _minigameTime = 0;
     }
 
@@ -307,10 +318,25 @@ internal class WorldMinigameSystem : ModSystem
         if (minigameSlot == -1)
             minigameSlot = Main.rand.Next(choices.Length);
 
-        playingMinigame = choices[minigameSlot].Clone(); //worldMinigames.First(x => x is PhotoOpGame).Clone();// 
+        playingMinigame = worldMinigames.First(x => x is KingOfTheHillGame).Clone();// choices[minigameSlot].Clone(); //
+        playingMinigame.PlayType = Minigame.MinigamePlayType.FreeForAll;
 
         if (playType == Minigame.MinigamePlayType.None)
             playingMinigame.PlayType = playingMinigame.GetRandomPlayType();
+
+        // TODO: Team mode
+        if (playingMinigame.PvPGame)
+        {
+            foreach (Player player in Main.ActivePlayers)
+            {
+                _wasPvp[player.whoAmI] = player.hostile;
+                player.team = (int)Team.None;
+                player.hostile = true;
+
+                if (player.whoAmI == Main.myPlayer)
+                    NetMessage.SendData(MessageID.TogglePVP, -1, -1, null, Main.myPlayer);
+            }
+        }
 
         playingMinigame.OnSet();
         NotReady = true;

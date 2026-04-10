@@ -13,6 +13,7 @@ namespace Parterraria.Core.MinigameSystem.Games;
 
 internal class ProjectileRainGame : Minigame
 {
+    public override MinigamePlayType AvailablePlayType => MinigamePlayType.FreeForAll | MinigamePlayType.Team;
     public override MinigameWinType WinType => MinigameWinType.Last;
     public override int MaxPlayTime => MinigameTimeInSeconds * 60;
 
