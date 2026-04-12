@@ -64,8 +64,6 @@ internal class ObliterationGame : Minigame
                 [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.LuckyHorseshoe), new Item(ItemID.HermesBoots), new Item(ItemID.CloudinaBalloon)],
                 [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.DualHook)]);
         }
-        else
-            plr.SafeTeleport(playerStartLocation.ToWorldCoordinates());
     }
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
@@ -103,7 +101,7 @@ internal class ObliterationGame : Minigame
 
     protected override void InternalDrawUI()
     {
-        if (!WorldMinigameSystem.NotReady)
+        if (WorldMinigameSystem.NotReady)
             return;
 
         if (PlayTime % (2 * 60) == 0)

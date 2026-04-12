@@ -61,9 +61,9 @@ internal static class DrawCommon
     /// <summary>
     /// Draws a centered string from the top of the screen.
     /// </summary>
-    internal static void DrawCenteredTextFromTop(string text, float yOffset, float scale = 0.5f)
+    internal static void DrawCenteredTextFromTop(string text, float yOffset, float scale = 0.5f, Color? color = null)
     {
         var position = new Vector2(Main.screenWidth / 2, yOffset);
-        CenteredString(FontAssets.DeathText.Value, position, text, Color.White, Vector2.One * scale);
+        CenteredString(FontAssets.DeathText.Value, position, text, color ?? Color.White, Vector2.One * scale);
     }
 }

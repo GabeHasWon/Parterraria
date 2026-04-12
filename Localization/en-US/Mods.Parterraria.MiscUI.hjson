@@ -9,6 +9,7 @@ PartyPlayers: Party Players:
 NextNode: Choose your next node!
 StartPosition: Start Position
 TimeLeft: Time Left
+ReadyIn: Starting in:
 
 Nodes: {
 	Connections: Connections:

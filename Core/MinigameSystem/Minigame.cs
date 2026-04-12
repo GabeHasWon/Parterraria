@@ -47,6 +47,12 @@ public abstract class Minigame : ModType
     public LocalizedText DisplayName => Language.GetText(LocalizationPath + ".Name");
     public LocalizedText Description => Language.GetText(LocalizationPath + ".Description");
 
+    /// <summary>
+    /// Allows a pause before the game actually starts, to let players all be aware of when the game starts. Defaults to 3 * 60.
+    /// </summary>
+    public virtual int AncitipationTime => 180;
+    protected virtual bool DrawDefaultUI => true;
+
     public bool Beaten { get; internal set; }
     public int PlayTime { get; protected set; }
 
@@ -56,8 +62,6 @@ public abstract class Minigame : ModType
     public virtual int MaxPlayTime { get; }
 
     public MinigamePlayType PlayType { get; internal set; }
-
-    protected virtual bool DrawDefaultUI => true;
 
     /// <summary>
     /// Internal ID used for IO/netsync.
@@ -261,10 +265,19 @@ public abstract class Minigame : ModType
 
     public void DrawUI()
     {
-        if (DrawDefaultUI && MaxPlayTime > 0 && !WorldMinigameSystem.NotReady)
+        if (DrawDefaultUI)
         {
-            string time = MathF.Max((MaxPlayTime - PlayTime) / 60f, 0).ToString("#0.##");
-            DrawCommon.DrawCenteredTextFromTop($"{Language.GetTextValue("Mods.Parterraria.MiscUI.TimeLeft")}: " + time + "s", 30);
+            if (MaxPlayTime > 0 && !WorldMinigameSystem.NotReady)
+            {
+                string time = MathF.Max((MaxPlayTime - PlayTime) / 60f, 0).ToString("#0.##");
+                DrawCommon.DrawCenteredTextFromTop($"{Language.GetTextValue("Mods.Parterraria.MiscUI.TimeLeft")}: " + time + "s", 30);
+            }
+
+            if (WorldMinigameSystem.anticipationTime > 0)
+            {
+                string time = MathF.Max(WorldMinigameSystem.anticipationTime / 60f, 0).ToString("#0.##");
+                DrawCommon.DrawCenteredTextFromTop($"{Language.GetTextValue("Mods.Parterraria.MiscUI.ReadyIn")} " + time, 200, 1f, new Color(200, 255, 200));
+            }
         }
 
         InternalDrawUI();

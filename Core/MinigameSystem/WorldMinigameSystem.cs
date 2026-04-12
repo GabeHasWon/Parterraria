@@ -32,12 +32,12 @@ internal class WorldMinigameSystem : ModSystem
 
     internal static bool selectingMinigame = false;
     internal static MinigameRanking rankings = null;
+    internal static int anticipationTime = -1;
 
     private static int _minigameOverTimer = 0;
     private static int _minigamePreviewTimer = 0;
 
     private float _minigameTime = 0;
-    private float _timerSpeed = 0f;
     private string[] _minigames = [];
     private int _selectedMinigame = 0;
     private bool[] _wasPvp = new bool[Main.maxPlayers];
@@ -159,51 +159,13 @@ internal class WorldMinigameSystem : ModSystem
         game.Draw(true);
     }
 
+    /// <summary>
+    /// Handles most of the game loop, like checking for minigames, doing win functionality and updating the minigame, if any.
+    /// </summary>
     public override void PreUpdatePlayers()
     {
         if (InMinigame)
-        {
-            if (NotReady)
-            {
-                bool ready = true;
-
-                for (int i = 0; i < Main.maxPlayers; ++i)
-                {
-                    Player plr = Main.player[i];
-
-                    if (plr.active && !plr.GetModPlayer<PlayingBoardPlayer>().minigameReady)
-                    {
-                        ready = false;
-                        break;
-                    }
-                }
-
-                if (ready)
-                {
-                    NotReady = false;
-                    playingMinigame.OnStart();
-
-                    foreach (var plr in Main.ActivePlayers)
-                        playingMinigame.SetupPlayer(plr, true);
-                }
-            }
-            else
-                playingMinigame.Update();
-
-            if (playingMinigame.Beaten)
-            {
-                if (Main.netMode != NetmodeID.MultiplayerClient && rankings is null)
-                {
-                    rankings = playingMinigame.GetRanking();
-
-                    if (Main.netMode == NetmodeID.Server)
-                        new SyncMinigameRankingModule(rankings).Send(-1, -1, false);
-                }
-
-                if (_minigameOverTimer++ > 240)
-                    CompleteMinigame();
-            }
-        }
+            UpdateDuringMinigame();
 
         if (WorldBoardSystem.PlayingParty && WorldBoardSystem.GameFinished)
         {
@@ -219,6 +181,58 @@ internal class WorldMinigameSystem : ModSystem
             return;
         }
 
+        RollMinigame();
+    }
+
+    private void UpdateDuringMinigame()
+    {
+        if (NotReady)
+        {
+            bool ready = true;
+
+            for (int i = 0; i < Main.maxPlayers; ++i)
+            {
+                Player plr = Main.player[i];
+
+                if (plr.active && !plr.GetModPlayer<PlayingBoardPlayer>().minigameReady)
+                {
+                    ready = false;
+                    break;
+                }
+            }
+
+            if (ready && anticipationTime == -1)
+                anticipationTime = playingMinigame.AncitipationTime;
+
+            if (ready && anticipationTime-- == 0)
+            {
+                NotReady = false;
+                playingMinigame.OnStart();
+
+                foreach (var plr in Main.ActivePlayers)
+                    playingMinigame.SetupPlayer(plr, true);
+            }
+        }
+        else
+            playingMinigame.Update();
+
+        if (playingMinigame.Beaten)
+        {
+            if (Main.netMode != NetmodeID.MultiplayerClient && rankings is null)
+            {
+                rankings = playingMinigame.GetRanking();
+
+                if (Main.netMode == NetmodeID.Server)
+                    new SyncMinigameRankingModule(rankings).Send(-1, -1, false);
+            }
+
+            if (_minigameOverTimer++ > 240)
+                CompleteMinigame();
+        }
+    }
+
+    private void RollMinigame()
+    {
         for (int i = 0; i < Main.maxPlayers; ++i)
         {
             Player plr = Main.player[i];
@@ -227,7 +241,7 @@ internal class WorldMinigameSystem : ModSystem
                 continue;
 
             PlayingBoardPlayer board = plr.GetModPlayer<PlayingBoardPlayer>();
-            
+
             if (!board.hasGoneOnCurrentTurn || board.isMoving || board.promptingSplit)
                 return;
         }
