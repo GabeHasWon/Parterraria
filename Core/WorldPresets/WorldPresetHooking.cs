@@ -16,7 +16,7 @@ internal class WorldPresetHooking : ILoadable
     {
         On_UIWorldCreation.MakeBackAndCreatebuttons += MakePresetButton;
 
-        AddPreset(new WorldPreset("Parterraria!", "Mods.Parterraria.Presets.Parterraria!", 3, 11, "GabeHasWon", mod, () => RetrieveZip(mod, "Parterraria!")));
+        AddPreset(new WorldPreset("Parterraria! v0.1.0.1", "Mods.Parterraria.Presets.Parterraria!", 3, 15, "GabeHasWon", mod, () => RetrieveZip(mod, "Parterraria!")));
     }
 
     public static byte[] RetrieveZip(Mod mod, string name)

@@ -165,3 +165,20 @@ KingOfTheHillGame: {
 		}
 	}
 }
+
+ObliterationGame: {
+	Name: Total Deathmatch
+	Description: Deal as much damage to other players as possible!
+
+	Fields: {
+		MinigameTimeInSeconds: {
+			Name: "{$MinigameLength}"
+			Description: "{$LengthDescription}"
+		}
+	}
+}
+
+DuelingPistolGame: {
+	Name: Deadly Duel
+	Description: Avoid getting hit, and hit others with your Dueling Pistol!
+}

@@ -7,6 +7,8 @@ namespace Parterraria.Core.BoardSystem.Nodes;
 
 public class EventNode() : EmptyNode
 {
+    public override MinigameReferral Referral => MinigameReferral.Any;
+
     public override void LandOn(Board board, Player player)
     {
         if (Main.netMode == NetmodeID.SinglePlayer)

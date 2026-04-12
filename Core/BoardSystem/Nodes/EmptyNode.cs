@@ -2,4 +2,5 @@
 
 public class EmptyNode() : BoardNode
 {
+    public override MinigameReferral Referral => MinigameReferral.Any;
 }

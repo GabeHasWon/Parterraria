@@ -1,4 +1,6 @@
-﻿using Terraria.GameContent;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Terraria.GameContent;
 using Terraria.UI.Chat;
 
 namespace Parterraria.Common;
@@ -35,5 +37,33 @@ internal static class DrawCommon
 
         var rect = new Rectangle((int)position.X, (int)position.Y, 16, 16);
         Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, color.Value);
+    }
+
+    /// <summary>
+    /// Draws a leaderboard from an unordered dictionary of whoAmI mapped to values. Higher values = winning.
+    /// </summary>
+    internal static void DrawLeaderboard(IDictionary<int, int> playerValuesUnordered, int whoAmIOffset = 0)
+    {
+        var ordered = playerValuesUnordered.OrderByDescending(x => x.Value);
+        int num = 0;
+
+        foreach (var pair in ordered)
+        {
+            Player player = Main.player[pair.Key - whoAmIOffset];
+            DrawCenteredTextFromTop($"{player.name}: #" + (num + 1), 60 + num * 30);
+            num++;
+
+            if (num >= Main.CurrentFrameFlags.ActivePlayersCount)
+                return;
+        }
+    }
+
+    /// <summary>
+    /// Draws a centered string from the top of the screen.
+    /// </summary>
+    internal static void DrawCenteredTextFromTop(string text, float yOffset, float scale = 0.5f)
+    {
+        var position = new Vector2(Main.screenWidth / 2, yOffset);
+        CenteredString(FontAssets.DeathText.Value, position, text, Color.White, Vector2.One * scale);
     }
 }

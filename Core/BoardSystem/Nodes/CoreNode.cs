@@ -5,6 +5,8 @@ namespace Parterraria.Core.BoardSystem.Nodes;
 
 public class CoreNode() : EmptyNode
 {
+    public override MinigameReferral Referral => MinigameReferral.NonPvP;
+
     public override void PassBy(Board board, Player player)
     {
         if (CommonUtils.ConsumeItemFromInventory<AmethystCoin>(player, board.config.CoreCost, false))

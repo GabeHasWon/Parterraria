@@ -14,7 +14,6 @@ namespace Parterraria.Core.MinigameSystem.Games;
 internal class ProjectileRainGame : Minigame
 {
     public override MinigamePlayType AvailablePlayType => MinigamePlayType.FreeForAll | MinigamePlayType.Team;
-    public override MinigameWinType WinType => MinigameWinType.Last;
     public override int MaxPlayTime => MinigameTimeInSeconds * 60;
 
     public int MinigameTimeInSeconds = 15;
@@ -62,7 +61,7 @@ internal class ProjectileRainGame : Minigame
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
 
-    public override MinigameRanking GetRanking() => MinigameRanking.ByLiving();
+    public override MinigameRanking GetRanking() => MinigameRanking.ByRemaining();
 
     public override void InternalUpdate()
     {

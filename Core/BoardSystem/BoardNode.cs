@@ -12,9 +12,18 @@ namespace Parterraria.Core.BoardSystem;
 
 public abstract class BoardNode
 {
+    public enum MinigameReferral : byte
+    {
+        Any = 0,
+        NonPvP,
+        PvP,
+    }
+
     public Asset<Texture2D> Texture => Tex(this);
     public Asset<Texture2D> Icon => Tex(this, "_Icon");
     public Asset<Texture2D> ChatIcon => Tex(this, "_Chat");
+
+    public abstract MinigameReferral Referral { get; }
 
     public virtual string Name => GetType().Name;
     public virtual LocalizedText DisplayName => Language.GetOrRegister("Mods.Parterraria.Nodes." + Name + ".DisplayName");

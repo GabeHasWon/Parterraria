@@ -36,7 +36,6 @@ internal class PhotoOpGame : Minigame
     }
 
     public override MinigamePlayType AvailablePlayType => MinigamePlayType.FreeForAll | MinigamePlayType.Team;
-    public override MinigameWinType WinType => MinigameWinType.First;
 
     public override int MaxPlayTime => secondsBetweenPhotos * totalPhotos * 60 + 10;
 

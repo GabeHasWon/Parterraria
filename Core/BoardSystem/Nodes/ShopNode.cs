@@ -6,6 +6,8 @@ namespace Parterraria.Core.BoardSystem.Nodes;
 
 public class ShopNode() : EmptyNode
 {
+    public override MinigameReferral Referral => MinigameReferral.Any;
+
     public override void PassBy(Board board, Player player)
     {
         int x = NPC.NewNPC(null, (int)player.Center.X, (int)player.Center.Y, ModContent.NPCType<ShopNPC>(), 0, player.whoAmI);

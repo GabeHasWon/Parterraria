@@ -76,14 +76,7 @@ internal partial class MinigameEditUI(Player player) : UIState
         AppendToolButton("List", ToggleList, null, mainPanel, ref number);
     }
 
-    private void SetMode(UIMouseEvent evt, UIElement listeningElement)
-    {
-        _player.GetModPlayer<MinigameToolPlayer>().ClearTool();
-        //_player.GetModPlayer<MinigameToolPlayer>().toolMode++;
-
-        //if (_player.GetModPlayer<MinigameToolPlayer>().toolMode > MinigameToolPlayer.ToolMode.Erase)
-        //    _player.GetModPlayer<MinigameToolPlayer>().toolMode = MinigameToolPlayer.ToolMode.Place;
-    }
+    private void SetMode(UIMouseEvent evt, UIElement listeningElement) => _player.GetModPlayer<MinigameToolPlayer>().ClearTool();
 
     private void ToggleList(UIMouseEvent evt, UIElement listeningElement)
     {
@@ -96,11 +89,12 @@ internal partial class MinigameEditUI(Player player) : UIState
 
         listPanel = new UIPanel()
         {
-            Width = StyleDimension.FromPixels(400),
-            Height = StyleDimension.FromPixels(200),
+            Width = StyleDimension.FromPixels(460),
+            Height = StyleDimension.FromPixels(400),
             HAlign = 0.5f,
-            VAlign = 0.4f,
-            Left = StyleDimension.FromPixels(280)
+            VAlign = 0f,
+            Left = StyleDimension.FromPixels(310),
+            Top = StyleDimension.FromPixelsAndPercent(-30, 0.4f)
         };
 
         Append(listPanel);
@@ -125,6 +119,9 @@ internal partial class MinigameEditUI(Player player) : UIState
 
         list.Add(new UIElement() { Height = StyleDimension.FromPixels(4) });
 
+        Color plainColor = Color.White;
+        Color pvpColor = new Color(255, 120, 120);
+
         foreach ((string name, Minigame game) in Minigame.MinigamesByModAndName)
         {
             string modName = name.Split('/')[0];
@@ -144,7 +141,7 @@ internal partial class MinigameEditUI(Player player) : UIState
                 offset = 40;
             }
 
-            var minigameText = new UIButton<string>(game.DisplayName.Value + $" [c/AAAAAA:({game.Name})]")
+            var minigameText = new UIButton<string>($"[c/{(game.PvPGame ? pvpColor : plainColor).Hex3()}:{game.DisplayName.Value}] [c/AAAAAA:({game.Name})]")
             {
                 Left = StyleDimension.FromPixels(offset),
                 Width = StyleDimension.FromPixelsAndPercent(-offset - 10, 1),

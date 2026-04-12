@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Terraria.DataStructures;
-using Terraria.GameContent;
 using Terraria.Localization;
 using Terraria.ModLoader.IO;
 
@@ -35,11 +34,6 @@ public abstract class Minigame : ModType
     internal static Dictionary<int, Minigame> MinigamesById = [];
 
     /// <summary>
-    /// How this minigame is won.
-    /// </summary>
-    public abstract MinigameWinType WinType { get; }
-
-    /// <summary>
     /// If this is a free-for-all, team, duel game, or any combination of these. Duo games will only be selected by duel nodes.
     /// </summary>
     public abstract MinigamePlayType AvailablePlayType { get; }
@@ -55,7 +49,12 @@ public abstract class Minigame : ModType
 
     public bool Beaten { get; internal set; }
     public int PlayTime { get; protected set; }
+
+    /// <summary>
+    /// Determines the max time this minigame can go on. If 0, the game will not end naturally.
+    /// </summary>
     public virtual int MaxPlayTime { get; }
+
     public MinigamePlayType PlayType { get; internal set; }
 
     protected virtual bool DrawDefaultUI => true;
@@ -265,16 +264,10 @@ public abstract class Minigame : ModType
         if (DrawDefaultUI && MaxPlayTime > 0 && !WorldMinigameSystem.NotReady)
         {
             string time = MathF.Max((MaxPlayTime - PlayTime) / 60f, 0).ToString("#0.##");
-            DrawCenteredTextFromTop($"{Language.GetTextValue("Mods.Parterraria.MiscUI.TimeLeft")}: " + time + "s", 30);
+            DrawCommon.DrawCenteredTextFromTop($"{Language.GetTextValue("Mods.Parterraria.MiscUI.TimeLeft")}: " + time + "s", 30);
         }
 
         InternalDrawUI();
-    }
-
-    protected static void DrawCenteredTextFromTop(string text, float yOffset, float scale = 0.5f)
-    {
-        var position = new Vector2(Main.screenWidth / 2, yOffset);
-        DrawCommon.CenteredString(FontAssets.DeathText.Value, position, text, Color.White, Vector2.One * scale);
     }
 
     protected virtual void InternalDrawUI() { }

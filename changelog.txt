@@ -1,3 +1,6 @@
 v0.1.0.1
 - Added Presets world option for ease of use
-- Added King of the Hill minigame
+- Added King of the Hill and Deathmatch minigames
+- Added "PvP minigame" functionality
+- Expanded the selection list UI for minigames a lot
+- Made pvp games show up as red in minigame selection

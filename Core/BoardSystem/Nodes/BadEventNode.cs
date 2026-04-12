@@ -8,8 +8,10 @@ using Terraria.ModLoader.IO;
 
 namespace Parterraria.Core.BoardSystem.Nodes;
 
-public class BadEventNode() : EmptyNode
+public class BadEventNode() : BoardNode
 {
+    public override MinigameReferral Referral => MinigameReferral.PvP;
+
     public override void LandOn(Board board, Player player)
     {
         var events = Microevent.Microevents.Where(x => x.EventQuality is Microevent.Quality.Bad or Microevent.Quality.Terrible or Microevent.Quality.Abysmal);

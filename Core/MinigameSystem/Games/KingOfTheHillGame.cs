@@ -14,13 +14,12 @@ namespace Parterraria.Core.MinigameSystem.Games;
 internal class KingOfTheHillGame : Minigame
 {
     public override MinigamePlayType AvailablePlayType => MinigamePlayType.FreeForAll | MinigamePlayType.Team;
-    public override MinigameWinType WinType => MinigameWinType.InOrder;
     public override int MaxPlayTime => MinigameTimeInSeconds * 60;
     public override bool PvPGame => true;
 
     private static Asset<Texture2D> Circle = null;
 
-    public int MinigameTimeInSeconds = 15;
+    public int MinigameTimeInSeconds = 45;
 
     public Point HoldPlace = Point.Zero;
     public float HoldDistance = 200f;

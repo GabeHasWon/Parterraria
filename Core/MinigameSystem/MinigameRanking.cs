@@ -38,17 +38,22 @@ public class MinigameRanking
     /// <summary>
     /// Used for minigames where living players come in first, everyone else comes in last (or, technically, comes in <see cref="MinigameReward.Placement.Otherwise"/>).<br/>
     /// <paramref name="binary"/> would mean players either get First or Last, exclusively. 
-    /// Otherwise, sort by health lost - most health lost loses, dead people counting as an unconditional loss.
+    /// Otherwise, sort by health lost - most health lost loses, dead people counting as an unconditional loss.<br/>
+    /// <paramref name="disabled"/> uses the <see cref="MinigameDisablePlayer.Disabled"/> flag instead of checking for dead. This also forces <paramref name="binary"/> to true.
     /// </summary>
-    public static MinigameRanking ByLiving(bool binary = false)
+    public static MinigameRanking ByRemaining(bool binary = false, bool disabled = false)
     {
         var rank = new MinigameRanking();
+
+        if (disabled)
+            binary = true;
 
         if (binary)
         {
             foreach (var player in Main.ActivePlayers)
             {
-                MinigameReward reward = player.dead ? new(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise)
+                MinigameReward reward = (disabled ? player.GetModPlayer<MinigameDisablePlayer>().Disabled : player.dead) 
+                    ? new(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise)
                     : new(Language.GetTextValue("Mods.Parterraria.Rankings.First"), MinigameReward.Placement.First);
                 rank.Ranking.Add(player.whoAmI, reward);
             }

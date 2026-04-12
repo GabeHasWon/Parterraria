@@ -122,3 +122,8 @@ NegativeDice: {
 		'Concerning.'
 		'''
 }
+
+DuelingPistol: {
+	DisplayName: Dueling Pistol
+	Tooltip: "'Three paces back, three seconds per shot.'"
+}

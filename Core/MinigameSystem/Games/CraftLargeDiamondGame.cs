@@ -12,7 +12,6 @@ namespace Parterraria.Core.MinigameSystem.Games;
 internal class CraftLargeDiamondGame : Minigame
 {
     public override MinigamePlayType AvailablePlayType => MinigamePlayType.FreeForAll | MinigamePlayType.Duel;
-    public override MinigameWinType WinType => MinigameWinType.First;
     public override int MaxPlayTime => 0;
 
     [HideFromEdit]

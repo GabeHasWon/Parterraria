@@ -13,7 +13,6 @@ namespace Parterraria.Core.MinigameSystem.Games;
 internal class SplashArtGame : Minigame
 {
     public override MinigamePlayType AvailablePlayType => MinigamePlayType.FreeForAll | MinigamePlayType.Team;
-    public override MinigameWinType WinType => MinigameWinType.First;
     public override int MaxPlayTime => MinigameTimeInSeconds * 60;
 
     public int MinigameTimeInSeconds = 15;
@@ -158,17 +157,6 @@ internal class SplashArtGame : Minigame
         if (PlayTime % (2 * 60) == 0)
             RecountPaint();
 
-        var ordered = _countsByPaintId.OrderByDescending(x => x.Value);
-        int num = 0;
-
-        foreach (var pair in ordered)
-        {
-            Player player = Main.player[pair.Key - 1];
-            DrawCenteredTextFromTop($"{player.name}: #" + (num + 1), 60 + num * 30);
-            num++;
-
-            if (num >= Main.CurrentFrameFlags.ActivePlayersCount)
-                return;
-        }
+        DrawCommon.DrawLeaderboard(_countsByPaintId, -1);
     }
 }

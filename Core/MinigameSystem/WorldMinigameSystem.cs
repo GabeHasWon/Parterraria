@@ -290,6 +290,7 @@ internal class WorldMinigameSystem : ModSystem
         foreach (Player player in Main.ActivePlayers)
         {
             player.hostile = _wasPvp[player.whoAmI];
+            player.GetModPlayer<MinigameDisablePlayer>().Enable();
 
             if (player.whoAmI == Main.myPlayer)
                 NetMessage.SendData(MessageID.TogglePVP, -1, -1, null, Main.myPlayer);
@@ -318,7 +319,7 @@ internal class WorldMinigameSystem : ModSystem
         if (minigameSlot == -1)
             minigameSlot = Main.rand.Next(choices.Length);
 
-        playingMinigame = worldMinigames.First(x => x is KingOfTheHillGame).Clone();// choices[minigameSlot].Clone(); //
+        playingMinigame = worldMinigames.First(x => x is ObliterationGame).Clone();// choices[minigameSlot].Clone(); //
         playingMinigame.PlayType = Minigame.MinigamePlayType.FreeForAll;
 
         if (playType == Minigame.MinigamePlayType.None)
