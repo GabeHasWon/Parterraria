@@ -61,7 +61,7 @@ internal class WorldMinigameSystem : ModSystem
             Main.NewText(Language.GetTextValue("Mods.Parterraria.ToolInfo.Minigame.Intersecting"), CommonColors.Error);
             return false;
         }
-
+        
         if (sync && Main.netMode == NetmodeID.MultiplayerClient)
             new SyncMinigameModule(name, rectangle, rectangle.Center.ToVector2().ToTileCoordinates(), data).Send(-1, -1, false);
         else
@@ -333,7 +333,7 @@ internal class WorldMinigameSystem : ModSystem
         if (minigameSlot == -1)
             minigameSlot = Main.rand.Next(choices.Length);
 
-        playingMinigame = worldMinigames.First(x => x is ObliterationGame).Clone();// choices[minigameSlot].Clone(); //
+        playingMinigame = worldMinigames.First(x => x is KingOfTheHillGame).Clone();// choices[minigameSlot].Clone(); //
         playingMinigame.PlayType = Minigame.MinigamePlayType.FreeForAll;
 
         if (playType == Minigame.MinigamePlayType.None)

@@ -1,5 +1,6 @@
 ﻿using Parterraria.Common;
 using Parterraria.Content.Items.MinigameItems;
+using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
 using Terraria.ID;
 
@@ -18,7 +19,7 @@ internal class DuelingPistolGame : Minigame
                 Projectile proj = Main.projectile[info.DamageSource.SourceProjectileLocalIndex];
 
                 if (proj.friendly && proj.TryGetOwner(out Player? owner) && proj.GetGlobalProjectile<DuelingPistol.DuelingPistolShot>().FromDueling)
-                    owner.GetModPlayer<MinigameDisablePlayer>().Disable();
+                    Player.GetModPlayer<MinigameDisablePlayer>().Disable();
             }
         }
     }
@@ -26,6 +27,9 @@ internal class DuelingPistolGame : Minigame
     public override MinigamePlayType AvailablePlayType => MinigamePlayType.FreeForAll | MinigamePlayType.Team | MinigamePlayType.Duel;
     public override int MaxPlayTime => 0;
     public override bool PvPGame => true;
+
+    [HideFromEdit]
+    private int _waitTimerAfterEnd = 0;
 
     public override bool ValidateRectangle(ref Rectangle rectangle)
     {
@@ -37,11 +41,15 @@ internal class DuelingPistolGame : Minigame
     {
         if (!playing)
         {
-            plr.GetModPlayer<InventoryPlayer>().SwitchInventory([new Item(ModContent.ItemType<DuelingPistol>()), new Item(ItemID.SilverBullet, 999)], 
+            plr.GetModPlayer<InventoryPlayer>().SwitchInventory([new Item(ModContent.ItemType<DuelingPistol>()), new Item(ItemID.SilverBullet, 999)],
                 [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.EoCShield), new Item(ItemID.HermesBoots), new Item(ItemID.CloudinaBalloon)],
                 []);
         }
+        else
+            plr.GetModPlayer<MinigameDisablePlayer>().Enable(false, true);
     }
+
+    public override void OnStart() => _waitTimerAfterEnd = 0;
 
     public override void ResetPlayer(Player plr) => plr.GetModPlayer<InventoryPlayer>().ReplaceInventory();
 
@@ -59,6 +67,11 @@ internal class DuelingPistolGame : Minigame
 
         // TODO: Team
         if (livingCount == 1)
-            Beaten = true;
+        {
+            _waitTimerAfterEnd++;
+
+            if (_waitTimerAfterEnd > 60)
+                Beaten = true;
+        }
     }
 }

@@ -4,3 +4,4 @@ v0.1.0.1
 - Added "PvP minigame" functionality
 - Expanded the selection list UI for minigames a lot
 - Made pvp games show up as red in minigame selection
+- Added "starting in" time for minigames to avoid unfair advantages for the last person to ready up
