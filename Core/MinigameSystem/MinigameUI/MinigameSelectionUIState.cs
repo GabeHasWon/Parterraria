@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Parterraria.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria.GameContent.UI.Elements;
@@ -10,6 +11,8 @@ namespace Parterraria.Core.MinigameSystem.MinigameUI;
 
 internal class MinigameSelectionUIState : UIState
 {
+    public readonly record struct MinigameDisplay(string Name, bool IsPvP);
+
     public delegate void SetMinigameDelegate(string value);
 
     private readonly SetMinigameDelegate _setMinigame;
@@ -81,32 +84,41 @@ internal class MinigameSelectionUIState : UIState
 
         Append(panel);
 
-        string[] minigamesDisplay = new string[4];
+        MinigameDisplay[] minigamesDisplay = new MinigameDisplay[4];
 
         if (_minigames is null)
             _minigames = DetermineMinigames(minigamesDisplay);
         else
         {
             for (int i = 0; i < minigamesDisplay.Length; ++i)
-                minigamesDisplay[i] = ModContent.Find<Minigame>(_minigames[i]).DisplayName.Value;
+            {
+                Minigame game = ModContent.Find<Minigame>(_minigames[i]);
+                minigamesDisplay[i] = new(game.DisplayName.Value, game.PvPGame);
+            } 
         }
 
         for (int i = 0; i < _minigames.Length; ++i)
         {
             int slot = i;
-            UIText text = new(minigamesDisplay[i])
+            UIText text = new(minigamesDisplay[i].Name)
             {
                 VAlign = 0.1f + 0.25f * i,
-                HAlign = 0.5f
+                HAlign = 0.5f,
             };
-            text.OnUpdate += (_) => text.SetText($"[c/{(slot == selectedMinigame ? "444444" : "FFFFFF")}:{minigamesDisplay[slot]}]");
+
+            text.OnUpdate += (_) =>
+            {
+                Color baseColor = minigamesDisplay[slot].IsPvP ? CommonColors.PvPGame : Color.White;
+                Color darkColor = minigamesDisplay[slot].IsPvP ? CommonColors.PvPDark : CommonColors.DarkGray;
+                text.SetText($"[c/{(slot == selectedMinigame ? darkColor.Hex3() : baseColor.Hex3())}:{minigamesDisplay[slot].Name}]");
+            };
             panel.Append(text);
         }
     }
 
-    public static string[] DetermineMinigames(string[] minigamesDisplay = null)
+    public static string[] DetermineMinigames(MinigameDisplay[] minigamesDisplay = null)
     {
-        minigamesDisplay ??= new string[4];
+        minigamesDisplay ??= new MinigameDisplay[4];
         string[] minigames = new string[4];
         HashSet<string> gameNames = [];
         HashSet<Minigame> games = [];
@@ -125,7 +137,7 @@ internal class MinigameSelectionUIState : UIState
             {
                 Minigame game = Main.rand.Next(games.ToArray());
                 minigames[i] = game.FullName;
-                minigamesDisplay[i] = game.DisplayName.Value;
+                minigamesDisplay[i] = new(game.DisplayName.Value, game.PvPGame);
                 games.Remove(game);
             }
             else

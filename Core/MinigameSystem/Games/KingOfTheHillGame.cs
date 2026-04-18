@@ -45,7 +45,7 @@ internal class KingOfTheHillGame : Minigame
         if (!playing)
         {
             plr.GetModPlayer<InventoryPlayer>().SwitchInventory([new Item(ItemID.Musket), new Item(ItemID.BreakerBlade), new Item(ItemID.MusketBall, 999)], 
-                [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.LuckyHorseshoe), new Item(ItemID.HermesBoots), new Item(ItemID.CloudinaBalloon)],
+                [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.LuckyHorseshoe), new Item(ItemID.HermesBoots), new Item(ItemID.CloudinaBalloon), new Item(ItemID.Magiluminescence)],
                 [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.DualHook)]);
         }
         else
@@ -76,7 +76,8 @@ internal class KingOfTheHillGame : Minigame
         if (prio.Count == 0)
             return MinigameRanking.CompleteTie();
 
-        return MinigameRanking.ByOrderAbsolute([.. prio.OrderBy(x => x.Value).Select(x => x.Key)], forcedLast);
+        int[] sortedWhoAmI = [.. prio.OrderByDescending(x => x.Value).Select(x => x.Key)];
+        return MinigameRanking.ByOrderAbsolute(sortedWhoAmI, forcedLast);
     }
 
     public override void InternalUpdate()

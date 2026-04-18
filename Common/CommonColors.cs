@@ -5,10 +5,14 @@ internal static class CommonColors
     public static readonly Color Error = new(255, 180, 180);
     public static readonly Color Success = new(180, 255, 180);
     public static readonly Color Info = new(228, 247, 246);
+    public static readonly Color DarkGray = new(70, 70, 70);
 
     public static readonly Color First = Color.Gold;
     public static readonly Color Second = Color.Silver;
     public static readonly Color Third = Color.SaddleBrown;
+
+    public static readonly Color PvPGame = new(255, 120, 120);
+    public static readonly Color PvPDark = new(120, 30, 30);
 
     public static Color GetPlacementColor(int placement) => placement switch
     {

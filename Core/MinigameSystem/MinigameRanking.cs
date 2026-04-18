@@ -122,8 +122,14 @@ public class MinigameRanking
         for (int i = 0; i < playerWhoAmIInOrderOfPlacement.Length; i++)
         {
             int who = playerWhoAmIInOrderOfPlacement[i];
-            rank.Ranking.Add(who, forcedLast?.Contains(who) is true ? new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise) 
-                : DetermineStandardOrderedPlacement(i));
+            MinigameReward reward;
+
+            if (forcedLast?.Contains(who) is true)
+                reward = new MinigameReward(Language.GetTextValue("Mods.Parterraria.Rankings.Last"), MinigameReward.Placement.Otherwise);
+            else
+                reward = DetermineStandardOrderedPlacement(i);
+
+            rank.Ranking.Add(who, reward);
         }
 
         return rank;

@@ -37,10 +37,11 @@ internal class WorldMinigameSystem : ModSystem
     private static int _minigameOverTimer = 0;
     private static int _minigamePreviewTimer = 0;
 
+    private readonly bool[] _wasPvp = new bool[Main.maxPlayers];
+
     private float _minigameTime = 0;
     private string[] _minigames = [];
     private int _selectedMinigame = 0;
-    private bool[] _wasPvp = new bool[Main.maxPlayers];
 
     public Minigame playingMinigame = null;
 
@@ -333,7 +334,7 @@ internal class WorldMinigameSystem : ModSystem
         if (minigameSlot == -1)
             minigameSlot = Main.rand.Next(choices.Length);
 
-        playingMinigame = worldMinigames.First(x => x is KingOfTheHillGame).Clone();// choices[minigameSlot].Clone(); //
+        playingMinigame = worldMinigames.First(x => x is DuelingPistolGame).Clone();// choices[minigameSlot].Clone(); //
         playingMinigame.PlayType = Minigame.MinigamePlayType.FreeForAll;
 
         if (playType == Minigame.MinigamePlayType.None)
