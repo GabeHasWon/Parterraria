@@ -9,23 +9,23 @@ internal class MinigameDisablePlayer : ModPlayer
 {
     public bool Disabled { get; private set; }
 
-    public void Disable(bool fromNet = false)
+    public void Disable(bool fromNet = false, bool forceSend = false)
     {
         Disabled = true;
         Player.hostile = false;
 
-        if (!fromNet && Main.myPlayer == Player.whoAmI)
+        if (!fromNet && (forceSend || Main.myPlayer == Player.whoAmI))
             new SyncMinigameDisabledModule((byte)Player.whoAmI, false).Send();
     }
 
-    public void Enable(bool fromNet = false, bool forceHostile = false)
+    public void Enable(bool fromNet = false, bool forceHostile = false, bool forceSend = false)
     {
         Disabled = false;
 
         if (forceHostile)
             Player.hostile = true;
 
-        if (!fromNet && Main.myPlayer == Player.whoAmI)
+        if (!fromNet && (forceSend || Main.myPlayer == Player.whoAmI))
             new SyncMinigameDisabledModule((byte)Player.whoAmI, true).Send();
     }
 

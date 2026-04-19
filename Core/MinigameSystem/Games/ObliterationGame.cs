@@ -1,6 +1,8 @@
-﻿using Parterraria.Common;
+﻿using NetEasy;
+using Parterraria.Common;
 using Parterraria.Core.BoardSystem.BoardUI.EditUI;
 using Parterraria.Core.InventoryStorageSystem;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +12,21 @@ using Terraria.ModLoader.IO;
 namespace Parterraria.Core.MinigameSystem.Games;
 
 #nullable enable
+
+[Serializable]
+public class ObliterationPlayerModule(int fromWho, int value) : Module
+{
+    private readonly int _fromWho = fromWho;
+    private readonly int _value = value;
+
+    protected override void Receive()
+    {
+        if (Main.netMode == NetmodeID.Server)
+            Send(-1, -1, false);
+
+        Main.player[_fromWho].GetModPlayer<ObliterationGame.ObliterationPlayer>().damageDealt = _value;
+    }
+}
 
 internal class ObliterationGame : Minigame
 {
@@ -25,6 +42,8 @@ internal class ObliterationGame : Minigame
                 {
                     Player other = Main.player[info.DamageSource.SourcePlayerIndex];
                     other.GetModPlayer<ObliterationPlayer>().damageDealt += info.Damage;
+                    new ObliterationPlayerModule((byte)other.whoAmI, other.GetModPlayer<ObliterationPlayer>().damageDealt).Send();
+                    return;
                 }
 
                 if (info.DamageSource.SourceProjectileLocalIndex != -1)
@@ -32,7 +51,11 @@ internal class ObliterationGame : Minigame
                     Projectile proj = Main.projectile[info.DamageSource.SourceProjectileLocalIndex];
 
                     if (proj.friendly && proj.TryGetOwner(out Player? owner))
+                    {
                         owner.GetModPlayer<ObliterationPlayer>().damageDealt += info.Damage;
+                        new ObliterationPlayerModule((byte)owner.whoAmI, owner.GetModPlayer<ObliterationPlayer>().damageDealt).Send();
+                        return;
+                    }
                 }
             }
         }
@@ -42,7 +65,7 @@ internal class ObliterationGame : Minigame
     public override int MaxPlayTime => MinigameTimeInSeconds * 60;
     public override bool PvPGame => true;
 
-    public int MinigameTimeInSeconds = 15;
+    public int MinigameTimeInSeconds = 45;
 
     [HideFromEdit]
     private int _timer = 0;
@@ -60,9 +83,14 @@ internal class ObliterationGame : Minigame
     {
         if (!playing)
         {
-            plr.GetModPlayer<InventoryPlayer>().SwitchInventory([new Item(ItemID.Musket), new Item(ItemID.BreakerBlade), new Item(ItemID.MusketBall, 999)], 
+            plr.GetModPlayer<InventoryPlayer>().SwitchInventory([new Item(ItemID.Musket), new Item(ItemID.BreakerBlade), new Item(ItemID.MusketBall, 999)],
                 [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.LuckyHorseshoe), new Item(ItemID.HermesBoots), new Item(ItemID.CloudinaBalloon)],
                 [ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), ItemHelper.Air(), new Item(ItemID.DualHook)]);
+        }
+        else
+        {
+            plr.GetModPlayer<ObliterationPlayer>().damageDealt = 0;
+            plr.statLife = plr.statLifeMax2;
         }
     }
 
@@ -85,7 +113,7 @@ internal class ObliterationGame : Minigame
         if (prio.Count == 0)
             return MinigameRanking.CompleteTie();
 
-        return MinigameRanking.ByOrderAbsolute([.. prio.OrderBy(x => x.Value).Select(x => x.Key)], forcedLast);
+        return MinigameRanking.ByOrderAbsolute([.. prio.OrderByDescending(x => x.Value).Select(x => x.Key)], forcedLast);
     }
 
     public override void InternalUpdate()

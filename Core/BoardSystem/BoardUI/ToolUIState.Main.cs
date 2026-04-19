@@ -4,6 +4,7 @@ using Parterraria.Core.Synchronization;
 using ReLogic.Content;
 using System;
 using System.Collections.Generic;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.Localization;
@@ -405,9 +406,16 @@ internal partial class ToolUIState(Player player) : UIState
 
         Board board = WorldBoardSystem.Self.worldBoards[_boardKey];
 
-        DrawCommon.DrawPositionMarker(board.config.WinIdlePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.WinIdle"));
-        DrawCommon.DrawPositionMarker(board.config.FirstPlacePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.Placements.0"), Color.Gold);
-        DrawCommon.DrawPositionMarker(board.config.SecondPlacePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.Placements.1"), Color.Silver);
-        DrawCommon.DrawPositionMarker(board.config.ThirdPlacePosition.ToWorldCoordinates(0, 0), Language.GetTextValue("Mods.Parterraria.MiscUI.Placements.2"), Color.SaddleBrown);
+        DrawMarker(board.config.WinIdlePosition, "Mods.Parterraria.MiscUI.WinIdle");
+        DrawMarker(board.config.FirstPlacePosition, "Mods.Parterraria.MiscUI.Placements.0", Color.Gold);
+        DrawMarker(board.config.SecondPlacePosition, "Mods.Parterraria.MiscUI.Placements.1", Color.Silver);
+        DrawMarker(board.config.ThirdPlacePosition, "Mods.Parterraria.MiscUI.Placements.2", Color.SaddleBrown);
+
+        void DrawMarker(Point position, string text, Color? color = null)
+        {
+            Vector2 pos = position.ToWorldCoordinates(0, 0);
+            DrawCommon.DrawPositionMarker(pos, Language.GetTextValue(text), color);
+            DrawCommon.CenteredString(FontAssets.ItemStack.Value, pos - new Vector2(0, 24) - Main.screenPosition, _boardKey, Color.Gray, new Vector2(0.8f));
+        }
     }
 }

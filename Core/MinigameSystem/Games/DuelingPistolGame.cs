@@ -18,8 +18,8 @@ internal class DuelingPistolGame : Minigame
             {
                 Projectile proj = Main.projectile[info.DamageSource.SourceProjectileLocalIndex];
 
-                if (proj.friendly && proj.TryGetOwner(out Player? owner) && proj.GetGlobalProjectile<DuelingPistol.DuelingPistolShot>().FromDueling)
-                    Player.GetModPlayer<MinigameDisablePlayer>().Disable();
+                if (proj.friendly && proj.GetGlobalProjectile<DuelingPistol.DuelingPistolShot>().FromDueling)
+                    Player.GetModPlayer<MinigameDisablePlayer>().Disable(false, true);
             }
         }
     }
@@ -46,7 +46,10 @@ internal class DuelingPistolGame : Minigame
                 []);
         }
         else
-            plr.GetModPlayer<MinigameDisablePlayer>().Enable(false, true);
+        {
+            plr.GetModPlayer<MinigameDisablePlayer>().Enable(false, true, true);
+            plr.QuickDismount();
+        }
     }
 
     public override void OnStart() => _waitTimerAfterEnd = 0;
@@ -57,6 +60,9 @@ internal class DuelingPistolGame : Minigame
 
     public override void InternalUpdate()
     {
+        if (Beaten)
+            return;
+
         int livingCount = 0;
 
         foreach (Player player in Main.ActivePlayers)

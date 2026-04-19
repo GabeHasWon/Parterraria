@@ -43,6 +43,11 @@ public abstract class Minigame : ModType
     /// </summary>
     public virtual bool PvPGame => false;
 
+    /// <summary>
+    /// The respawn time this minigame forces when active. Defaults to 3 seconds for pvp games, and no override otherwise.
+    /// </summary>
+    public virtual int RespawnTime => PvPGame ? 5 * 60 : -1;
+
     public virtual string LocalizationPath => "Mods." + Mod.Name + ".Party.Minigames." + GetType().Name;
     public LocalizedText DisplayName => Language.GetText(LocalizationPath + ".Name");
     public LocalizedText Description => Language.GetText(LocalizationPath + ".Description");
@@ -152,7 +157,7 @@ public abstract class Minigame : ModType
     public virtual void OnSet() { }
 
     /// <summary>
-    /// Called when the minigame is set, per player.
+    /// Called when the minigame is set, per player. Called on all clients + server.
     /// </summary>
     /// <param name="plr">Relevant player.</param>
     /// <param name="playing">Whether this is running during <see cref="OnSet"/> or during <see cref="OnStart"/>.</param>

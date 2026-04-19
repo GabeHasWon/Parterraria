@@ -1,7 +1,17 @@
 v0.1.0.1
+Mod:
 - Added Presets world option for ease of use
 - Added King of the Hill and Deathmatch minigames
 - Added "PvP minigame" functionality
 - Expanded the selection list UI for minigames a lot
-- Made pvp games show up as red in minigame selection
+- Made pvp games show up as red in minigame selection & rolling
 - Added "starting in" time for minigames to avoid unfair advantages for the last person to ready up
+- Added respawn times for minigames to make them easier to play
+- Added board name above win positions to clarify what you're editing & what you're looking at
+
+"Parterraria!" World:
+- Added 4 minigame builds - Deadly Duel, King of the Hill, and Total Deathmatch (x2)
+- Minor changes/cleanup to some builds
+- Tweaked some configurations on the Diamond Dash minigames
+- Fixed In Clouds board not setting its win locations properly
+- Added a lot of light and polish to Peak Performance minigame area
