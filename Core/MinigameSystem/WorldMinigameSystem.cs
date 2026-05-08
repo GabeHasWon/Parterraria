@@ -334,7 +334,12 @@ internal class WorldMinigameSystem : ModSystem
         if (minigameSlot == -1)
             minigameSlot = Main.rand.Next(choices.Length);
 
-        playingMinigame = worldMinigames.Last(x => x is ObliterationGame).Clone();// choices[minigameSlot].Clone(); //
+        playingMinigame =
+#if RELEASE
+            choices[minigameSlot].Clone();
+#elif DEBUG
+            worldMinigames.Last(x => x is ObliterationGame).Clone();// choices[minigameSlot].Clone(); // 
+#endif
         playingMinigame.PlayType = Minigame.MinigamePlayType.FreeForAll;
 
         if (playType == Minigame.MinigamePlayType.None)
