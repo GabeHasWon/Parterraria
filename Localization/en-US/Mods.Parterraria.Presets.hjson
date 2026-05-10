@@ -1,6 +1,16 @@
 NoInfo: "[World info will display here]"
 DisplayInfo: "{0} boards / {1} games"
 
+WorldNotice: {
+	Title: "[c/AAAAFF:Parterraria!]"
+	Notice:
+		'''
+		If you want to play a party,
+		use the Presets option in the
+		world creation menu!
+		'''
+}
+
 Parterraria!: {
 	Name: Parterraria!
 	Description: The original world for Parterraria! Showcases everything.

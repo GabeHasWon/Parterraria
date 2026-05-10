@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Terraria.Audio;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameContent.UI.States;
@@ -15,8 +16,46 @@ internal class WorldPresetHooking : ILoadable
     public void Load(Mod mod)
     {
         On_UIWorldCreation.MakeBackAndCreatebuttons += MakePresetButton;
+        On_UIWorldSelect.OnInitialize += AddPresetNotice;
 
         AddPreset(new WorldPreset("Parterraria! v0.1.0.1", "Mods.Parterraria.Presets.Parterraria!", 3, 15, "GabeHasWon", mod, () => RetrieveZip(mod, "Parterraria!")));
+    }
+
+    private void AddPresetNotice(On_UIWorldSelect.orig_OnInitialize orig, UIWorldSelect self)
+    {
+        orig(self);
+
+        UIText title = new(Language.GetText("Mods.Parterraria.Presets.WorldNotice.Title"), 0.8f, true)
+        {
+            HAlign = 0f,
+            Left = StyleDimension.FromPixelsAndPercent(650 / 2 + 8, 0.5f),
+            Top = StyleDimension.FromPixelsAndPercent(-40, 0.8f)
+        };
+
+        self.Append(title);
+
+        title.Append(new UIImage(ModContent.Request<Texture2D>("Parterraria/icon_small"))
+        {
+            HAlign = 1,
+            Left = StyleDimension.FromPixels(10),
+            Top = StyleDimension.FromPixels(-4)
+        });
+
+        UIText text = new(Language.GetText("Mods.Parterraria.Presets.WorldNotice.Notice"))
+        {
+            HAlign = 0f,
+            Left = StyleDimension.FromPixelsAndPercent(650 / 2 + 8, 0.5f),
+            Top = StyleDimension.FromPercent(0.8f)
+        };
+
+        self.Append(text);
+
+        var arrow = new UIImage(ModContent.Request<Texture2D>("Parterraria/Assets/Textures/UI/NoticeArrow"))
+        {
+            Top = StyleDimension.FromPixels(82)
+        };
+
+        text.Append(arrow);
     }
 
     public static byte[] RetrieveZip(Mod mod, string name)

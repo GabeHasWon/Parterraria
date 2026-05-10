@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
 
@@ -26,29 +25,6 @@ internal class InventoryPlayer : ModPlayer
     }
 
     private StoredInventory _inventory = null;
-
-    public override void Load()
-    {
-        Type playerIO = typeof(ModLoader).Assembly.GetType("Terraria.ModLoader.IO.PlayerIO");
-        MonoModHooks.Add(playerIO.GetMethod("SaveData", BindingFlags.NonPublic | BindingFlags.Static), DetourSaveData);
-    }
-
-    // Stops players from being saved with their alt inventories
-    public static TagCompound DetourSaveData(Func<Player, TagCompound> orig, Player player)
-    {
-        InventoryPlayer invPlr = player.GetModPlayer<InventoryPlayer>();
-
-        if (invPlr._inventory is null)
-            return orig(player);
-
-        var clone = invPlr._inventory.Clone();
-        invPlr.FullyResetInventory();
-
-        TagCompound tag = orig(player);
-
-        RecursivelyResetInventory(player, clone);
-        return tag;
-    }
 
     private static void RecursivelyResetInventory(Player player, StoredInventory clone)
     {
@@ -134,5 +110,38 @@ internal class InventoryPlayer : ModPlayer
     {
         while (_inventory is not null && _inventory.oldInv is not null)
             ReplaceInventory();
+    }
+
+    public override void SaveData(TagCompound tag)
+    {
+        if (_inventory is null)
+            return;
+
+        SaveInventory(tag, _inventory);
+    }
+
+    private static void SaveInventory(TagCompound tag, StoredInventory inventory)
+    {
+        if (inventory.oldInv is not null)
+        {
+            SaveInventory(tag, inventory.oldInv);
+            return;
+        }
+        
+        TagCompound newTag = [];
+        newTag.Add("inv", inventory.inv);
+        newTag.Add("acc", inventory.armorAndAcc);
+        newTag.Add("misc", inventory.miscAccessories);
+        tag.Add("storedInv", newTag);
+    }
+
+    public override void LoadData(TagCompound tag)
+    {
+        if (tag.TryGet("storedInv", out TagCompound invTag))
+        {
+            Player.inventory = invTag.Get<Item[]>("inv");
+            Player.armor = invTag.Get<Item[]>("acc");
+            Player.miscEquips = invTag.Get<Item[]>("misc");
+        }
     }
 }

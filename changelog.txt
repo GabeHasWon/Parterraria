@@ -1,2 +1,8 @@
-v0.1.0.2
-- Fixed debug tool forcing minigame choices to only be Total Deathmatch
+v0.1.0.3
+- Hopefully fixed players being reset occasionally
+- Added a notice to the world select menu clarifying that there's a Presets option for worlds
+
+GOALS: 
+- Duel node + functionality
+- Item selection UI + mp functionality
+- Dropper minigame
